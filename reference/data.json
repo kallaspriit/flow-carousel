@@ -1,0 +1,68 @@
+{
+    "project": {
+        "name": "FlowCarousel",
+        "description": "",
+        "version": "0.1.0",
+        "url": ""
+    },
+    "files": {
+        "src\\Config.js": {
+            "name": "src\\Config.js",
+            "modules": {},
+            "classes": {
+                "Config": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\FlowCarousel.js": {
+            "name": "src\\FlowCarousel.js",
+            "modules": {},
+            "classes": {
+                "FlowCarousel": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {
+        "Config": {
+            "name": "Config",
+            "shortname": "Config",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\Config.js",
+            "line": 5,
+            "description": "Provides configuration.",
+            "is_constructor": 1
+        },
+        "FlowCarousel": {
+            "name": "FlowCarousel",
+            "shortname": "FlowCarousel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\FlowCarousel.js",
+            "line": 9,
+            "description": "FlowCarousel main class.\n\nResponsive paginated high-performance HTML5 carousel with AngularJS support.\n\nCopyright Stagnation Lab\nReleased under the MIT license\nhttps://github.com/kallaspriit/flow-carousel",
+            "is_constructor": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 27,
+            "description": "Initializes the carousel component.",
+            "itemtype": "method",
+            "name": "init",
+            "class": "FlowCarousel"
+        }
+    ],
+    "warnings": []
+}

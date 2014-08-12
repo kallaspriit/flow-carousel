@@ -15,7 +15,7 @@ define([
 	 * Released under the MIT license
 	 * https://github.com/kallaspriit/flow-carousel
 	 *
-	 * @module FlowCarousel
+	 * @class FlowCarousel
 	 * @constructor
 	 */
 	function FlowCarousel() {
@@ -26,6 +26,8 @@ define([
 
 	/**
 	 * Initializes the carousel component.
+	 *
+	 * @method init
 	 */
 	FlowCarousel.prototype.init = function() {
 		console.log('FlowCarousel.init() called', this.version, this._config.x, $('SCRIPT').length);

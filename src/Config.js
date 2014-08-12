@@ -2,8 +2,14 @@ define([
 ], function() {
 	'use strict';
 
+	/**
+	 * Provides configuration.
+	 *
+	 * @class Config
+	 * @constructor
+	 */
 	function Config() {
-		this.x = 'y';
+		this.itemsPerPage = 5;
 	}
 
 	return Config;

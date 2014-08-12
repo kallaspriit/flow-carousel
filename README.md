@@ -41,3 +41,15 @@ Responsive paginated high-performance HTML5 carousel with AngularJS support.
 - support CommonJS module pattern
 - support RequireJS AMD
 - work without AMD
+- support multiple instances on the same page
+- include AngularJS directive example
+
+#Installing#
+You need **node package manager** (npm) and **grunt** to build the library yourself.
+```
+> npm install
+> grunt
+```
+
+#Class diagram#
+![Class diagram](https://raw.githubusercontent.com/kallaspriit/flow-carousel/master/doc/class-diagram.png "Class diagram")

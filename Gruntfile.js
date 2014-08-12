@@ -66,6 +66,23 @@ module.exports = function (grunt) {
             }
         },
 
+		// generates the reference documentation
+		yuidoc: {
+			compile: {
+				name: '<%= pkg.name %>',
+				description: '<%= pkg.description %>',
+				version: '<%= pkg.version %>',
+				url: '<%= pkg.homepage %>',
+				options: {
+					paths: [
+						'src',
+					],
+					outdir: 'reference',
+					linkNatives: 'true'
+				}
+			}
+		},
+
 		// creates a local server for viewing the examples
 		connect: {
 			server: {
@@ -79,11 +96,15 @@ module.exports = function (grunt) {
 	});
 
 	// register default task
-	grunt.registerTask('default', ['jshint', 'build', 'test']);
+	grunt.registerTask('default', ['jshint', 'test', 'build', 'doc']);
 
 	// builds distribution version of the library
 	grunt.registerTask('build', ['requirejs']);
 
 	// executes the tests
 	grunt.registerTask('test', ['karma']);
+
+
+	// executes the tests
+	grunt.registerTask('doc', ['yuidoc']);
 };

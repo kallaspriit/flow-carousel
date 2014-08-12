@@ -1,9 +1,9 @@
 FlowCarousel
 ============
 
-Responsive paginated high-performance HTML5 carousel with AngularJS support.
+**Responsive paginated high-performance HTML5 carousel with AngularJS support.**
 
-**The FlowCarousel should:**
+#The FlowCarousel should:#
 - be able to render any number of columns without noticable performance penalty
 - accept either a simple array or a data source object which reports how many items it has and has async deferred getters for ranges of data
 - support asynchronous data loading
@@ -51,5 +51,19 @@ You need **node package manager** (npm) and **grunt** to build the library yours
 > grunt
 ```
 
+If your setup does not have grunt installed then you can do that via npm by
+```
+> npm install -g grunt-cli
+```
+
 #Class diagram#
 ![Class diagram](https://raw.githubusercontent.com/kallaspriit/flow-carousel/master/doc/class-diagram.png "Class diagram")
+
+#Implementation progress#
+1. main project structure (npm, grunt) ✓
+2. AMD support (requirejs) ✓
+3. distribution build support (r.js, almond) ✓
+4. unit testing support (karma + jasmine) ✓
+5. code linting (jshint) ✓
+6. documentation generation (yuidoc) ✓
+7. configuration management

@@ -21,7 +21,7 @@ module.exports = function (grunt) {
 			}
 		},
 
-		// generated a distribution version of the project
+		// generates a single file distribution version of the project
 		requirejs: {
 			compile: {
 				options: {
@@ -41,6 +41,23 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+
+		// executes jasmine unit tests
+		jasmine: {
+			pivotal: {
+				src: 'dist/FlowCarousel.js',
+				options: {
+					specs: 'test/*Spec.js'
+				}
+			}
+		},
+
+		// executes tests using karma test runner
+		karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
+        },
 
 		// creates a local server for viewing the examples
 		connect: {

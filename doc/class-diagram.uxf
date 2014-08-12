@@ -143,7 +143,7 @@ navigated by</panel_attributes>
       <w>130</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>DataSource</panel_attributes>
+    <panel_attributes>/AbstractDataSource/</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -493,7 +493,7 @@ onEvent(event)
       <w>230</w>
       <h>70</h>
     </coordinates>
-    <panel_attributes>DataSource
+    <panel_attributes>/AbstractDataSource/
 --
 getItemCount()
 getItems(startIndex, endIndex): promise</panel_attributes>
@@ -739,5 +739,49 @@ Carousel API</panel_attributes>
     </coordinates>
     <panel_attributes>UrlNavigator</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>850</x>
+      <y>300</y>
+      <w>130</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>ArrayDataSource</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>700</x>
+      <y>300</y>
+      <w>130</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>UserDataSource</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>740</x>
+      <y>240</y>
+      <w>90</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>70;30;30;60</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>830</x>
+      <y>240</y>
+      <w>100</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>30;30;80;60</additional_attributes>
   </element>
 </diagram>

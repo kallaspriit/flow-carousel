@@ -33,7 +33,7 @@ define([
 	 * @method getItems
 	 * @param {number} [startIndex=0] Range start index to fetch
 	 * @param {number} [endIndex=length] Range end index to fetch
-	 * @return {number}
+	 * @return {Deferred.Promise}
 	 */
 	AbstractDataSource.prototype.getItems = function(startIndex, endIndex) {
 		throw new Error('Not implemented');

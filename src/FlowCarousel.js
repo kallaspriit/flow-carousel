@@ -1,6 +1,7 @@
 define([
-	'./Config'
-], function(Config) {
+	'Config',
+	'ArrayDataSource'
+], function(Config, ArrayDataSource) {
 	'use strict';
 
 	// expect jQuery to exists outside of this component
@@ -35,6 +36,17 @@ define([
 		 * @private
 		 */
 		this._config = new Config();
+
+		/**
+		 * Data source to use.
+		 *
+		 * Defaults to an empty ArrayDataSource.
+		 *
+		 * @property _dataSource
+		 * @type {AbstractDataSource}
+		 * @private
+		 */
+		this._dataSource = new ArrayDataSource();
 	}
 
 	/**

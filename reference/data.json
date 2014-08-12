@@ -117,7 +117,27 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 27,
+            "line": 22,
+            "description": "Component version number.",
+            "itemtype": "property",
+            "name": "version",
+            "type": "string",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 30,
+            "description": "Carousel configuration.",
+            "itemtype": "property",
+            "name": "_config",
+            "type": "Config",
+            "access": "private",
+            "tagname": "",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 40,
             "description": "Initializes the carousel component.",
             "itemtype": "method",
             "name": "init",
@@ -125,7 +145,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 38,
+            "line": 51,
             "description": "Returns current configuration.",
             "itemtype": "method",
             "name": "getConfig",

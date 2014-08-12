@@ -19,8 +19,21 @@ define([
 	 * @constructor
 	 */
 	function FlowCarousel() {
+		/**
+		 * Component version number.
+		 *
+		 * @property version
+		 * @type string
+		 */
 		this.version = '0.1.0';
 
+		/**
+		 * Carousel configuration.
+		 *
+		 * @property _config
+		 * @type Config
+		 * @private
+		 */
 		this._config = new Config();
 	}
 

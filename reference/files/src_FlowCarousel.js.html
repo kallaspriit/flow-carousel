@@ -94,7 +94,7 @@ define([
 	&#x27;use strict&#x27;;
 
 	// expect jQuery to exists outside of this component
-	var $ = window.jQuery;
+	//var $ = window.jQuery;
 
 	/**
 	 * FlowCarousel main class.
@@ -119,8 +119,20 @@ define([
 	 *
 	 * @method init
 	 */
-	FlowCarousel.prototype.init = function() {
-		console.log(&#x27;FlowCarousel.init() called&#x27;, this.version, this._config.x, $(&#x27;SCRIPT&#x27;).length);
+	FlowCarousel.prototype.init = function(userConfig) {
+		if (typeof userConfig === &#x27;object&#x27;) {
+			this._config.extend(userConfig);
+		}
+	};
+
+	/**
+	 * Returns current configuration.
+	 *
+	 * @method getConfig
+	 * @return {Config}
+	 */
+	FlowCarousel.prototype.getConfig = function() {
+		return this._config;
 	};
 
 	return FlowCarousel;

@@ -11,12 +11,20 @@ module.exports = function (grunt) {
 
 		// lints the codebase for errors and typos
 		jshint: {
-			app: {
+			library: {
 				options: {
 					jshintrc: '.jshintrc',
 				},
 				src: [
-					'src/*.js',
+					'src/**/*.js',
+				]
+			},
+			tests: {
+				options: {
+					jshintrc: 'test/.jshintrc',
+				},
+				src: [
+					'test/**/*.js',
 				]
 			}
 		},
@@ -96,7 +104,7 @@ module.exports = function (grunt) {
 	});
 
 	// register default task
-	grunt.registerTask('default', ['jshint', 'test', 'build', 'doc']);
+	grunt.registerTask('default', ['jshint', 'test', 'build', 'reference']);
 
 	// builds distribution version of the library
 	grunt.registerTask('build', ['requirejs']);
@@ -104,7 +112,6 @@ module.exports = function (grunt) {
 	// executes the tests
 	grunt.registerTask('test', ['karma']);
 
-
 	// executes the tests
-	grunt.registerTask('doc', ['yuidoc']);
+	grunt.registerTask('reference', ['yuidoc']);
 };

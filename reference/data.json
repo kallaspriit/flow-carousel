@@ -56,11 +56,83 @@
     },
     "classitems": [
         {
+            "file": "src\\Config.js",
+            "line": 13,
+            "description": "Number of items to render side-by-side when not using responsive layout.\n\nThis parameter is ignored when using responsive layout strategy.",
+            "itemtype": "property",
+            "name": "itemsPerPage",
+            "type": "number",
+            "default": "5",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 24,
+            "description": "Should responsive layout be used by default.",
+            "itemtype": "property",
+            "name": "useResponsiveLayout",
+            "type": "boolean",
+            "default": "true",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 33,
+            "description": "List of default responsive layout breakpoint.\n\nThe list should be ordered from the smallest width to the largest.",
+            "itemtype": "property",
+            "name": "responsiveBreakpoints",
+            "type": "array",
+            "default": "true",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 60,
+            "description": "Extends the base default configuration properties with user-defined values.",
+            "itemtype": "method",
+            "name": "extend",
+            "params": [
+                {
+                    "name": "userConfig",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 81,
+            "description": "Returns the number of items to render side-by-side based on the wrap width and\n{{#crossLink \"Config.responsiveBreakpoints\"}} setting.",
+            "itemtype": "method",
+            "name": "getResponsiveItemsPerPage",
+            "params": [
+                {
+                    "name": "wrapWidth",
+                    "description": "Wrap width to base the calculation on",
+                    "type": "Number"
+                }
+            ],
+            "class": "Config"
+        },
+        {
             "file": "src\\FlowCarousel.js",
             "line": 27,
             "description": "Initializes the carousel component.",
             "itemtype": "method",
             "name": "init",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 38,
+            "description": "Returns current configuration.",
+            "itemtype": "method",
+            "name": "getConfig",
+            "return": {
+                "description": "",
+                "type": "Config"
+            },
             "class": "FlowCarousel"
         }
     ],

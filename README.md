@@ -56,9 +56,6 @@ If your setup does not have grunt installed then you can do that via npm by
 > npm install -g grunt-cli
 ```
 
-#Class diagram#
-![Class diagram](https://raw.githubusercontent.com/kallaspriit/flow-carousel/master/doc/class-diagram.png "Class diagram")
-
 #Implementation progress#
 1. main project structure (npm, grunt) ✓
 2. AMD support (requirejs) ✓
@@ -67,3 +64,6 @@ If your setup does not have grunt installed then you can do that via npm by
 5. code linting (jshint) ✓
 6. documentation generation (yuidoc) ✓
 7. configuration management
+
+#Class diagram#
+![Class diagram](https://raw.githubusercontent.com/kallaspriit/flow-carousel/master/doc/class-diagram.png "Class diagram")

@@ -21,6 +21,27 @@ module.exports = function (grunt) {
 			}
 		},
 
+		// generated a distribution version of the project
+		requirejs: {
+			compile: {
+				options: {
+					baseUrl: './',
+					paths: {
+						jquery: 'examples/lib/jquery'
+					},
+					name: 'src/FlowCarousel',
+					out: 'dist/FlowCarousel.js',
+					almond: true,
+					//wrap: true,
+					wrap: {
+						startFile: 'build/almond-start.frag',
+						endFile: 'build/almond-end.frag'
+					}
+					//insertRequire: ['src/FlowCarousel']
+				}
+			}
+		},
+
 		// creates a local server for viewing the examples
 		connect: {
 			server: {

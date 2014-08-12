@@ -15,6 +15,13 @@
 
 		paths: {
 			jquery: 'examples/lib/jquery'
+		},
+
+		// make sure jquery gets loaded before the FlowCarousel library
+		shim: {
+			'src/FlowCarousel': {
+				deps: ['jquery']
+			}
 		}
 	});
 

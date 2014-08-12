@@ -9,6 +9,7 @@
     "grunt": "*",
     "grunt-contrib-connect": "^0.8.0",
     "grunt-contrib-jshint": "^0.10.0",
+    "grunt-requirejs": "^0.4.2",
     "matchdep": "^0.3.0"
   }
 }

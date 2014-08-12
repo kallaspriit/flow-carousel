@@ -23,7 +23,7 @@ module.exports = function (grunt) {
 
 		// generates a single file distribution version of the project
 		requirejs: {
-			compile: {
+			combined: {
 				options: {
 					baseUrl: './',
 					paths: {
@@ -32,22 +32,29 @@ module.exports = function (grunt) {
 					name: 'src/FlowCarousel',
 					out: 'dist/FlowCarousel.js',
 					almond: true,
-					//wrap: true,
 					wrap: {
 						startFile: 'build/almond-start.frag',
 						endFile: 'build/almond-end.frag'
-					}
-					//insertRequire: ['src/FlowCarousel']
+					},
+					optimize: 'none'
 				}
-			}
-		},
-
-		// executes jasmine unit tests
-		jasmine: {
-			pivotal: {
-				src: 'dist/FlowCarousel.js',
+			},
+			minified: {
 				options: {
-					specs: 'test/*Spec.js'
+					baseUrl: './',
+					paths: {
+						jquery: 'examples/lib/jquery'
+					},
+					name: 'src/FlowCarousel',
+					out: 'dist/FlowCarousel.min.js',
+					almond: true,
+					wrap: {
+						startFile: 'build/almond-start.frag',
+						endFile: 'build/almond-end.frag'
+					},
+					optimize: 'uglify2',
+					preserveLicenseComments: false,
+					generateSourceMaps: true
 				}
 			}
 		},
@@ -72,5 +79,11 @@ module.exports = function (grunt) {
 	});
 
 	// register default task
-	grunt.registerTask('default', ['jshint']);
+	grunt.registerTask('default', ['jshint', 'build', 'test']);
+
+	// builds distribution version of the library
+	grunt.registerTask('build', ['requirejs']);
+
+	// executes the tests
+	grunt.registerTask('test', ['karma']);
 };

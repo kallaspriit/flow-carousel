@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>FlowCarousel RequireJS example</title>
+</head>
+<body>
+	<p>Open your console to see any output.</p>
+	<script src="lib/require.js"></script>
+	<script>
+
+	// configure RequireJS
+	require.config({
+		baseUrl: '../src'
+	});
+
+	// fetch the carousel component and run it
+	require(['FlowCarousel'], function(FlowCarousel) {
+		var flowCarousel = new FlowCarousel();
+
+		flowCarousel.init();
+	});
+
+	</script>
+</body>
+</html>

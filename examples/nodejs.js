@@ -1,4 +1,5 @@
-var FlowCarousel = require('../src/FlowCarousel.js'),
+var window = {document: {}},
+	FlowCarousel = require('../src/FlowCarousel.js')(window),
 	flowCarousel = new FlowCarousel();
 
 flowCarousel.init();

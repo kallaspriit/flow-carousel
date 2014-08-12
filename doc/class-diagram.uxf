@@ -623,7 +623,8 @@ called with events:
     <panel_attributes>Config
 --
 getDefaultConfig()
-getConfig(userConfig=null)</panel_attributes>
+getConfig(userConfig=null)
+getItemsPerPage(wrapWidth)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>

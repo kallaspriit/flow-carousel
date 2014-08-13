@@ -1,13 +1,30 @@
+BODY {
+    font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
+    background-color: #F8F8F8;
+}
 .carousel {
-    width: 800px;
-    border: 1px solid #F00;
     overflow: hidden;
+    margin-bottom: 60px;
+    border: 10px solid #FFF;
+}
+.carousel-horizontal {
+    width: 1200px;
+    height: 200px;
+}
+.carousel-vertical {
+    width: 200px;
+    height: 800px;
 }
 .carousel > DIV {
-    padding: 40px;
-    margin-left: 20px;
-    background-color: #EEE;
+    background-color: #4F9BFF;
+    line-height: 40px;
+    padding: 0 20px;
+    font-size: 20px;
+    color: #FFF;
 }
-.carousel > DIV:first-child {
-    margin-left: 0;
+.carousel-horizontal > DIV {
+
+}
+.carousel-vertical > DIV {
+
 }

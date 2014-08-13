@@ -267,6 +267,15 @@
         {
             "file": "src\\Config.js",
             "line": 13,
+            "description": "Carousel orientation to use.\n\nOne of {{#crossLink \"Config/Orientation:property\"}}{{/crossLink}}.\n\nDefaults to horizontal.",
+            "itemtype": "property",
+            "name": "orientation",
+            "type": "{Config/Orientation:property}",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 25,
             "description": "Number of items to render side-by-side when not using responsive layout.\n\nThis parameter is ignored when using responsive layout strategy.",
             "itemtype": "property",
             "name": "itemsPerPage",
@@ -276,7 +285,17 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 24,
+            "line": 36,
+            "description": "Item margin to use.",
+            "itemtype": "property",
+            "name": "margin",
+            "type": "{number}",
+            "default": "0",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 45,
             "description": "Should responsive layout be used by default.",
             "itemtype": "property",
             "name": "useResponsiveLayout",
@@ -286,8 +305,8 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 33,
-            "description": "List of default responsive layout breakpoint.\n\nThe list should be ordered from the smallest width to the largest.",
+            "line": 54,
+            "description": "List of default responsive layout breakpoint.\n\nThe list should be ordered from the smallest size to the largest.",
             "itemtype": "property",
             "name": "responsiveBreakpoints",
             "type": "array",
@@ -296,7 +315,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 59,
+            "line": 80,
             "description": "The css classes prefix to use.",
             "itemtype": "property",
             "name": "cssPrefix",
@@ -306,7 +325,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 68,
+            "line": 89,
             "description": "CSS class names to use.",
             "itemtype": "property",
             "name": "cssClasses",
@@ -315,7 +334,29 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 79,
+            "line": 103,
+            "description": "Enumeration of possible carousel orientations.",
+            "itemtype": "property",
+            "name": "Orientation",
+            "static": 1,
+            "type": "{object}",
+            "class": "Config",
+            "subprops": [
+                {
+                    "name": "HORIZONTAL='horizontal'",
+                    "description": "Horizontal orientation",
+                    "type": "String"
+                },
+                {
+                    "name": "VERTIAL='vertical'",
+                    "description": "Vertical orientation",
+                    "type": "String"
+                }
+            ]
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 117,
             "description": "Extends the base default configuration properties with user-defined values.",
             "itemtype": "method",
             "name": "extend",
@@ -330,14 +371,14 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 100,
-            "description": "Returns the number of items to render side-by-side based on the wrap width and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
+            "line": 138,
+            "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
             "name": "getResponsiveItemsPerPage",
             "params": [
                 {
-                    "name": "wrapWidth",
-                    "description": "Wrap width to base the calculation on",
+                    "name": "wrapSize",
+                    "description": "Wrap size to base the calculation on",
                     "type": "Number"
                 }
             ],
@@ -345,7 +386,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 122,
+            "line": 160,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -491,6 +532,7 @@
                     "type": "AbstractDataSource|array"
                 }
             ],
+            "chainable": 1,
             "return": {
                 "description": "",
                 "type": "FlowCarousel"
@@ -499,7 +541,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 162,
+            "line": 163,
             "description": "Returns the data used for rendering the component.\n\nReturns null if the component has not yet been initialized.",
             "itemtype": "method",
             "name": "getDataSource",
@@ -511,10 +553,10 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 174,
+            "line": 175,
             "description": "Initializes the top-level wrap elements.",
             "itemtype": "method",
-            "name": "_initWraps",
+            "name": "_setupWraps",
             "params": [
                 {
                     "name": "selector",
@@ -528,17 +570,118 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 191,
+            "line": 190,
             "description": "Initializes a single wrap element.",
             "itemtype": "method",
-            "name": "_initWrap",
+            "name": "_setupWrap",
             "params": [
                 {
                     "name": "element",
                     "description": "Element to initialize",
                     "type": "DOMelement"
+                },
+                {
+                    "name": "orientation",
+                    "description": "Orientation to use",
+                    "type": "Config/Orientation:property"
                 }
             ],
+            "access": "private",
+            "tagname": "",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 226,
+            "description": "Initializes items in a wrap.",
+            "itemtype": "method",
+            "name": "_setupItems",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "Element to setup items in",
+                    "type": "DOMelement"
+                },
+                {
+                    "name": "orientation",
+                    "description": "Orientation to use",
+                    "type": "Config/Orientation:property"
+                }
+            ],
+            "access": "private",
+            "tagname": "",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 272,
+            "description": "Calculates and returns a single item size based on wrap size and items per page.",
+            "itemtype": "method",
+            "name": "_calculateItemSize",
+            "params": [
+                {
+                    "name": "wrapSize",
+                    "description": "Wrapping element size",
+                    "type": "Number"
+                },
+                {
+                    "name": "itemsPerPage",
+                    "description": "Number of items per page",
+                    "type": "Number"
+                }
+            ],
+            "access": "private",
+            "tagname": "",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 284,
+            "description": "Returns the outer size of an element.\n\nHorizontal orientation returns element innter width and vertical inner height.",
+            "itemtype": "method",
+            "name": "_getWrapSize",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "Element to get size of",
+                    "type": "DOMelement"
+                },
+                {
+                    "name": "orientation",
+                    "description": "Orientation to get size of",
+                    "type": "Config/Orientation:property"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "access": "private",
+            "tagname": "",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 305,
+            "description": "Returns the extra padding+margin+border size of given element in given orientation.\n\nTODO Handle border-box sizing",
+            "itemtype": "method",
+            "name": "_getExtraSize",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "Element to get size of",
+                    "type": "DOMelement"
+                },
+                {
+                    "name": "orientation",
+                    "description": "Orientation to get size of",
+                    "type": "Config/Orientation:property"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
             "access": "private",
             "tagname": "",
             "class": "FlowCarousel"

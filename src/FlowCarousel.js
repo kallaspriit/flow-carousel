@@ -117,7 +117,7 @@ define([
 			throw new Error('Unexpected data type "' + typeof(data) + '" provided');
 		}
 
-		this._initWraps(this._selector);
+		this._setupWraps(this._selector);
 	};
 
 	/**
@@ -142,6 +142,7 @@ define([
 	 *
 	 * @method setDataSource
 	 * @param {AbstractDataSource|array} Either an instance of AbstractDataSource or a simple array
+	 * @chainable
 	 * @return {FlowCarousel}
 	 */
 	FlowCarousel.prototype.setDataSource = function(data) {
@@ -174,29 +175,172 @@ define([
 	/**
 	 * Initializes the top-level wrap elements.
 	 *
-	 * @method _initWraps
+	 * @method _setupWraps
 	 * @param {string} selector Wraps selector
 	 * @private
 	 */
-	FlowCarousel.prototype._initWraps = function(selector) {
-		var self = this;
-
+	FlowCarousel.prototype._setupWraps = function(selector) {
 		this._$wrap = $(selector);
 
-		this._$wrap.each(function() {
-			self._initWrap(this);
-		});
+		this._$wrap.each(function(index, el) {
+			this._setupWrap(el, this._config.orientation);
+		}.bind(this));
 	};
 
 	/**
 	 * Initializes a single wrap element.
 	 *
-	 * @method _initWrap
+	 * @method _setupWrap
 	 * @param {DOMelement} element Element to initialize
+	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @private
 	 */
-	FlowCarousel.prototype._initWrap = function(element) {
-		console.log('init', element);
+	FlowCarousel.prototype._setupWrap = function(element, orientation) {
+		var $element = $(element),
+			className = {
+				wrap: this._config.getClassName('wrap'),
+				horizontal: this._config.getClassName('horizontal'),
+				vertical: this._config.getClassName('vertical'),
+				item: this._config.getClassName('item')
+			};
+
+		// add main carousel class to the wrap element
+		$element.addClass(className.wrap);
+
+		// add class to wrap based on orientation
+		if (orientation === Config.Orientation.HORIZONTAL) {
+			$element.addClass(className.horizontal);
+		} else if (orientation === Config.Orientation.VERTICAL) {
+			$element.addClass(className.vertical);
+		} else {
+			throw new Error('Unexpected orientation "' + orientation + '" provided');
+		}
+
+		// add item class to all immediate children
+		$element.children().addClass(className.item);
+
+		// setup the individual elements
+		this._setupItems(element, orientation);
+	};
+
+	/**
+	 * Initializes items in a wrap.
+	 *
+	 * @method _setupItems
+	 * @param {DOMelement} element Element to setup items in
+	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @private
+	 */
+	FlowCarousel.prototype._setupItems = function(element, orientation) {
+		var $element = $(element),
+			wrapSize = this._getWrapSize(element, orientation),
+			itemsPerPage = this._config.getResponsiveItemsPerPage(wrapSize),
+			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
+			itemMargin = this._config.margin,
+			gapPerItem = (itemMargin * 2 / 3),
+			effectiveOffset = 0,
+			effectiveSize,
+			extraSize,
+			cssProperties;
+
+		console.log('itemsPerPage', itemsPerPage, 'itemSize', itemSize);
+
+		$element.children().each(function(index, el) {
+			// calculate the extra size of an element
+			extraSize = this._getExtraSize(el, orientation);
+			effectiveSize = itemSize - extraSize - gapPerItem;
+			cssProperties = {};
+
+			// the properties to set depends on the orientation
+			if (orientation === Config.Orientation.HORIZONTAL) {
+				cssProperties.width = effectiveSize;
+				cssProperties.left = effectiveOffset;
+				cssProperties.height = wrapSize;
+
+			} else if (orientation === Config.Orientation.VERTICAL) {
+				cssProperties.height = effectiveSize;
+				cssProperties.top = effectiveOffset;
+				cssProperties.width = wrapSize;
+			}
+
+			$(el).css(cssProperties);
+
+			effectiveOffset += itemSize + (itemMargin - gapPerItem);
+		}.bind(this));
+	};
+
+	/**
+	 * Calculates and returns a single item size based on wrap size and items per page.
+	 *
+	 * @method _calculateItemSize
+	 * @param {number} wrapSize Wrapping element size
+	 * @param {number} itemsPerPage Number of items per page
+	 * @private
+	 */
+	FlowCarousel.prototype._calculateItemSize = function(wrapSize, itemsPerPage) {
+		return wrapSize / itemsPerPage;
+	};
+
+	/**
+	 * Returns the outer size of an element.
+	 *
+	 * Horizontal orientation returns element innter width and vertical inner height.
+	 *
+	 * @method _getWrapSize
+	 * @param {DOMelement} element Element to get size of
+	 * @param {Config/Orientation:property} orientation Orientation to get size of
+	 * @return {number}
+	 * @private
+	 */
+	FlowCarousel.prototype._getWrapSize = function(element, orientation) {
+		if (orientation === Config.Orientation.HORIZONTAL) {
+			return $(element).innerWidth();
+		} else if (orientation === Config.Orientation.VERTICAL) {
+			return $(element).innerHeight();
+		} else {
+			throw new Error('Invalid orientation "' + orientation + '" requested');
+		}
+	};
+
+	/**
+	 * Returns the extra padding+margin+border size of given element in given orientation.
+	 *
+	 * TODO Handle border-box sizing
+	 *
+	 * @method _getExtraSize
+	 * @param {DOMelement} element Element to get size of
+	 * @param {Config/Orientation:property} orientation Orientation to get size of
+	 * @return {number}
+	 * @private
+	 */
+	FlowCarousel.prototype._getExtraSize = function(element, orientation) {
+		var $el = $(element),
+			border,
+			padding,
+			margin,
+			borderProp,
+			paddingProp,
+			marginProp;
+
+		// properties to use depend on the orientation
+		if (orientation === Config.Orientation.HORIZONTAL) {
+			borderProp = ['border-left-width', 'border-right-width'];
+			paddingProp = ['padding-left', 'padding-right'];
+			marginProp = ['margin-left', 'margin-right'];
+		} else if (orientation === Config.Orientation.VERTICAL) {
+			borderProp = ['border-top-width', 'border-bottom-width'];
+			paddingProp = ['padding-top', 'padding-bottom'];
+			marginProp = ['margin-top', 'margin-bottom'];
+		} else {
+			throw new Error('Invalid orientation "' + orientation + '" requested');
+		}
+
+		// calculate the extra size of an element
+		border = parseInt($el.css(borderProp[0]), 10) + parseInt($el.css(borderProp[1]), 10);
+		padding = parseInt($el.css(paddingProp[0]), 10) + parseInt($el.css(paddingProp[1]), 10);
+		margin = parseInt($el.css(marginProp[0]), 10) + parseInt($el.css(marginProp[1]), 10);
+
+		return border + padding + margin;
 	};
 
 	return FlowCarousel;

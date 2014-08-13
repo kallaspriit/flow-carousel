@@ -7,7 +7,9 @@
 	<link rel="stylesheet" href="examples.css">
 </head>
 <body>
-	<div class="carousel">
+	<h1>Flow Carousel</h1>
+
+	<div class="carousel carousel-horizontal">
 		<div>First</div>
 		<div>Second</div>
 		<div>Third</div>
@@ -20,17 +22,17 @@
 		<div>Tenth</div>
 	</div>
 
-	<div class="carousel">
-		<div>a</div>
-		<div>b</div>
-		<div>c</div>
-		<div>d</div>
-		<div>e</div>
-		<div>f</div>
-		<div>g</div>
-		<div>h</div>
-		<div>i</div>
-		<div>j</div>
+	<div class="carousel carousel-vertical">
+		<div>First</div>
+		<div>Second</div>
+		<div>Third</div>
+		<div>Fourth</div>
+		<div>Fifth</div>
+		<div>Sixth</div>
+		<div>Seventh</div>
+		<div>Eight</div>
+		<div>Ninth</div>
+		<div>Tenth</div>
 	</div>
 	<script src="lib/require.js"></script>
 	<script>
@@ -52,10 +54,17 @@
 	});
 
 	// fetch the carousel component and run it
-	require(['FlowCarousel'], function(FlowCarousel) {
+	require(['FlowCarousel', 'Config'], function(FlowCarousel, Config) {
 		var flowCarousel = new FlowCarousel();
 
-		flowCarousel.init('.carousel');
+		flowCarousel.init('.carousel-horizontal', {
+			margin: 10
+		});
+
+		flowCarousel.init('.carousel-vertical', {
+			margin: 10,
+			orientation: Config.Orientation.VERTICAL
+		});
 	});
 
 	</script>

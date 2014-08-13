@@ -204,14 +204,42 @@ Released under the MIT license
                     <ul class="index-list methods">
                         
                             <li class="index-item method private">
-                                <a href="#method__initWrap">_initWrap</a>
+                                <a href="#method__calculateItemSize">_calculateItemSize</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method__initWraps">_initWraps</a>
+                                <a href="#method__getExtraSize">_getExtraSize</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__getWrapSize">_getWrapSize</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__setupItems">_setupItems</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__setupWrap">_setupWrap</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__setupWraps">_setupWraps</a>
 
                                 
                                 
@@ -304,8 +332,8 @@ Released under the MIT license
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method__initWrap" class="method item private">
-    <h3 class="name"><code>_initWrap</code></h3>
+                    <div id="method__calculateItemSize" class="method item private">
+    <h3 class="name"><code>_calculateItemSize</code></h3>
 
     
         <div class="args">
@@ -313,7 +341,13 @@ Released under the MIT license
             
                 <li class="arg">
                     
-                        <code>element</code>
+                        <code>wrapSize</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>itemsPerPage</code>
                     
                 </li>
             
@@ -348,7 +382,493 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l191"><code>src\FlowCarousel.js:191</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l272"><code>src\FlowCarousel.js:272</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Calculates and returns a single item size based on wrap size and items per page.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">wrapSize</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Wrapping element size</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">itemsPerPage</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Number of items per page</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method__getExtraSize" class="method item private">
+    <h3 class="name"><code>_getExtraSize</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>element</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>orientation</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+        </span>
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l305"><code>src\FlowCarousel.js:305</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns the extra padding+margin+border size of given element in given orientation.</p>
+<p>TODO Handle border-box sizing</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">element</code>
+                        <span class="type">DOMelement</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Element to get size of</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">orientation</code>
+                        <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Orientation to get size of</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method__getWrapSize" class="method item private">
+    <h3 class="name"><code>_getWrapSize</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>element</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>orientation</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+        </span>
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l284"><code>src\FlowCarousel.js:284</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns the outer size of an element.</p>
+<p>Horizontal orientation returns element innter width and vertical inner height.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">element</code>
+                        <span class="type">DOMelement</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Element to get size of</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">orientation</code>
+                        <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Orientation to get size of</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method__setupItems" class="method item private">
+    <h3 class="name"><code>_setupItems</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>element</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>orientation</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l226"><code>src\FlowCarousel.js:226</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Initializes items in a wrap.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">element</code>
+                        <span class="type">DOMelement</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Element to setup items in</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">orientation</code>
+                        <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Orientation to use</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method__setupWrap" class="method item private">
+    <h3 class="name"><code>_setupWrap</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>element</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>orientation</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l190"><code>src\FlowCarousel.js:190</code></a>
         
         </p>
 
@@ -385,6 +905,22 @@ Released under the MIT license
                     
                 </li>
             
+                <li class="param">
+                    
+                        <code class="param-name">orientation</code>
+                        <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Orientation to use</p>
+
+                    </div>
+
+                    
+                </li>
+            
             </ul>
         </div>
     
@@ -395,8 +931,8 @@ Released under the MIT license
 </div>
 
                 
-                    <div id="method__initWraps" class="method item private">
-    <h3 class="name"><code>_initWraps</code></h3>
+                    <div id="method__setupWraps" class="method item private">
+    <h3 class="name"><code>_setupWraps</code></h3>
 
     
         <div class="args">
@@ -439,7 +975,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l174"><code>src\FlowCarousel.js:174</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l175"><code>src\FlowCarousel.js:175</code></a>
         
         </p>
 
@@ -593,7 +1129,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l162"><code>src\FlowCarousel.js:162</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l163"><code>src\FlowCarousel.js:163</code></a>
         
         </p>
 
@@ -798,6 +1334,8 @@ Released under the MIT license
 
     
 
+    
+        <span class="flag chainable">chainable</span>
     
 
     

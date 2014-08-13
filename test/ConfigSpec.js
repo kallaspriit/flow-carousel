@@ -72,13 +72,13 @@ define([
 		it('user can define new responsive breakpoints', function () {
 			config.extend({
 				responsiveBreakpoints: [{
-					width: 0,
+					size: 0,
 					itemsPerPage: 1
 				}, {
-					width: 250,
+					size: 250,
 					itemsPerPage: 2
 				}, {
-					width: 500,
+					size: 500,
 					itemsPerPage: 3
 				}]
 			});
@@ -89,16 +89,16 @@ define([
 			expect(config.getResponsiveItemsPerPage(0)).toEqual(1);
 		});
 
-		it('returns first responsive breakpoint value if width less then minimum', function () {
+		it('returns first responsive breakpoint value if size less then minimum', function () {
 			config.extend({
 				responsiveBreakpoints: [{
-					width: 100,
+					size: 100,
 					itemsPerPage: 1
 				}, {
-					width: 250,
+					size: 250,
 					itemsPerPage: 2
 				}, {
-					width: 500,
+					size: 500,
 					itemsPerPage: 3
 				}]
 			});
@@ -116,6 +116,18 @@ define([
 			};
 
 			expect(requestInvalidClassType).toThrow();
+		});
+
+		it('has horizontal and vertical orientations', function () {
+			expect(Config.Orientation.HORIZONTAL).toEqual(jasmine.any(String));
+			expect(Config.Orientation.VERTICAL).toEqual(jasmine.any(String));
+
+			expect(Config.Orientation.HORIZONTAL).toEqual('horizontal');
+			expect(Config.Orientation.VERTICAL).toEqual('vertical');
+		});
+
+		it('default orientation is horizontal', function () {
+			expect(config.orientation).toEqual(Config.Orientation.HORIZONTAL);
 		});
 	});
 });

@@ -11,6 +11,18 @@ define([
 	function Config() {
 
 		/**
+		 * Carousel orientation to use.
+		 *
+		 * One of {{#crossLink "Config/Orientation:property"}}{{/crossLink}}.
+		 *
+		 * Defaults to horizontal.
+		 *
+		 * @property orientation
+		 * @type {Config/Orientation:property}
+		 */
+		this.orientation = Config.Orientation.HORIZONTAL;
+
+		/**
 		 * Number of items to render side-by-side when not using responsive layout.
 		 *
 		 * This parameter is ignored when using responsive layout strategy.
@@ -20,6 +32,15 @@ define([
 		 * @default 5
 		 */
 		this.itemsPerPage = 5;
+
+		/**
+		 * Item margin to use.
+		 *
+		 * @property margin
+		 * @type {number}
+		 * @default 0
+		 */
+		this.margin = 0;
 
 		/**
 		 * Should responsive layout be used by default.
@@ -33,26 +54,26 @@ define([
 		/**
 		 * List of default responsive layout breakpoint.
 		 *
-		 * The list should be ordered from the smallest width to the largest.
+		 * The list should be ordered from the smallest size to the largest.
 		 *
 		 * @property responsiveBreakpoints
 		 * @type array
 		 * @default true
 		 */
 		this.responsiveBreakpoints = [{
-			width: 0,
+			size: 0,
 			itemsPerPage: 1
 		}, {
-			width: 320,
+			size: 320,
 			itemsPerPage: 2
 		}, {
-			width: 768,
+			size: 768,
 			itemsPerPage: 3
 		}, {
-			width: 1224,
+			size: 1224,
 			itemsPerPage: 4
 		}, {
-			width: 1824,
+			size: 1824,
 			itemsPerPage: 5
 		}];
 
@@ -72,9 +93,26 @@ define([
 		 * @type {object}
 		 */
 		this.cssClasses = {
-			wrap: 'wrap'
+			wrap: 'wrap',
+			horizontal: 'horizontal',
+			vertical: 'vertical',
+			item: 'item'
 		};
 	}
+
+	/**
+	 * Enumeration of possible carousel orientations.
+	 *
+	 * @property Orientation
+	 * @param {string} Orientation.HORIZONTAL='horizontal' Horizontal orientation
+	 * @param {string} Orientation.VERTIAL='vertical' Vertical orientation
+	 * @static
+	 * @type {object}
+	 */
+	Config.Orientation = {
+		HORIZONTAL: 'horizontal',
+		VERTICAL: 'vertical'
+	};
 
 	/**
 	 * Extends the base default configuration properties with user-defined values.
@@ -98,20 +136,20 @@ define([
 	};
 
 	/**
-	 * Returns the number of items to render side-by-side based on the wrap width and
+	 * Returns the number of items to render side-by-side based on the wrap size and
 	 * {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} setting.
 	 *
 	 * @method getResponsiveItemsPerPage
-	 * @param {number} wrapWidth Wrap width to base the calculation on
+	 * @param {number} wrapSize Wrap size to base the calculation on
 	 */
-	Config.prototype.getResponsiveItemsPerPage = function(wrapWidth) {
+	Config.prototype.getResponsiveItemsPerPage = function(wrapSize) {
 		var i,
 			breakpoint;
 
 		for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
 			breakpoint = this.responsiveBreakpoints[i];
 
-			if (breakpoint.width <= wrapWidth) {
+			if (breakpoint.size <= wrapSize) {
 				return breakpoint.itemsPerPage;
 			}
 		}

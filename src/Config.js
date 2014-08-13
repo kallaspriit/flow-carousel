@@ -80,7 +80,7 @@ define([
 
 	/**
 	 * Returns the number of items to render side-by-side based on the wrap width and
-	 * {{#crossLink "Config.responsiveBreakpoints"}} setting.
+	 * {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} setting.
 	 *
 	 * @method getResponsiveItemsPerPage
 	 * @param {number} wrapWidth Wrap width to base the calculation on

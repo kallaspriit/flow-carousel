@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>FlowCarousel - FlowCarousel</title>
+    <title>ArrayDataSource - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -88,15 +88,19 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>FlowCarousel Class</h1>
+                        <h1>ArrayDataSource Class</h1>
 <div class="box meta">
     
 
     
+        <div class="extends">
+            Extends <a href="../classes/AbstractDataSource.html" class="crosslink">AbstractDataSource</a>
+        </div>
+    
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_FlowCarousel.js.html#l11"><code>src\FlowCarousel.js:11</code></a>
+            Defined in: <a href="../files/src_ArrayDataSource.js.html#l10"><code>src\ArrayDataSource.js:10</code></a>
         </div>
     
 
@@ -108,19 +112,15 @@
 
 
 <div class="box intro">
-    <p>FlowCarousel main class.</p>
-<p>Responsive paginated high-performance HTML5 carousel with AngularJS support.</p>
-<p>Copyright Stagnation Lab
-Released under the MIT license
-<a href="https://github.com/kallaspriit/flow-carousel">https://github.com/kallaspriit/flow-carousel</a></p>
+    <p>Data source interface.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_FlowCarousel" class="method item">
-    <h3 class="name"><code>FlowCarousel</code></h3>
+        <div id="method_ArrayDataSource" class="method item">
+    <h3 class="name"><code>ArrayDataSource</code></h3>
 
     
         <span class="paren">()</span>
@@ -151,7 +151,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l11"><code>src\FlowCarousel.js:11</code></a>
+        <a href="../files/src_ArrayDataSource.js.html#l10"><code>src\ArrayDataSource.js:10</code></a>
         
         </p>
 
@@ -183,8 +183,6 @@ Released under the MIT license
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
         
         
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
-        
         
         
     </ul>
@@ -197,17 +195,17 @@ Released under the MIT license
                 <div class="index-section methods">
                     <h3>Methods</h3>
 
-                    <ul class="index-list methods">
+                    <ul class="index-list methods extends">
                         
-                            <li class="index-item method">
-                                <a href="#method_getConfig">getConfig</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getItemCount">getItemCount</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_init">init</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getItems">getItems</a>
 
                                 
                                 
@@ -217,35 +215,6 @@ Released under the MIT license
                 </div>
             
 
-            
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                        
-                            <li class="index-item property private">
-                                <a href="#property__config">_config</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property private">
-                                <a href="#property__dataSource">_dataSource</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
-                                <a href="#property_version">version</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
             
 
             
@@ -258,8 +227,8 @@ Released under the MIT license
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getConfig" class="method item">
-    <h3 class="name"><code>getConfig</code></h3>
+                    <div id="method_getItemCount" class="method item">
+    <h3 class="name"><code>getItemCount</code></h3>
 
     
         <span class="paren">()</span>
@@ -267,7 +236,7 @@ Released under the MIT license
 
     
         <span class="returns-inline">
-            <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
         </span>
     
 
@@ -285,16 +254,16 @@ Released under the MIT license
 
     <div class="meta">
         
+            <p>Inherited from
+            <a href="../classes/AbstractDataSource.html#method_getItemCount">
+                AbstractDataSource
+            </a>
             
-                
-                <p>
-                
-                Defined in
-                
+            but overwritten in
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l70"><code>src\FlowCarousel.js:70</code></a>
+        <a href="../files/src_ArrayDataSource.js.html#l25"><code>src\ArrayDataSource.js:25</code></a>
         
         </p>
 
@@ -305,7 +274,7 @@ Released under the MIT license
     </div>
 
     <div class="description">
-        <p>Returns current configuration.</p>
+        <p>Returns the number of items in the dataset.</p>
 
     </div>
 
@@ -318,7 +287,7 @@ Released under the MIT license
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>:
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
                     
                 
             </div>
@@ -329,8 +298,8 @@ Released under the MIT license
 </div>
 
                 
-                    <div id="method_init" class="method item">
-    <h3 class="name"><code>init</code></h3>
+                    <div id="method_getItems" class="method item">
+    <h3 class="name"><code>getItems</code></h3>
 
     
         <div class="args">
@@ -338,7 +307,13 @@ Released under the MIT license
             
                 <li class="arg">
                     
-                        <code class="optional">[userConfig]</code>
+                        <code class="optional">[startIndex=0]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[endIndex=length]</code>
                     
                 </li>
             
@@ -346,6 +321,10 @@ Released under the MIT license
         </div>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Deferred.Promise</span>
+        </span>
     
 
     
@@ -362,16 +341,16 @@ Released under the MIT license
 
     <div class="meta">
         
+            <p>Inherited from
+            <a href="../classes/AbstractDataSource.html#method_getItems">
+                AbstractDataSource
+            </a>
             
-                
-                <p>
-                
-                Defined in
-                
+            but overwritten in
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l53"><code>src\FlowCarousel.js:53</code></a>
+        <a href="../files/src_ArrayDataSource.js.html#l35"><code>src\ArrayDataSource.js:35</code></a>
         
         </p>
 
@@ -382,7 +361,11 @@ Released under the MIT license
     </div>
 
     <div class="description">
-        <p>Initializes the carousel component.</p>
+        <p>Fetches given range of items from the dataset.</p>
+<p>This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
+available or rejected when an error occurs.</p>
+<p>By default the range is the entire dataset.</p>
+<p>Throws error if invalid range is requested.</p>
 
     </div>
 
@@ -394,16 +377,32 @@ Released under the MIT license
             
                 <li class="param">
                     
-                        <code class="param-name optional">[userConfig]</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <code class="param-name optional">[startIndex=0]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>Optional user configuration object overriding defaults in the
-<a href="../classes/Config.html" class="crosslink">Config</a>.</p>
+                        <p>Range start index to fetch</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[endIndex=length]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Range end index to fetch</p>
 
                     </div>
 
@@ -415,6 +414,18 @@ Released under the MIT license
     
 
     
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Deferred.Promise</span>:
+                    
+                
+            </div>
+        </div>
+    
 
     
 </div>
@@ -423,152 +434,6 @@ Released under the MIT license
             </div>
         
 
-        
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-                
-                    <div id="property__config" class="property item private">
-    <h3 class="name"><code>_config</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l32"><code>src\FlowCarousel.js:32</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Carousel configuration.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property__dataSource" class="property item private">
-    <h3 class="name"><code>_dataSource</code></h3>
-    <span class="type"><a href="../classes/AbstractDataSource.html" class="crosslink">AbstractDataSource</a></span>
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l41"><code>src\FlowCarousel.js:41</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Data source to use.</p>
-<p>Defaults to an empty ArrayDataSource.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_version" class="property item">
-    <h3 class="name"><code>version</code></h3>
-    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l24"><code>src\FlowCarousel.js:24</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Component version number.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
         
 
         

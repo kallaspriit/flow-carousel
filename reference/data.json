@@ -6,6 +6,24 @@
         "url": ""
     },
     "files": {
+        "src\\AbstractDataSource.js": {
+            "name": "src\\AbstractDataSource.js",
+            "modules": {},
+            "classes": {
+                "AbstractDataSource": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\ArrayDataSource.js": {
+            "name": "src\\ArrayDataSource.js",
+            "modules": {},
+            "classes": {
+                "ArrayDataSource": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\Config.js": {
             "name": "src\\Config.js",
             "modules": {},
@@ -27,6 +45,33 @@
     },
     "modules": {},
     "classes": {
+        "AbstractDataSource": {
+            "name": "AbstractDataSource",
+            "shortname": "AbstractDataSource",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\AbstractDataSource.js",
+            "line": 5,
+            "description": "Data source interface.",
+            "is_constructor": 1
+        },
+        "ArrayDataSource": {
+            "name": "ArrayDataSource",
+            "shortname": "ArrayDataSource",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\ArrayDataSource.js",
+            "line": 10,
+            "description": "Data source interface.",
+            "extends": "AbstractDataSource",
+            "is_constructor": 1
+        },
         "Config": {
             "name": "Config",
             "shortname": "Config",
@@ -49,12 +94,92 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\FlowCarousel.js",
-            "line": 9,
+            "line": 11,
             "description": "FlowCarousel main class.\n\nResponsive paginated high-performance HTML5 carousel with AngularJS support.\n\nCopyright Stagnation Lab\nReleased under the MIT license\nhttps://github.com/kallaspriit/flow-carousel",
             "is_constructor": 1
         }
     },
     "classitems": [
+        {
+            "file": "src\\AbstractDataSource.js",
+            "line": 13,
+            "description": "Returns the number of items in the dataset.",
+            "itemtype": "method",
+            "name": "getItemCount",
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "AbstractDataSource"
+        },
+        {
+            "file": "src\\AbstractDataSource.js",
+            "line": 23,
+            "description": "Fetches given range of items from the dataset.\n\nThis operation can be asynchronous and thus returns a promise that will be resolved once the data becomes\navailable or rejected when an error occurs.\n\nBy default the range is the entire dataset.\n\nThrows error if invalid range is requested.",
+            "itemtype": "method",
+            "name": "getItems",
+            "params": [
+                {
+                    "name": "startIndex",
+                    "description": "Range start index to fetch",
+                    "type": "Number",
+                    "optional": true,
+                    "optdefault": "0"
+                },
+                {
+                    "name": "endIndex",
+                    "description": "Range end index to fetch",
+                    "type": "Number",
+                    "optional": true,
+                    "optdefault": "length"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "AbstractDataSource"
+        },
+        {
+            "file": "src\\ArrayDataSource.js",
+            "line": 25,
+            "description": "Returns the number of items in the dataset.",
+            "itemtype": "method",
+            "name": "getItemCount",
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "ArrayDataSource"
+        },
+        {
+            "file": "src\\ArrayDataSource.js",
+            "line": 35,
+            "description": "Fetches given range of items from the dataset.\n\nThis operation can be asynchronous and thus returns a promise that will be resolved once the data becomes\navailable or rejected when an error occurs.\n\nBy default the range is the entire dataset.\n\nThrows error if invalid range is requested.",
+            "itemtype": "method",
+            "name": "getItems",
+            "params": [
+                {
+                    "name": "startIndex",
+                    "description": "Range start index to fetch",
+                    "type": "Number",
+                    "optional": true,
+                    "optdefault": "0"
+                },
+                {
+                    "name": "endIndex",
+                    "description": "Range end index to fetch",
+                    "type": "Number",
+                    "optional": true,
+                    "optdefault": "length"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "ArrayDataSource"
+        },
         {
             "file": "src\\Config.js",
             "line": 13,
@@ -103,7 +228,7 @@
         {
             "file": "src\\Config.js",
             "line": 81,
-            "description": "Returns the number of items to render side-by-side based on the wrap width and\n{{#crossLink \"Config.responsiveBreakpoints\"}} setting.",
+            "description": "Returns the number of items to render side-by-side based on the wrap width and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
             "name": "getResponsiveItemsPerPage",
             "params": [
@@ -117,7 +242,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 22,
+            "line": 24,
             "description": "Component version number.",
             "itemtype": "property",
             "name": "version",
@@ -126,7 +251,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 30,
+            "line": 32,
             "description": "Carousel configuration.",
             "itemtype": "property",
             "name": "_config",
@@ -137,15 +262,34 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 40,
-            "description": "Initializes the carousel component.",
-            "itemtype": "method",
-            "name": "init",
+            "line": 41,
+            "description": "Data source to use.\n\nDefaults to an empty ArrayDataSource.",
+            "itemtype": "property",
+            "name": "_dataSource",
+            "type": "{AbstractDataSource}",
+            "access": "private",
+            "tagname": "",
             "class": "FlowCarousel"
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 51,
+            "line": 53,
+            "description": "Initializes the carousel component.",
+            "itemtype": "method",
+            "name": "init",
+            "params": [
+                {
+                    "name": "userConfig",
+                    "description": "Optional user configuration object overriding defaults in the\n{{#crossLink \"Config\"}}{{/crossLink}}.",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 70,
             "description": "Returns current configuration.",
             "itemtype": "method",
             "name": "getConfig",

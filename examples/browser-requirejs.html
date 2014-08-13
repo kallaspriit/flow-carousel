@@ -11,22 +11,22 @@
 
 	// configure RequireJS
 	require.config({
-		baseUrl: '../',
+		baseUrl: '../src',
 
 		paths: {
-			jquery: 'examples/lib/jquery'
+			jquery: '../examples/lib/jquery'
 		},
 
 		// make sure jquery gets loaded before the FlowCarousel library
 		shim: {
-			'src/FlowCarousel': {
+			'FlowCarousel': {
 				deps: ['jquery']
 			}
 		}
 	});
 
 	// fetch the carousel component and run it
-	require(['src/FlowCarousel'], function(FlowCarousel) {
+	require(['FlowCarousel'], function(FlowCarousel) {
 		var flowCarousel = new FlowCarousel();
 
 		flowCarousel.init();

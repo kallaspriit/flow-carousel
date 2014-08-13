@@ -20,7 +20,7 @@ define([
 		this._data = data || [];
 	}
 
-	ArrayDataSource.prototype = Object.create(AbstractDataSource);
+	ArrayDataSource.prototype = Object.create(AbstractDataSource.prototype);
 
 	/**
 	 * Returns the number of items in the dataset.

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\FlowCarousel.js - FlowCarousel</title>
+    <title>src\ArrayDataSource.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -88,92 +88,82 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\FlowCarousel.js</h1>
+                        <h1 class="file-heading">File: src\ArrayDataSource.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;Config&#x27;,
-	&#x27;ArrayDataSource&#x27;,
-	&#x27;AbstractDataSource&#x27;,
-], function(Config, ArrayDataSource, AbstractDataSource) {
+	&#x27;AbstractDataSource&#x27;
+], function(AbstractDataSource) {
 	&#x27;use strict&#x27;;
 
-	// expect jQuery to exists outside of this component
-	//var $ = window.jQuery;
+	// using deferred implementation from jQuery
+	var $ = window.jQuery,
+		Deferred = $.Deferred;
 
 	/**
-	 * FlowCarousel main class.
+	 * Data source interface.
 	 *
-	 * Responsive paginated high-performance HTML5 carousel with AngularJS support.
-	 *
-	 * Copyright Stagnation Lab
-	 * Released under the MIT license
-	 * https://github.com/kallaspriit/flow-carousel
-	 *
-	 * @class FlowCarousel
+	 * @class ArrayDataSource
+	 * @extends AbstractDataSource
 	 * @constructor
 	 */
-	function FlowCarousel() {
-		/**
-		 * Component version number.
-		 *
-		 * @property version
-		 * @type string
-		 */
-		this.version = &#x27;0.1.0&#x27;;
+	function ArrayDataSource(data) {
+		AbstractDataSource.call(this);
 
-		/**
-		 * Carousel configuration.
-		 *
-		 * @property _config
-		 * @type Config
-		 * @private
-		 */
-		this._config = new Config();
-
-		/**
-		 * Data source to use.
-		 *
-		 * Defaults to an empty ArrayDataSource.
-		 *
-		 * @property _dataSource
-		 * @type {AbstractDataSource}
-		 * @private
-		 */
-		this._dataSource = new ArrayDataSource();
+		this._data = data || [];
 	}
 
-	/**
-	 * Initializes the carousel component.
-	 *
-	 * @method init
-	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
-	 * {{#crossLink &quot;Config&quot;}}{{/crossLink}}.
-	 */
-	FlowCarousel.prototype.init = function(userConfig, data) {
-		if (typeof userConfig === &#x27;object&#x27;) {
-			this._config.extend(userConfig);
-		}
+	ArrayDataSource.prototype = Object.create(AbstractDataSource);
 
-		if (data instanceof AbstractDataSource) {
-			this._dataSource = data;
-		}
+	/**
+	 * Returns the number of items in the dataset.
+	 *
+	 * @method getItemCount
+	 * @return {number}
+	 */
+	ArrayDataSource.prototype.getItemCount = function() {
+		return this._data.length;
 	};
 
 	/**
-	 * Returns current configuration.
+	 * Fetches given range of items from the dataset.
 	 *
-	 * @method getConfig
-	 * @return {Config}
+	 * This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
+	 * available or rejected when an error occurs.
+	 *
+	 * By default the range is the entire dataset.
+	 *
+	 * Throws error if invalid range is requested.
+	 *
+	 * @method getItems
+	 * @param {number} [startIndex=0] Range start index to fetch
+	 * @param {number} [endIndex=length] Range end index to fetch
+	 * @return {Deferred.Promise}
 	 */
-	FlowCarousel.prototype.getConfig = function() {
-		return this._config;
+	ArrayDataSource.prototype.getItems = function(startIndex, endIndex) {
+		var deferred = new Deferred();
+
+		startIndex = startIndex || 0;
+		endIndex = endIndex || this._data.length;
+
+		if (startIndex &lt; 0) {
+			throw new Error(&#x27;Invalid negative start index &quot;&#x27; + startIndex + &#x27;&quot; requested&#x27;);
+		}
+
+		if (endIndex &gt; this._data.length) {
+			throw new Error(
+				&#x27;Too large end index &quot;&#x27; + endIndex + &#x27;&quot; requested, there are only &#x27; + this._data.length + &#x27; items&#x27;
+			);
+		}
+
+		// resolve the deferred immediately as array data source is syncronous
+		deferred.resolve(this._data.slice(startIndex, endIndex));
+
+		return deferred.promise();
 	};
 
-
-
-	return FlowCarousel;
+	return ArrayDataSource;
 });
     </pre>
 </div>

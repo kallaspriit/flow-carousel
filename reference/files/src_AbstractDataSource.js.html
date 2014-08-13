@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\FlowCarousel.js - FlowCarousel</title>
+    <title>src\AbstractDataSource.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -88,92 +88,52 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\FlowCarousel.js</h1>
+                        <h1 class="file-heading">File: src\AbstractDataSource.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;Config&#x27;,
-	&#x27;ArrayDataSource&#x27;,
-	&#x27;AbstractDataSource&#x27;,
-], function(Config, ArrayDataSource, AbstractDataSource) {
+], function() {
 	&#x27;use strict&#x27;;
 
-	// expect jQuery to exists outside of this component
-	//var $ = window.jQuery;
-
 	/**
-	 * FlowCarousel main class.
+	 * Data source interface.
 	 *
-	 * Responsive paginated high-performance HTML5 carousel with AngularJS support.
-	 *
-	 * Copyright Stagnation Lab
-	 * Released under the MIT license
-	 * https://github.com/kallaspriit/flow-carousel
-	 *
-	 * @class FlowCarousel
+	 * @class AbstractDataSource
 	 * @constructor
 	 */
-	function FlowCarousel() {
-		/**
-		 * Component version number.
-		 *
-		 * @property version
-		 * @type string
-		 */
-		this.version = &#x27;0.1.0&#x27;;
-
-		/**
-		 * Carousel configuration.
-		 *
-		 * @property _config
-		 * @type Config
-		 * @private
-		 */
-		this._config = new Config();
-
-		/**
-		 * Data source to use.
-		 *
-		 * Defaults to an empty ArrayDataSource.
-		 *
-		 * @property _dataSource
-		 * @type {AbstractDataSource}
-		 * @private
-		 */
-		this._dataSource = new ArrayDataSource();
-	}
+	function AbstractDataSource() {}
 
 	/**
-	 * Initializes the carousel component.
+	 * Returns the number of items in the dataset.
 	 *
-	 * @method init
-	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
-	 * {{#crossLink &quot;Config&quot;}}{{/crossLink}}.
+	 * @method getItemCount
+	 * @return {number}
 	 */
-	FlowCarousel.prototype.init = function(userConfig, data) {
-		if (typeof userConfig === &#x27;object&#x27;) {
-			this._config.extend(userConfig);
-		}
-
-		if (data instanceof AbstractDataSource) {
-			this._dataSource = data;
-		}
+	AbstractDataSource.prototype.getItemCount = function() {
+		throw new Error(&#x27;Not implemented&#x27;);
 	};
 
 	/**
-	 * Returns current configuration.
+	 * Fetches given range of items from the dataset.
 	 *
-	 * @method getConfig
-	 * @return {Config}
+	 * This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
+	 * available or rejected when an error occurs.
+	 *
+	 * By default the range is the entire dataset.
+	 *
+	 * Throws error if invalid range is requested.
+	 *
+	 * @method getItems
+	 * @param {number} [startIndex=0] Range start index to fetch
+	 * @param {number} [endIndex=length] Range end index to fetch
+	 * @return {Deferred.Promise}
 	 */
-	FlowCarousel.prototype.getConfig = function() {
-		return this._config;
+	AbstractDataSource.prototype.getItems = function(startIndex, endIndex) {
+		throw new Error(&#x27;Not implemented&#x27;);
 	};
 
-
-
-	return FlowCarousel;
+	return AbstractDataSource;
 });
     </pre>
 </div>

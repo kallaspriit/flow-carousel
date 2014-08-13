@@ -33,11 +33,11 @@ module.exports = function (grunt) {
 		requirejs: {
 			combined: {
 				options: {
-					baseUrl: './',
+					baseUrl: './src',
 					paths: {
 						jquery: 'examples/lib/jquery'
 					},
-					name: 'src/FlowCarousel',
+					name: 'FlowCarousel',
 					out: 'dist/FlowCarousel.js',
 					almond: true,
 					wrap: {
@@ -49,11 +49,11 @@ module.exports = function (grunt) {
 			},
 			minified: {
 				options: {
-					baseUrl: './',
+					baseUrl: './src',
 					paths: {
 						jquery: 'examples/lib/jquery'
 					},
-					name: 'src/FlowCarousel',
+					name: 'FlowCarousel',
 					out: 'dist/FlowCarousel.min.js',
 					almond: true,
 					wrap: {

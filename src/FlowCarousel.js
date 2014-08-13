@@ -31,6 +31,16 @@ define([
 		this.version = '0.1.0';
 
 		/**
+		 * Set to true once the component is initiated and to false once it's destroyed.
+		 *
+		 * @property _initiated
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
+		this._initiated = false;
+
+		/**
 		 * Carousel configuration.
 		 *
 		 * @property _config
@@ -43,7 +53,8 @@ define([
 		/**
 		 * Data source to use.
 		 *
-		 * Defaults to an empty ArrayDataSource.
+		 * Data source is only set when the carousel is initiated with data or it's set with
+		 * {{#crossLink "FlowCarousel/setDataSource"}}{{/crossLink}}.
 		 *
 		 * @property _dataSource
 		 * @type {AbstractDataSource}
@@ -53,40 +64,60 @@ define([
 		this._dataSource = null;
 
 		/**
-		 * Set to true once the component is initiated and to false once it's destroyed.
+		 * Renderer used to render the data.
 		 *
-		 * @property _initiated
-		 * @type {boolean}
-		 * @default false
+		 * @type {AbstractRenderer}
+		 * @default null
 		 * @private
 		 */
-		this._initiated = false;
+		this._renderer = null;
+
+		/**
+		 * Selector of elements to turn into a carousel.
+		 *
+		 * @property _selector
+		 * @type {string}
+		 * @default null
+		 * @private
+		 */
+		this._selector = null;
+
+		/**
+		 * The top wrap elements jQuery object.
+		 * @type {jQuery}
+		 * @default null
+		 * @private
+		 */
+		this._$wrap = null;
 	}
 
 	/**
 	 * Initializes the carousel component.
 	 *
 	 * @method init
+	 * @param {string} selector Selector of elements to turn into a carousel
 	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
 	 * {{#crossLink "Config"}}{{/crossLink}}.
+	 * @param {object|AbstractDataSource} [data] Data to render
 	 */
-	FlowCarousel.prototype.init = function(userConfig, data) {
+	FlowCarousel.prototype.init = function(selector, userConfig, data) {
+		if (typeof selector !== 'string') {
+			throw new Error('Expected a string as the selector argument, but got ' + typeof selector);
+		}
+
+		this._selector = selector;
+
 		if (util.isObject(userConfig)) {
 			this._config.extend(userConfig);
 		}
 
 		if (data instanceof AbstractDataSource || util.isArray(data)) {
 			this.setDataSource(data);
-		} else if (typeof data === 'undefined' || data === null) {
-			// only set to empty array data source if it has not already been set
-			if (this._dataSource === null) {
-				this._dataSource = new ArrayDataSource();
-			}
-		} else {
+		} else if (typeof data !== 'undefined' && data !== null) {
 			throw new Error('Unexpected data type "' + typeof(data) + '" provided');
 		}
 
-		console.log('init');
+		this._initWraps(this._selector);
 	};
 
 	/**
@@ -138,6 +169,34 @@ define([
 	 */
 	FlowCarousel.prototype.getDataSource = function() {
 		return this._dataSource;
+	};
+
+	/**
+	 * Initializes the top-level wrap elements.
+	 *
+	 * @method _initWraps
+	 * @param {string} selector Wraps selector
+	 * @private
+	 */
+	FlowCarousel.prototype._initWraps = function(selector) {
+		var self = this;
+
+		this._$wrap = $(selector);
+
+		this._$wrap.each(function() {
+			self._initWrap(this);
+		});
+	};
+
+	/**
+	 * Initializes a single wrap element.
+	 *
+	 * @method _initWrap
+	 * @param {DOMelement} element Element to initialize
+	 * @private
+	 */
+	FlowCarousel.prototype._initWrap = function(element) {
+		console.log('init', element);
 	};
 
 	return FlowCarousel;

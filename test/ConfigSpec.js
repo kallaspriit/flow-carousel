@@ -105,5 +105,17 @@ define([
 
 			expect(config.getResponsiveItemsPerPage(50)).toEqual(1);
 		});
+
+		it('provides class name', function () {
+			expect(config.getClassName('wrap')).toEqual('flow-carousel-wrap');
+		});
+
+		it('requesting invalid class name type throws error', function () {
+			var requestInvalidClassType = function() {
+				expect(config.getClassName('foo'));
+			};
+
+			expect(requestInvalidClassType).toThrow();
+		});
 	});
 });

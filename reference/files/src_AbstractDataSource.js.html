@@ -43,11 +43,15 @@
             
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
+                <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
+            
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/Util.html">Util</a></li>
             
             </ul>
 
@@ -93,7 +97,8 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-], function() {
+	&#x27;Util&#x27;
+], function(util) {
 	&#x27;use strict&#x27;;
 
 	/**
@@ -130,6 +135,8 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	AbstractDataSource.prototype.getItems = function(startIndex, endIndex) {
+		util.noop(startIndex, endIndex);
+
 		throw new Error(&#x27;Not implemented&#x27;);
 	};
 

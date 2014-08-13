@@ -43,11 +43,15 @@
             
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
+                <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
+            
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/Util.html">Util</a></li>
             
             </ul>
 
@@ -203,6 +207,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_getClassName">getClassName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_getResponsiveItemsPerPage">getResponsiveItemsPerPage</a>
 
                                 
@@ -218,6 +229,20 @@
                     <h3>Properties</h3>
 
                     <ul class="index-list properties">
+                        
+                            <li class="index-item property">
+                                <a href="#property_cssClasses">cssClasses</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_cssPrefix">cssPrefix</a>
+
+                                
+                                
+                            </li>
                         
                             <li class="index-item property">
                                 <a href="#property_itemsPerPage">itemsPerPage</a>
@@ -296,7 +321,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l60"><code>src\Config.js:60</code></a>
+        <a href="../files/src_Config.js.html#l79"><code>src\Config.js:79</code></a>
         
         </p>
 
@@ -336,6 +361,114 @@
         </div>
     
 
+    
+
+    
+</div>
+
+                
+                    <div id="method_getClassName" class="method item">
+    <h3 class="name"><code>getClassName</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>type</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l122"><code>src\Config.js:122</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns class name to use by type.</p>
+<p>The class name is constructed by combining the value of <a href="../classes/Config.html#property_cssPrefix" class="crosslink">cssPrefix</a>
+and the mapping in <a href="../classes/Config.html#property_cssClasses" class="crosslink">cssClasses</a>.</p>
+<p>Throws error if invalid class name type is requested.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">type</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Class name type, one of the keys in cssClasses</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>:
+                    
+                
+            </div>
+        </div>
     
 
     
@@ -384,7 +517,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l81"><code>src\Config.js:81</code></a>
+        <a href="../files/src_Config.js.html#l100"><code>src\Config.js:100</code></a>
         
         </p>
 
@@ -438,6 +571,98 @@
         
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_cssClasses" class="property item">
+    <h3 class="name"><code>cssClasses</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l68"><code>src\Config.js:68</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>CSS class names to use.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_cssPrefix" class="property item">
+    <h3 class="name"><code>cssPrefix</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l59"><code>src\Config.js:59</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The css classes prefix to use.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> &#x27;flow-carousel-&#x27;</p>
+    
+
+    
+
+    
+</div>
 
                 
                     <div id="property_itemsPerPage" class="property item">

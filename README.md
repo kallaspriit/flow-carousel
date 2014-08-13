@@ -64,7 +64,10 @@ If your setup does not have grunt installed then you can do that via npm by
 5. code linting (jshint) ✓
 6. documentation generation (yuidoc) ✓
 7. configuration management ✓
-8. abstract and array data sources
+8. abstract and array data sources ✓
+9. abstract renderer ✓
+10. existing html renderer
+11. jQuery plugin interface
 
 #Class diagram#
 ![Class diagram](https://raw.githubusercontent.com/kallaspriit/flow-carousel/master/doc/class-diagram.png "Class diagram")

@@ -1,3 +1,4 @@
+/* global module */
 module.exports = function(config) {
 	'use strict';
 
@@ -9,9 +10,19 @@ module.exports = function(config) {
         // frameworks to use
         frameworks: ['jasmine', 'requirejs'],
 
+		// plugins to load
+		/*plugins: [
+			'karma-requirejs',
+			'karma-jasmine',
+			'karma-chrome-launcher',
+			'karma-html2js-preprocessor',
+			'karma-coverage'
+		],*/
+
 		// configure preprocessors
 		preprocessors: {
-			'src/**/*.js': 'coverage'
+			'test/**/*.html': ['html2js'],
+			'src/**/*.js': ['coverage']
 		},
  
         // list of files / patterns to load in the browser
@@ -19,7 +30,8 @@ module.exports = function(config) {
 			{pattern: 'examples/lib/**/*.js', included: true},
 			{pattern: 'src/**/*.js', included: false},
 			{pattern: 'test/**/*Spec.js', included: false},
-			'test/test.js',
+			{pattern: 'test/test.js', watched: true, included: true, served: true},
+			{pattern: 'test/**/*.html', watched: true, included: true, served: true},
         ],
 
         // test results reporter to use
@@ -39,7 +51,7 @@ module.exports = function(config) {
  
         // Start these browsers
         browsers: [
-			'PhantomJS'
+			'PhantomJS',
 			//'Chrome',
 			//'Firefox',
 			//'IE'

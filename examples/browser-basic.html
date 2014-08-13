@@ -3,9 +3,23 @@
 <head lang="en">
 	<meta charset="UTF-8">
 	<title>FlowCarousel browser example</title>
+	<link rel="stylesheet" href="../dist/flow-carousel.css">
+	<link rel="stylesheet" href="examples.css">
 </head>
 <body>
-	<p>Open your console to see any output.</p>
+	<div class="carousel">
+		<div>First</div>
+		<div>Second</div>
+		<div>Third</div>
+		<div>Fourth</div>
+		<div>Fifth</div>
+		<div>Sixth</div>
+		<div>Seventh</div>
+		<div>Eight</div>
+		<div>Ninth</div>
+		<div>Tenth</div>
+	</div>
+
 	<script src="lib/jquery.js"></script>
 	<script src="../dist/FlowCarousel.js"></script>
 	<script>
@@ -13,7 +27,7 @@
 	// the carousel file is directly included
 	var flowCarousel = new FlowCarousel();
 
-	flowCarousel.init();
+	flowCarousel.init('.carousel');
 
 	</script>
 </body>

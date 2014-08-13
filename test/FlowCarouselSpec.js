@@ -43,18 +43,33 @@ define([
 		});
 
 		it('data is array data source after initialization with defaults', function () {
-			carousel.init();
+			carousel.init('.carousel');
 
-			expect(carousel.getDataSource()).toEqual(jasmine.any(AbstractDataSource));
-			expect(carousel.getDataSource()).toEqual(jasmine.any(ArrayDataSource));
+			expect(carousel.getDataSource()).toEqual(null);
 		});
 
 		it('init works without providing user config', function () {
 			var callInitWithoutConfig = function() {
-				carousel.init();
+				carousel.init('.carousel');
 			};
 
 			expect(callInitWithoutConfig).not.toThrow();
+		});
+
+		it('calling init without selector throws error', function () {
+			var callInitWithoutSelector = function() {
+				carousel.init();
+			};
+
+			expect(callInitWithoutSelector).toThrow();
+		});
+
+		it('calling init with invalid selector type throws error', function () {
+			var callInitWithoutSelector = function() {
+				carousel.init(5);
+			};
+
+			expect(callInitWithoutSelector).toThrow();
 		});
 
 		it('uses default config by default', function () {
@@ -76,7 +91,7 @@ define([
 
 			expect(carousel.getConfig().itemsPerPage).toEqual(defaultConfig.itemsPerPage);
 
-			carousel.init({
+			carousel.init('.carousel', {
 				itemsPerPage: newItemsPerPage
 			});
 
@@ -86,7 +101,7 @@ define([
 		it('can be initiated with array data', function (done) {
 			var data = [1, 2, 3, 4];
 
-			carousel.init(null, data);
+			carousel.init('.carousel', null, data);
 
 			expect(carousel.getDataSource()).toEqual(jasmine.any(AbstractDataSource));
 			expect(carousel.getDataSource()).toEqual(jasmine.any(ArrayDataSource));
@@ -100,7 +115,7 @@ define([
 
 		it('throws error if provided data is of wrong type', function () {
 			var initiatedWithWrongData = function() {
-				carousel.init(null, 'foobar');
+				carousel.init('.carousel', null, 'foobar');
 			};
 
 			expect(initiatedWithWrongData).toThrow();
@@ -117,7 +132,7 @@ define([
 		it('"init" accepts custom data sources', function () {
 			var customDataSource = new CustomDataSource();
 
-			carousel.init(null, customDataSource);
+			carousel.init('.carousel', null, customDataSource);
 
 			expect(carousel.getDataSource()).toEqual(jasmine.any(CustomDataSource));
 			expect(carousel.getDataSource()).toEqual(jasmine.any(AbstractDataSource));
@@ -126,11 +141,20 @@ define([
 		it('"setDataSource" accepts custom data sources', function () {
 			var customDataSource = new CustomDataSource();
 
-			carousel.init();
+			carousel.init('.carousel');
 			carousel.setDataSource(customDataSource);
 
 			expect(carousel.getDataSource()).toEqual(jasmine.any(CustomDataSource));
 			expect(carousel.getDataSource()).toEqual(jasmine.any(AbstractDataSource));
+		});
+
+		it('fixtures work', function(){
+			expect(typeof window.__html__).toEqual('object');
+
+			// load a fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			expect($('.carousel').length).toEqual(2);
 		});
 	});
 });

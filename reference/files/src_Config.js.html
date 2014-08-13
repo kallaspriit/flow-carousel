@@ -43,11 +43,15 @@
             
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
+                <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
+            
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/Util.html">Util</a></li>
             
             </ul>
 
@@ -149,6 +153,25 @@ define([
 			width: 1824,
 			itemsPerPage: 5
 		}];
+
+		/**
+		 * The css classes prefix to use.
+		 *
+		 * @property cssPrefix
+		 * @type {string}
+		 * @default &#x27;flow-carousel-&#x27;
+		 */
+		this.cssPrefix = &#x27;flow-carousel-&#x27;;
+
+		/**
+		 * CSS class names to use.
+		 *
+		 * @property cssClasses
+		 * @type {object}
+		 */
+		this.cssClasses = {
+			wrap: &#x27;wrap&#x27;
+		};
 	}
 
 	/**
@@ -192,6 +215,26 @@ define([
 		}
 
 		return this.responsiveBreakpoints[0].itemsPerPage;
+	};
+
+	/**
+	 * Returns class name to use by type.
+	 *
+	 * The class name is constructed by combining the value of {{#crossLink &quot;Config/cssPrefix:property&quot;}}{{/crossLink}}
+	 * and the mapping in {{#crossLink &quot;Config/cssClasses:property&quot;}}{{/crossLink}}.
+	 *
+	 * Throws error if invalid class name type is requested.
+	 *
+	 * @method getClassName
+	 * @param {string} type Class name type, one of the keys in cssClasses
+	 * @return {string}
+	 */
+	Config.prototype.getClassName = function(type) {
+		if (typeof(this.cssClasses[type]) === &#x27;undefined&#x27;) {
+			throw new Error(&#x27;Unknown CSS class type &quot;&#x27; + type + &#x27;&quot; requested&#x27;);
+		}
+
+		return this.cssPrefix + this.cssClasses[type];
 	};
 
 	return Config;

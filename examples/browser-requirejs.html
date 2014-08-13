@@ -3,9 +3,35 @@
 <head lang="en">
 	<meta charset="UTF-8">
 	<title>FlowCarousel RequireJS example</title>
+	<link rel="stylesheet" href="../dist/flow-carousel.css">
+	<link rel="stylesheet" href="examples.css">
 </head>
 <body>
-	<p>Open your console to see any output.</p>
+	<div class="carousel">
+		<div>First</div>
+		<div>Second</div>
+		<div>Third</div>
+		<div>Fourth</div>
+		<div>Fifth</div>
+		<div>Sixth</div>
+		<div>Seventh</div>
+		<div>Eight</div>
+		<div>Ninth</div>
+		<div>Tenth</div>
+	</div>
+
+	<div class="carousel">
+		<div>a</div>
+		<div>b</div>
+		<div>c</div>
+		<div>d</div>
+		<div>e</div>
+		<div>f</div>
+		<div>g</div>
+		<div>h</div>
+		<div>i</div>
+		<div>j</div>
+	</div>
 	<script src="lib/require.js"></script>
 	<script>
 
@@ -29,7 +55,7 @@
 	require(['FlowCarousel'], function(FlowCarousel) {
 		var flowCarousel = new FlowCarousel();
 
-		flowCarousel.init();
+		flowCarousel.init('.carousel');
 	});
 
 	</script>

@@ -55,6 +55,25 @@ define([
 			width: 1824,
 			itemsPerPage: 5
 		}];
+
+		/**
+		 * The css classes prefix to use.
+		 *
+		 * @property cssPrefix
+		 * @type {string}
+		 * @default 'flow-carousel-'
+		 */
+		this.cssPrefix = 'flow-carousel-';
+
+		/**
+		 * CSS class names to use.
+		 *
+		 * @property cssClasses
+		 * @type {object}
+		 */
+		this.cssClasses = {
+			wrap: 'wrap'
+		};
 	}
 
 	/**
@@ -98,6 +117,26 @@ define([
 		}
 
 		return this.responsiveBreakpoints[0].itemsPerPage;
+	};
+
+	/**
+	 * Returns class name to use by type.
+	 *
+	 * The class name is constructed by combining the value of {{#crossLink "Config/cssPrefix:property"}}{{/crossLink}}
+	 * and the mapping in {{#crossLink "Config/cssClasses:property"}}{{/crossLink}}.
+	 *
+	 * Throws error if invalid class name type is requested.
+	 *
+	 * @method getClassName
+	 * @param {string} type Class name type, one of the keys in cssClasses
+	 * @return {string}
+	 */
+	Config.prototype.getClassName = function(type) {
+		if (typeof(this.cssClasses[type]) === 'undefined') {
+			throw new Error('Unknown CSS class type "' + type + '" requested');
+		}
+
+		return this.cssPrefix + this.cssClasses[type];
 	};
 
 	return Config;

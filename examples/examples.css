@@ -1,0 +1,13 @@
+.carousel {
+    width: 800px;
+    border: 1px solid #F00;
+    overflow: hidden;
+}
+.carousel > DIV {
+    padding: 40px;
+    margin-left: 20px;
+    background-color: #EEE;
+}
+.carousel > DIV:first-child {
+    margin-left: 0;
+}

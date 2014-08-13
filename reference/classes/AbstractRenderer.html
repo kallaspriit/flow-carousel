@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>ArrayDataSource - FlowCarousel</title>
+    <title>AbstractRenderer - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -92,19 +92,15 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>ArrayDataSource Class</h1>
+                        <h1>AbstractRenderer Class</h1>
 <div class="box meta">
     
 
     
-        <div class="extends">
-            Extends <a href="../classes/AbstractDataSource.html" class="crosslink">AbstractDataSource</a>
-        </div>
-    
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_ArrayDataSource.js.html#l10"><code>src\ArrayDataSource.js:10</code></a>
+            Defined in: <a href="../files/src_AbstractRenderer.js.html#l6"><code>src\AbstractRenderer.js:6</code></a>
         </div>
     
 
@@ -116,15 +112,15 @@
 
 
 <div class="box intro">
-    <p>Data source interface.</p>
+    <p>Renderer interface.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_ArrayDataSource" class="method item">
-    <h3 class="name"><code>ArrayDataSource</code></h3>
+        <div id="method_AbstractRenderer" class="method item">
+    <h3 class="name"><code>AbstractRenderer</code></h3>
 
     
         <span class="paren">()</span>
@@ -155,7 +151,7 @@
             
         
         
-        <a href="../files/src_ArrayDataSource.js.html#l10"><code>src\ArrayDataSource.js:10</code></a>
+        <a href="../files/src_AbstractRenderer.js.html#l6"><code>src\AbstractRenderer.js:6</code></a>
         
         </p>
 
@@ -199,17 +195,17 @@
                 <div class="index-section methods">
                     <h3>Methods</h3>
 
-                    <ul class="index-list methods extends">
+                    <ul class="index-list methods">
                         
-                            <li class="index-item method inherited">
-                                <a href="#method_getItemCount">getItemCount</a>
+                            <li class="index-item method">
+                                <a href="#method_destroyItem">destroyItem</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method inherited">
-                                <a href="#method_getItems">getItems</a>
+                            <li class="index-item method">
+                                <a href="#method_renderItem">renderItem</a>
 
                                 
                                 
@@ -231,79 +227,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getItemCount" class="method item">
-    <h3 class="name"><code>getItemCount</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            <p>Inherited from
-            <a href="../classes/AbstractDataSource.html#method_getItemCount">
-                AbstractDataSource
-            </a>
-            
-            but overwritten in
-            
-        
-        
-        <a href="../files/src_ArrayDataSource.js.html#l25"><code>src\ArrayDataSource.js:25</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Returns the number of items in the dataset.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
-                    
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getItems" class="method item">
-    <h3 class="name"><code>getItems</code></h3>
+                    <div id="method_destroyItem" class="method item">
+    <h3 class="name"><code>destroyItem</code></h3>
 
     
         <div class="args">
@@ -311,13 +236,7 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[startIndex=0]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[endIndex=length]</code>
+                        <code>index</code>
                     
                 </li>
             
@@ -326,10 +245,6 @@
     
 
     
-        <span class="returns-inline">
-            <span class="type">Deferred.Promise</span>
-        </span>
-    
 
     
 
@@ -345,16 +260,16 @@
 
     <div class="meta">
         
-            <p>Inherited from
-            <a href="../classes/AbstractDataSource.html#method_getItems">
-                AbstractDataSource
-            </a>
             
-            but overwritten in
+                
+                <p>
+                
+                Defined in
+                
             
         
         
-        <a href="../files/src_ArrayDataSource.js.html#l35"><code>src\ArrayDataSource.js:35</code></a>
+        <a href="../files/src_AbstractRenderer.js.html#l30"><code>src\AbstractRenderer.js:30</code></a>
         
         </p>
 
@@ -365,11 +280,7 @@
     </div>
 
     <div class="description">
-        <p>Fetches given range of items from the dataset.</p>
-<p>This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
-available or rejected when an error occurs.</p>
-<p>By default the range is the entire dataset.</p>
-<p>Throws error if invalid range is requested.</p>
+        <p>Destroys a carousel item.</p>
 
     </div>
 
@@ -381,32 +292,14 @@ available or rejected when an error occurs.</p>
             
                 <li class="param">
                     
-                        <code class="param-name optional">[startIndex=0]</code>
+                        <code class="param-name">index</code>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>Range start index to fetch</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[endIndex=length]</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Range end index to fetch</p>
+                        <p>Item position index</p>
 
                     </div>
 
@@ -418,17 +311,139 @@ available or rejected when an error occurs.</p>
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
 
-            <div class="returns-description">
+    
+</div>
+
                 
+                    <div id="method_renderItem" class="method item">
+    <h3 class="name"><code>renderItem</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
                     
-                        <span class="type">Deferred.Promise</span>:
+                        <code>config</code>
                     
-                
-            </div>
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>index</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>data</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
         </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_AbstractRenderer.js.html#l14"><code>src\AbstractRenderer.js:14</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Renders a carousel item.</p>
+<p>The data can be either a object of key-value pairs or an existing dom element to modify.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">config</code>
+                        <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Carousel configuration</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">index</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Item position index</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">data</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a> | DOMElement</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Item data object or existing dom element</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
     
 
     

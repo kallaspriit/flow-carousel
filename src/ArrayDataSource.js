@@ -3,6 +3,10 @@ define([
 ], function(AbstractDataSource) {
 	'use strict';
 
+	// using deferred implementation from jQuery
+	var $ = window.jQuery,
+		Deferred = $.Deferred;
+
 	/**
 	 * Data source interface.
 	 *
@@ -44,6 +48,8 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	ArrayDataSource.prototype.getItems = function(startIndex, endIndex) {
+		var deferred = new Deferred();
+
 		startIndex = startIndex || 0;
 		endIndex = endIndex || this._data.length;
 
@@ -57,8 +63,10 @@ define([
 			);
 		}
 
-		// TODO Make it return a promise instead
-		return this._data.slice(startIndex, endIndex);
+		// resolve the deferred immediately as array data source is syncronous
+		deferred.resolve(this._data.slice(startIndex, endIndex));
+
+		return deferred.promise();
 	};
 
 	return ArrayDataSource;

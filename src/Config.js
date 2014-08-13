@@ -78,6 +78,17 @@ define([
 		}];
 
 		/**
+		 * The interval at which to check for carousel wrap size changes so responsive layout could be applied.
+		 *
+		 * Value is in milliseconds.
+		 *
+		 * @property responsiveLayoutListenerInterval
+		 * @type {number}
+		 * @default 100
+		 */
+		this.responsiveLayoutListenerInterval = 100;
+
+		/**
 		 * The css classes prefix to use.
 		 *
 		 * @property cssPrefix
@@ -96,7 +107,9 @@ define([
 			wrap: 'wrap',
 			horizontal: 'horizontal',
 			vertical: 'vertical',
-			item: 'item'
+			item: 'item',
+			loading: 'loading',
+			ready: 'ready',
 		};
 	}
 

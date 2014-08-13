@@ -83,6 +83,16 @@ define([
 		this._selector = null;
 
 		/**
+		 * The interval reference for responsive layout changes.
+		 *
+		 * @property _responsiveLayoutListenerInterval
+		 * @type {number}
+		 * @default null
+		 * @private
+		 */
+		this._responsiveLayoutListenerInterval = null;
+
+		/**
 		 * The top wrap elements jQuery object.
 		 * @type {jQuery}
 		 * @default null
@@ -199,6 +209,8 @@ define([
 		var $element = $(element),
 			className = {
 				wrap: this._config.getClassName('wrap'),
+				loading: this._config.getClassName('loading'),
+				ready: this._config.getClassName('ready'),
 				horizontal: this._config.getClassName('horizontal'),
 				vertical: this._config.getClassName('vertical'),
 				item: this._config.getClassName('item')
@@ -206,6 +218,7 @@ define([
 
 		// add main carousel class to the wrap element
 		$element.addClass(className.wrap);
+		$element.addClass(className.loading);
 
 		// add class to wrap based on orientation
 		if (orientation === Config.Orientation.HORIZONTAL) {
@@ -220,18 +233,27 @@ define([
 		$element.children().addClass(className.item);
 
 		// setup the individual elements
-		this._setupItems(element, orientation);
+		this._setupLayout(element, orientation);
+
+		// if we're using responsive layout then we need to recalculate sizes and positions if the wrap size changes
+		if (this._config.useResponsiveLayout) {
+			this._setupResponsiveLayoutListener(element, orientation);
+		}
+
+		// remove the loading class
+		$element.removeClass(className.loading);
+		$element.addClass(className.ready);
 	};
 
 	/**
 	 * Initializes items in a wrap.
 	 *
-	 * @method _setupItems
+	 * @method _setupLayout
 	 * @param {DOMelement} element Element to setup items in
 	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @private
 	 */
-	FlowCarousel.prototype._setupItems = function(element, orientation) {
+	FlowCarousel.prototype._setupLayout = function(element, orientation) {
 		var $element = $(element),
 			wrapSize = this._getWrapSize(element, orientation),
 			oppositeOrientation = orientation === Config.Orientation.HORIZONTAL
@@ -246,8 +268,6 @@ define([
 			effectiveSize,
 			extraSize,
 			cssProperties;
-
-		console.log('itemsPerPage', itemsPerPage, 'itemSize', itemSize);
 
 		$element.children().each(function(index, el) {
 			// calculate the extra size of an element
@@ -271,6 +291,44 @@ define([
 
 			effectiveOffset += itemSize + (itemMargin - gapPerItem);
 		}.bind(this));
+	};
+
+	/**
+	 * Sets up main wrap size change listener to apply responsive layout.
+	 *
+	 * @method _setupResponsiveLayoutListener
+	 * @param {DOMelement} element Element to listen changes of
+	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @private
+	 */
+	FlowCarousel.prototype._setupResponsiveLayoutListener = function(element, orientation) {
+		this._responsiveLayoutListenerInterval = window.setInterval(function() {
+			this._validateResponsiveLayout(element, orientation);
+		}.bind(this), this._config.responsiveLayoutListenerInterval);
+	};
+
+	/**
+	 * Checks whether the carousel wrap size has changed and triggers re-layout if so.
+	 *
+	 * @method _validateResponsiveLayout
+	 * @param {DOMelement} element Element to validate
+	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @private
+	 */
+	FlowCarousel.prototype._validateResponsiveLayout = function(element, orientation) {
+		var lastSize = $(element).data(this._config.cssPrefix + 'last-width') || null,
+			currentSize = this._getWrapSize(element, orientation);
+
+		$(element).data(this._config.cssPrefix + 'last-width', currentSize);
+
+		if (lastSize === null)  {
+			return;
+		}
+
+		// perform the layout routine if the wrap size has changed
+		if (currentSize !== lastSize) {
+			this._setupLayout(element, orientation);
+		}
 	};
 
 	/**
@@ -309,7 +367,7 @@ define([
 	/**
 	 * Returns the extra padding+margin+border size of given element in given orientation.
 	 *
-	 * TODO Handle border-box sizing
+	 * TODO handle border-box sizing
 	 *
 	 * @method _getExtraSize
 	 * @param {DOMelement} element Element to get size of

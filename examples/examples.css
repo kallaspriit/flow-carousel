@@ -8,8 +8,10 @@ BODY {
     border: 10px solid #FFF;
 }
 .carousel-horizontal {
-    width: 1000px;
     height: 200px;
+}
+.carousel-halfwidth {
+    width: 50%;
 }
 .carousel-vertical {
     width: 300px;
@@ -21,6 +23,8 @@ BODY {
     padding: 0 20px;
     font-size: 40px;
     color: #FFF;
+    /* TODO don't want to have to define it in the user css */
+    opacity: 0;
 }
 .carousel-horizontal > DIV {
 

@@ -139,12 +139,16 @@ define([
 	 * Returns the number of items to render side-by-side based on the wrap size and
 	 * {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} setting.
 	 *
-	 * @method getResponsiveItemsPerPage
+	 * @method getItemsPerPage
 	 * @param {number} wrapSize Wrap size to base the calculation on
 	 */
-	Config.prototype.getResponsiveItemsPerPage = function(wrapSize) {
+	Config.prototype.getItemsPerPage = function(wrapSize) {
 		var i,
 			breakpoint;
+
+		if (!this.useResponsiveLayout) {
+			return this.itemsPerPage;
+		}
 
 		for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
 			breakpoint = this.responsiveBreakpoints[i];

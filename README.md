@@ -66,8 +66,11 @@ If your setup does not have grunt installed then you can do that via npm by
 7. configuration management ✓
 8. abstract and array data sources ✓
 9. abstract renderer ✓
-10. existing html renderer
-11. jQuery plugin interface
+10. multi-orientation support ✓
+11. margin support ✓
+12. testing fixtures support ✓
+- existing html renderer
+- jQuery plugin interface
 
 #Class diagram#
 ![Class diagram](https://raw.githubusercontent.com/kallaspriit/flow-carousel/master/doc/class-diagram.png "Class diagram")

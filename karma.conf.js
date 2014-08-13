@@ -10,15 +10,6 @@ module.exports = function(config) {
         // frameworks to use
         frameworks: ['jasmine', 'requirejs'],
 
-		// plugins to load
-		/*plugins: [
-			'karma-requirejs',
-			'karma-jasmine',
-			'karma-chrome-launcher',
-			'karma-html2js-preprocessor',
-			'karma-coverage'
-		],*/
-
 		// configure preprocessors
 		preprocessors: {
 			'test/**/*.html': ['html2js'],
@@ -27,12 +18,25 @@ module.exports = function(config) {
  
         // list of files / patterns to load in the browser
         files: [
-			{pattern: 'test/shim/**/*.js', included: true},
-			{pattern: 'examples/lib/**/*.js', included: true},
-			{pattern: 'src/**/*.js', included: false},
-			{pattern: 'test/**/*Spec.js', included: false},
-			{pattern: 'test/test.js', watched: true, included: true, served: true},
-			{pattern: 'test/**/*.html', watched: true, included: true, served: true},
+			// we need some shims for example bind()
+			{pattern: 'test/shim/**/*.js', included: true, watched: true, served: true},
+
+			// get carousel css files
+			{pattern: 'dist/**/*.css', included: false, watched: true, served: true},
+
+			// get example css and libraries
+			{pattern: 'examples/**/*.css', included: false, watched: true, served: true},
+			{pattern: 'examples/lib/**/*.js', included: true, watched: true, served: true},
+
+			// get the actual sources
+			{pattern: 'src/**/*.js', included: false, watched: true, served: true},
+
+			// and the specs
+			{pattern: 'test/**/*Spec.js', included: false, watched: true, served: true},
+
+			// include the main test file and html fixtures
+			{pattern: 'test/test.js', included: true, watched: true, served: true},
+			{pattern: 'test/**/*.html', included: true, watched: true, served: true},
         ],
 
         // test results reporter to use

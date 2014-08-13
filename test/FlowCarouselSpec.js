@@ -154,7 +154,16 @@ define([
 			// load a fixture
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 
-			expect($('.carousel').length).toEqual(2);
+			expect($('.carousel').length).toEqual(1);
+		});
+
+		it('renders carousel with default settings', function(){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			carousel.init('.carousel');
+
+			expect($('.flow-carousel-wrap').length).toEqual(1);
 		});
 	});
 });

@@ -332,10 +332,14 @@ define([
 	FlowCarousel.prototype._setupItems = function(element, orientation) {
 		var $element = $(element),
 			wrapSize = this._getWrapSize(element, orientation),
-			itemsPerPage = this._config.getResponsiveItemsPerPage(wrapSize),
+			oppositeOrientation = orientation === Config.Orientation.HORIZONTAL
+				? Config.Orientation.VERTICAL
+				: Config.Orientation.HORIZONTAL,
+			wrapOppositeSize = this._getWrapSize(element, oppositeOrientation),
+			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			itemMargin = this._config.margin,
-			gapPerItem = (itemMargin * 2 / 3),
+			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
 			effectiveOffset = 0,
 			effectiveSize,
 			extraSize,
@@ -353,12 +357,12 @@ define([
 			if (orientation === Config.Orientation.HORIZONTAL) {
 				cssProperties.width = effectiveSize;
 				cssProperties.left = effectiveOffset;
-				cssProperties.height = wrapSize;
+				cssProperties.height = wrapOppositeSize;
 
 			} else if (orientation === Config.Orientation.VERTICAL) {
 				cssProperties.height = effectiveSize;
 				cssProperties.top = effectiveOffset;
-				cssProperties.width = wrapSize;
+				cssProperties.width = wrapOppositeSize;
 			}
 
 			$(el).css(cssProperties);

@@ -8,18 +8,18 @@ BODY {
     border: 10px solid #FFF;
 }
 .carousel-horizontal {
-    width: 1200px;
+    width: 1000px;
     height: 200px;
 }
 .carousel-vertical {
-    width: 200px;
-    height: 800px;
+    width: 300px;
+    height: 1000px;
 }
 .carousel > DIV {
     background-color: #4F9BFF;
-    line-height: 40px;
+    line-height: 60px;
     padding: 0 20px;
-    font-size: 20px;
+    font-size: 40px;
     color: #FFF;
 }
 .carousel-horizontal > DIV {

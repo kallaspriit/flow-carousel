@@ -57,16 +57,16 @@ define([
 		});
 
 		it('calculates default responsive breakpoints', function () {
-			expect(config.getResponsiveItemsPerPage(2000)).toEqual(5);
-			expect(config.getResponsiveItemsPerPage(1800)).toEqual(4);
-			expect(config.getResponsiveItemsPerPage(900)).toEqual(3);
-			expect(config.getResponsiveItemsPerPage(500)).toEqual(2);
-			expect(config.getResponsiveItemsPerPage(300)).toEqual(1);
+			expect(config.getItemsPerPage(2000)).toEqual(5);
+			expect(config.getItemsPerPage(1800)).toEqual(4);
+			expect(config.getItemsPerPage(900)).toEqual(3);
+			expect(config.getItemsPerPage(500)).toEqual(2);
+			expect(config.getItemsPerPage(300)).toEqual(1);
 		});
 
 		it('responsive breakpoints are inclusive', function () {
-			expect(config.getResponsiveItemsPerPage(1824)).toEqual(5);
-			expect(config.getResponsiveItemsPerPage(768)).toEqual(3);
+			expect(config.getItemsPerPage(1824)).toEqual(5);
+			expect(config.getItemsPerPage(768)).toEqual(3);
 		});
 
 		it('user can define new responsive breakpoints', function () {
@@ -83,10 +83,24 @@ define([
 				}]
 			});
 
-			expect(config.getResponsiveItemsPerPage(1000)).toEqual(3);
-			expect(config.getResponsiveItemsPerPage(300)).toEqual(2);
-			expect(config.getResponsiveItemsPerPage(100)).toEqual(1);
-			expect(config.getResponsiveItemsPerPage(0)).toEqual(1);
+			expect(config.getItemsPerPage(1000)).toEqual(3);
+			expect(config.getItemsPerPage(300)).toEqual(2);
+			expect(config.getItemsPerPage(100)).toEqual(1);
+			expect(config.getItemsPerPage(0)).toEqual(1);
+		});
+
+		it('user can choose not to use responsive layout', function () {
+			var itemsPerPage = 10;
+
+			config.extend({
+				useResponsiveLayout: false,
+				itemsPerPage: itemsPerPage
+			});
+
+			expect(config.getItemsPerPage(1000)).toEqual(itemsPerPage);
+			expect(config.getItemsPerPage(300)).toEqual(itemsPerPage);
+			expect(config.getItemsPerPage(100)).toEqual(itemsPerPage);
+			expect(config.getItemsPerPage(0)).toEqual(itemsPerPage);
 		});
 
 		it('returns first responsive breakpoint value if size less then minimum', function () {
@@ -103,7 +117,7 @@ define([
 				}]
 			});
 
-			expect(config.getResponsiveItemsPerPage(50)).toEqual(1);
+			expect(config.getItemsPerPage(50)).toEqual(1);
 		});
 
 		it('provides class name', function () {

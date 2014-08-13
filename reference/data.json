@@ -374,7 +374,7 @@
             "line": 138,
             "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
-            "name": "getResponsiveItemsPerPage",
+            "name": "getItemsPerPage",
             "params": [
                 {
                     "name": "wrapSize",
@@ -386,7 +386,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 160,
+            "line": 164,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -614,7 +614,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 272,
+            "line": 276,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -636,7 +636,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 284,
+            "line": 288,
             "description": "Returns the outer size of an element.\n\nHorizontal orientation returns element innter width and vertical inner height.",
             "itemtype": "method",
             "name": "_getWrapSize",
@@ -662,7 +662,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 305,
+            "line": 309,
             "description": "Returns the extra padding+margin+border size of given element in given orientation.\n\nTODO Handle border-box sizing",
             "itemtype": "method",
             "name": "_getExtraSize",

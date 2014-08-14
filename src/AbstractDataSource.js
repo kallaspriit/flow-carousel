@@ -1,6 +1,5 @@
 define([
-	'Util'
-], function(util) {
+], function() {
 	'use strict';
 
 	/**
@@ -37,7 +36,7 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	AbstractDataSource.prototype.getItems = function(startIndex, endIndex) {
-		util.noop(startIndex, endIndex);
+		void(startIndex, endIndex);
 
 		throw new Error('Not implemented');
 	};

@@ -41,6 +41,8 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/AbstractAnimator.html">AbstractAnimator</a></li>
+            
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
                 <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
@@ -48,6 +50,8 @@
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
             
                 <li><a href="../classes/Config.html">Config</a></li>
+            
+                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
             
@@ -100,7 +104,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_FlowCarousel.js.html#l12"><code>src\FlowCarousel.js:12</code></a>
+            Defined in: <a href="../files/src_FlowCarousel.js.html#l14"><code>src\FlowCarousel.js:14</code></a>
         </div>
     
 
@@ -155,7 +159,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l12"><code>src\FlowCarousel.js:12</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l14"><code>src\FlowCarousel.js:14</code></a>
         
         </p>
 
@@ -267,6 +271,13 @@ Released under the MIT license
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_getAnimator">getAnimator</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_getConfig">getConfig</a>
 
                                 
@@ -305,6 +316,13 @@ Released under the MIT license
                     <ul class="index-list properties">
                         
                             <li class="index-item property private">
+                                <a href="#property__animator">_animator</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
                                 <a href="#property__config">_config</a>
 
                                 
@@ -320,6 +338,13 @@ Released under the MIT license
                         
                             <li class="index-item property private">
                                 <a href="#property__initiated">_initiated</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__renderer">_renderer</a>
 
                                 
                                 
@@ -417,7 +442,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l361"><code>src\FlowCarousel.js:361</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l396"><code>src\FlowCarousel.js:396</code></a>
         
         </p>
 
@@ -534,7 +559,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l394"><code>src\FlowCarousel.js:394</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l429"><code>src\FlowCarousel.js:429</code></a>
         
         </p>
 
@@ -664,7 +689,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l373"><code>src\FlowCarousel.js:373</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l408"><code>src\FlowCarousel.js:408</code></a>
         
         </p>
 
@@ -790,7 +815,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l306"><code>src\FlowCarousel.js:306</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l343"><code>src\FlowCarousel.js:343</code></a>
         
         </p>
 
@@ -904,7 +929,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l258"><code>src\FlowCarousel.js:258</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l295"><code>src\FlowCarousel.js:295</code></a>
         
         </p>
 
@@ -1017,7 +1042,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l323"><code>src\FlowCarousel.js:323</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l358"><code>src\FlowCarousel.js:358</code></a>
         
         </p>
 
@@ -1130,7 +1155,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l210"><code>src\FlowCarousel.js:210</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l247"><code>src\FlowCarousel.js:247</code></a>
         
         </p>
 
@@ -1237,7 +1262,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l195"><code>src\FlowCarousel.js:195</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l232"><code>src\FlowCarousel.js:232</code></a>
         
         </p>
 
@@ -1334,7 +1359,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l337"><code>src\FlowCarousel.js:337</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l372"><code>src\FlowCarousel.js:372</code></a>
         
         </p>
 
@@ -1397,6 +1422,77 @@ Released under the MIT license
 </div>
 
                 
+                    <div id="method_getAnimator" class="method item">
+    <h3 class="name"><code>getAnimator</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l180"><code>src\FlowCarousel.js:180</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns current animator instance.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
                     <div id="method_getConfig" class="method item">
     <h3 class="name"><code>getConfig</code></h3>
 
@@ -1433,7 +1529,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l143"><code>src\FlowCarousel.js:143</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l170"><code>src\FlowCarousel.js:170</code></a>
         
         </p>
 
@@ -1504,7 +1600,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l183"><code>src\FlowCarousel.js:183</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l220"><code>src\FlowCarousel.js:220</code></a>
         
         </p>
 
@@ -1596,7 +1692,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l114"><code>src\FlowCarousel.js:114</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l127"><code>src\FlowCarousel.js:127</code></a>
         
         </p>
 
@@ -1726,7 +1822,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l153"><code>src\FlowCarousel.js:153</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l190"><code>src\FlowCarousel.js:190</code></a>
         
         </p>
 
@@ -1797,6 +1893,55 @@ converted to an ArrayDataSource.</p>
                 <h2 class="off-left">Properties</h2>
 
                 
+                    <div id="property__animator" class="property item private">
+    <h3 class="name"><code>_animator</code></h3>
+    <span class="type"><a href="../classes/AbstractAnimator.html" class="crosslink">AbstractAnimator</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l78"><code>src\FlowCarousel.js:78</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Animator to use.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="property__config" class="property item private">
     <h3 class="name"><code>_config</code></h3>
     <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
@@ -1822,7 +1967,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l43"><code>src\FlowCarousel.js:43</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l45"><code>src\FlowCarousel.js:45</code></a>
         
         </p>
 
@@ -1871,7 +2016,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l53"><code>src\FlowCarousel.js:53</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l55"><code>src\FlowCarousel.js:55</code></a>
         
         </p>
 
@@ -1922,7 +2067,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l33"><code>src\FlowCarousel.js:33</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l35"><code>src\FlowCarousel.js:35</code></a>
         
         </p>
 
@@ -1938,6 +2083,55 @@ converted to an ArrayDataSource.</p>
 
     
         <p><strong>Default:</strong> false</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__renderer" class="property item private">
+    <h3 class="name"><code>_renderer</code></h3>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l68"><code>src\FlowCarousel.js:68</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Renderer used to render the data.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
     
 
     
@@ -1971,7 +2165,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l85"><code>src\FlowCarousel.js:85</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l98"><code>src\FlowCarousel.js:98</code></a>
         
         </p>
 
@@ -2020,7 +2214,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l75"><code>src\FlowCarousel.js:75</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l88"><code>src\FlowCarousel.js:88</code></a>
         
         </p>
 
@@ -2067,7 +2261,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l103"><code>src\FlowCarousel.js:103</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l116"><code>src\FlowCarousel.js:116</code></a>
         
         </p>
 
@@ -2146,7 +2340,7 @@ converted to an ArrayDataSource.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l25"><code>src\FlowCarousel.js:25</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l27"><code>src\FlowCarousel.js:27</code></a>
         
         </p>
 

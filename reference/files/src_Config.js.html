@@ -41,6 +41,8 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/AbstractAnimator.html">AbstractAnimator</a></li>
+            
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
                 <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
@@ -48,6 +50,8 @@
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
             
                 <li><a href="../classes/Config.html">Config</a></li>
+            
+                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
             
@@ -209,6 +213,19 @@ define([
 			loading: &#x27;loading&#x27;,
 			ready: &#x27;ready&#x27;,
 		};
+
+		/**
+		 * Custom animator to use.
+		 *
+		 * Should be an instance of {{#crossLink &quot;AbstractAnimator&quot;}}{{/crossLink}}.
+		 *
+		 * If none is set, the carousel uses the {{#crossLink &quot;DefaultAnimator&quot;}}{{/crossLink}}.
+		 *
+		 * @property animator
+		 * @type {AbstractAnimator}
+		 * @default null
+		 */
+		this.animator = null;
 	}
 
 	/**

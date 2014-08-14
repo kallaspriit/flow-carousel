@@ -1,9 +1,11 @@
 define([
 	'Config',
-	'ArrayDataSource',
 	'AbstractDataSource',
+	'ArrayDataSource',
+	'AbstractAnimator',
+	'DefaultAnimator',
 	'Util',
-], function(Config, ArrayDataSource, AbstractDataSource, util) {
+], function(Config, AbstractDataSource, ArrayDataSource, AbstractAnimator, DefaultAnimator, util) {
 	'use strict';
 
 	// expect jQuery to exists outside of this component
@@ -66,11 +68,22 @@ define([
 		/**
 		 * Renderer used to render the data.
 		 *
+		 * @property _renderer
 		 * @type {AbstractRenderer}
 		 * @default null
 		 * @private
 		 */
 		this._renderer = null;
+
+		/**
+		 * Animator to use.
+		 *
+		 * @property _animator
+		 * @type {AbstractAnimator}
+		 * @default null
+		 * @private
+		 */
+		this._animator = null;
 
 		/**
 		 * Selector of elements to turn into a carousel.
@@ -127,16 +140,30 @@ define([
 
 		this._selector = selector;
 
+		// extend the config with user-provided values if available
 		if (util.isObject(userConfig)) {
 			this._config.extend(userConfig);
 		}
 
+		// use provided data source or a simple array if provided
 		if (data instanceof AbstractDataSource || util.isArray(data)) {
 			this.setDataSource(data);
 		} else if (typeof data !== 'undefined' && data !== null) {
 			throw new Error('Unexpected data type "' + typeof(data) + '" provided');
 		}
 
+		// use custom animator if provided or the DefaultAnimator if not
+		if (this._config.animator !== null) {
+			if (this._config.animator instanceof AbstractAnimator) {
+				this._animator = this._config.animator;
+			} else {
+				throw new Error('Custom animator provided in config but it\'s not an instance of AbstractAnimator');
+			}
+		} else {
+			this._animator = new DefaultAnimator(this);
+		}
+
+		// initialize the wraps that match given selector
 		this._setupWraps(this._selector);
 	};
 
@@ -148,6 +175,16 @@ define([
 	 */
 	FlowCarousel.prototype.getConfig = function() {
 		return this._config;
+	};
+
+	/**
+	 * Returns current animator instance.
+	 *
+	 * @method getAnimator
+	 * @return {Config}
+	 */
+	FlowCarousel.prototype.getAnimator = function() {
+		return this._animator;
 	};
 
 	/**
@@ -314,8 +351,6 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		console.log('_reLayout');
-
 		// just forward to _setupLayout
 		this._setupLayout(element, orientation);
 	};

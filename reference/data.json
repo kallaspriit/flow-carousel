@@ -6,6 +6,15 @@
         "url": ""
     },
     "files": {
+        "src\\AbstractAnimator.js": {
+            "name": "src\\AbstractAnimator.js",
+            "modules": {},
+            "classes": {
+                "AbstractAnimator": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\AbstractDataSource.js": {
             "name": "src\\AbstractDataSource.js",
             "modules": {},
@@ -42,6 +51,15 @@
             "fors": {},
             "namespaces": {}
         },
+        "src\\DefaultAnimator.js": {
+            "name": "src\\DefaultAnimator.js",
+            "modules": {},
+            "classes": {
+                "DefaultAnimator": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\FlowCarousel.js": {
             "name": "src\\FlowCarousel.js",
             "modules": {},
@@ -63,6 +81,26 @@
     },
     "modules": {},
     "classes": {
+        "AbstractAnimator": {
+            "name": "AbstractAnimator",
+            "shortname": "AbstractAnimator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\AbstractAnimator.js",
+            "line": 5,
+            "description": "Animator interface.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "carousel",
+                    "description": "The carousel component",
+                    "type": "FlowCarousel"
+                }
+            ]
+        },
         "AbstractDataSource": {
             "name": "AbstractDataSource",
             "shortname": "AbstractDataSource",
@@ -72,7 +110,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\AbstractDataSource.js",
-            "line": 6,
+            "line": 5,
             "description": "Data source interface.",
             "is_constructor": 1
         },
@@ -85,7 +123,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\AbstractRenderer.js",
-            "line": 6,
+            "line": 5,
             "description": "Renderer interface.",
             "is_constructor": 1
         },
@@ -116,6 +154,27 @@
             "description": "Provides configuration.",
             "is_constructor": 1
         },
+        "DefaultAnimator": {
+            "name": "DefaultAnimator",
+            "shortname": "DefaultAnimator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\DefaultAnimator.js",
+            "line": 10,
+            "description": "Data source interface.",
+            "extends": "AbstractAnimator",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "carousel",
+                    "description": "The carousel component",
+                    "type": "FlowCarousel"
+                }
+            ]
+        },
         "FlowCarousel": {
             "name": "FlowCarousel",
             "shortname": "FlowCarousel",
@@ -125,7 +184,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\FlowCarousel.js",
-            "line": 12,
+            "line": 14,
             "description": "FlowCarousel main class.\n\nResponsive paginated high-performance HTML5 carousel with AngularJS support.\n\nCopyright Stagnation Lab\nReleased under the MIT license\nhttps://github.com/kallaspriit/flow-carousel",
             "is_constructor": 1
         },
@@ -145,8 +204,27 @@
     },
     "classitems": [
         {
+            "file": "src\\AbstractAnimator.js",
+            "line": 16,
+            "description": "Animates the carousel to given item index position.",
+            "itemtype": "method",
+            "name": "animateToIndex",
+            "params": [
+                {
+                    "name": "itemIndex",
+                    "description": "Index of the item",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "AbstractAnimator"
+        },
+        {
             "file": "src\\AbstractDataSource.js",
-            "line": 14,
+            "line": 13,
             "description": "Returns the number of items in the dataset.",
             "itemtype": "method",
             "name": "getItemCount",
@@ -158,7 +236,7 @@
         },
         {
             "file": "src\\AbstractDataSource.js",
-            "line": 24,
+            "line": 23,
             "description": "Fetches given range of items from the dataset.\n\nThis operation can be asynchronous and thus returns a promise that will be resolved once the data becomes\navailable or rejected when an error occurs.\n\nBy default the range is the entire dataset.\n\nThrows error if invalid range is requested.",
             "itemtype": "method",
             "name": "getItems",
@@ -186,7 +264,7 @@
         },
         {
             "file": "src\\AbstractRenderer.js",
-            "line": 14,
+            "line": 13,
             "description": "Renders a carousel item.\n\nThe data can be either a object of key-value pairs or an existing dom element to modify.",
             "itemtype": "method",
             "name": "renderItem",
@@ -211,7 +289,7 @@
         },
         {
             "file": "src\\AbstractRenderer.js",
-            "line": 30,
+            "line": 29,
             "description": "Destroys a carousel item.",
             "itemtype": "method",
             "name": "destroyItem",
@@ -344,7 +422,17 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 116,
+            "line": 115,
+            "description": "Custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is set, the carousel uses the {{#crossLink \"DefaultAnimator\"}}{{/crossLink}}.",
+            "itemtype": "property",
+            "name": "animator",
+            "type": "{AbstractAnimator}",
+            "default": "null",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 129,
             "description": "Enumeration of possible carousel orientations.",
             "itemtype": "property",
             "name": "Orientation",
@@ -366,7 +454,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 130,
+            "line": 143,
             "description": "Extends the base default configuration properties with user-defined values.",
             "itemtype": "method",
             "name": "extend",
@@ -381,7 +469,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 151,
+            "line": 164,
             "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
             "name": "getItemsPerPage",
@@ -396,7 +484,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 177,
+            "line": 190,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -414,8 +502,27 @@
             "class": "Config"
         },
         {
+            "file": "src\\DefaultAnimator.js",
+            "line": 26,
+            "description": "Animates the carousel to given item index position.",
+            "itemtype": "method",
+            "name": "animateToIndex",
+            "params": [
+                {
+                    "name": "itemIndex",
+                    "description": "Index of the item",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "DefaultAnimator"
+        },
+        {
             "file": "src\\FlowCarousel.js",
-            "line": 25,
+            "line": 27,
             "description": "Component version number.",
             "itemtype": "property",
             "name": "version",
@@ -424,7 +531,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 33,
+            "line": 35,
             "description": "Set to true once the component is initiated and to false once it's destroyed.",
             "itemtype": "property",
             "name": "_initiated",
@@ -436,7 +543,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 43,
+            "line": 45,
             "description": "Carousel configuration.",
             "itemtype": "property",
             "name": "_config",
@@ -448,7 +555,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 53,
+            "line": 55,
             "description": "Data source to use.\n\nData source is only set when the carousel is initiated with data or it's set with\n{{#crossLink \"FlowCarousel/setDataSource\"}}{{/crossLink}}.",
             "itemtype": "property",
             "name": "_dataSource",
@@ -460,8 +567,10 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 66,
+            "line": 68,
             "description": "Renderer used to render the data.",
+            "itemtype": "property",
+            "name": "_renderer",
             "type": "{AbstractRenderer}",
             "default": "null",
             "access": "private",
@@ -470,7 +579,19 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 75,
+            "line": 78,
+            "description": "Animator to use.",
+            "itemtype": "property",
+            "name": "_animator",
+            "type": "{AbstractAnimator}",
+            "default": "null",
+            "access": "private",
+            "tagname": "",
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 88,
             "description": "Selector of elements to turn into a carousel.",
             "itemtype": "property",
             "name": "_selector",
@@ -482,7 +603,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 85,
+            "line": 98,
             "description": "The interval reference for responsive layout changes.",
             "itemtype": "property",
             "name": "_responsiveLayoutListenerInterval",
@@ -494,7 +615,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 95,
+            "line": 108,
             "description": "The top wrap elements jQuery object.",
             "type": "{jQuery}",
             "default": "null",
@@ -504,7 +625,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 103,
+            "line": 116,
             "description": "Shortcut to the list of possible orientations from Config.",
             "itemtype": "property",
             "name": "Orientation",
@@ -525,7 +646,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 114,
+            "line": 127,
             "description": "Initializes the carousel component.",
             "itemtype": "method",
             "name": "init",
@@ -552,7 +673,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 143,
+            "line": 170,
             "description": "Returns current configuration.",
             "itemtype": "method",
             "name": "getConfig",
@@ -564,7 +685,19 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 153,
+            "line": 180,
+            "description": "Returns current animator instance.",
+            "itemtype": "method",
+            "name": "getAnimator",
+            "return": {
+                "description": "",
+                "type": "Config"
+            },
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 190,
             "description": "Sets the data source to use.\n\nExpects either an instance of AbstractDataSource (you can roll your own) or a simple array that will be\nconverted to an ArrayDataSource.\n\nThis can optionally be set in the init method as second argument.\n\nThis method supports call chaining by returning itself.",
             "itemtype": "method",
             "name": "setDataSource",
@@ -584,7 +717,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 183,
+            "line": 220,
             "description": "Returns the data used for rendering the component.\n\nReturns null if the component has not yet been initialized.",
             "itemtype": "method",
             "name": "getDataSource",
@@ -596,7 +729,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 195,
+            "line": 232,
             "description": "Initializes the top-level wrap elements.",
             "itemtype": "method",
             "name": "_setupWraps",
@@ -613,7 +746,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 210,
+            "line": 247,
             "description": "Initializes a single wrap element.",
             "itemtype": "method",
             "name": "_setupWrap",
@@ -635,7 +768,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 258,
+            "line": 295,
             "description": "Initializes items in a wrap.",
             "itemtype": "method",
             "name": "_setupLayout",
@@ -657,7 +790,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 306,
+            "line": 343,
             "description": "Re-initializes the layout.\n\nUsed to apply responsive layout when the wrap size changes.",
             "itemtype": "method",
             "name": "_reLayout",
@@ -679,7 +812,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 323,
+            "line": 358,
             "description": "Sets up main wrap size change listener to apply responsive layout.",
             "itemtype": "method",
             "name": "_setupResponsiveLayoutListener",
@@ -701,7 +834,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 337,
+            "line": 372,
             "description": "Checks whether the carousel wrap size has changed and triggers re-layout if so.",
             "itemtype": "method",
             "name": "_validateResponsiveLayout",
@@ -723,7 +856,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 361,
+            "line": 396,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -745,7 +878,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 373,
+            "line": 408,
             "description": "Returns the outer size of an element.\n\nHorizontal orientation returns element innter width and vertical inner height.",
             "itemtype": "method",
             "name": "_getWrapSize",
@@ -771,7 +904,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 394,
+            "line": 429,
             "description": "Returns the extra padding+margin+border size of given element in given orientation.\n\nTODO handle border-box sizing",
             "itemtype": "method",
             "name": "_getExtraSize",
@@ -832,24 +965,12 @@
                 "type": "Boolean"
             },
             "class": "Util"
-        },
-        {
-            "file": "src\\Util.js",
-            "line": 35,
-            "description": "Does nothing, used to keep linter happy by passing unused parameters into it.",
-            "itemtype": "method",
-            "name": "noop",
-            "class": "Util"
         }
     ],
     "warnings": [
         {
-            "message": "Missing item type\nRenderer used to render the data.",
-            "line": " src\\FlowCarousel.js:66"
-        },
-        {
             "message": "Missing item type\nThe top wrap elements jQuery object.",
-            "line": " src\\FlowCarousel.js:95"
+            "line": " src\\FlowCarousel.js:108"
         }
     ]
 }

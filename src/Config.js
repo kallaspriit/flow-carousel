@@ -111,6 +111,19 @@ define([
 			loading: 'loading',
 			ready: 'ready',
 		};
+
+		/**
+		 * Custom animator to use.
+		 *
+		 * Should be an instance of {{#crossLink "AbstractAnimator"}}{{/crossLink}}.
+		 *
+		 * If none is set, the carousel uses the {{#crossLink "DefaultAnimator"}}{{/crossLink}}.
+		 *
+		 * @property animator
+		 * @type {AbstractAnimator}
+		 * @default null
+		 */
+		this.animator = null;
 	}
 
 	/**

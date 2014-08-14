@@ -31,12 +31,5 @@ define([
 		isArray: function(arg) {
 			return Object.prototype.toString.call(arg) === '[object Array]';
 		},
-
-		/**
-		 * Does nothing, used to keep linter happy by passing unused parameters into it.
-		 *
-		 * @method noop
-		 */
-		noop: function() {}
 	};
 });

@@ -1,6 +1,5 @@
 define([
-	'Util'
-], function(util) {
+], function() {
 	'use strict';
 
 	/**
@@ -22,7 +21,7 @@ define([
 	 * @param {object|DOMElement} data Item data object or existing dom element
 	 */
 	AbstractRenderer.prototype.renderItem = function(config, index, data) {
-		util.noop(config, index, data);
+		void(config, index, data);
 
 		throw new Error('Not implemented');
 	};
@@ -34,7 +33,7 @@ define([
 	 * @param {number} index Item position index
 	 */
 	AbstractRenderer.prototype.destroyItem = function(index) {
-		util.noop(index);
+		void(index);
 
 		throw new Error('Not implemented');
 	};

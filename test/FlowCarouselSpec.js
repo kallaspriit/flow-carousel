@@ -3,7 +3,9 @@ define([
 	'Config',
 	'AbstractDataSource',
 	'ArrayDataSource',
-], function(FlowCarousel, Config, AbstractDataSource, ArrayDataSource) {
+	'AbstractAnimator',
+	'DefaultAnimator',
+], function(FlowCarousel, Config, AbstractDataSource, ArrayDataSource, AbstractAnimator, DefaultAnimator) {
 	'use strict';
 
 	function CustomDataSource() {
@@ -98,6 +100,27 @@ define([
 			expect(carousel.getConfig().itemsPerPage).toEqual(newItemsPerPage);
 		});
 
+		it('can be initiated with a custom animator', function () {
+			var animator = new DefaultAnimator(carousel);
+
+			carousel.init('.carousel', {
+				animator: animator
+			});
+
+			expect(carousel.getAnimator()).toEqual(animator);
+		});
+
+		it('initiating with invalid animator throws error', function () {
+			var animator = {},
+				initiateWithInvalidAnimator = function() {
+					carousel.init('.carousel', {
+						animator: animator
+					});
+				};
+
+			expect(initiateWithInvalidAnimator).toThrow();
+		});
+
 		it('can be initiated with array data', function (done) {
 			var data = [1, 2, 3, 4];
 
@@ -148,7 +171,7 @@ define([
 			expect(carousel.getDataSource()).toEqual(jasmine.any(AbstractDataSource));
 		});
 
-		it('fixtures work', function(){
+		it('fixtures work', function() {
 			expect(typeof window.__html__).toEqual('object');
 
 			// load a fixture
@@ -157,7 +180,7 @@ define([
 			expect($('.carousel').length).toEqual(1);
 		});
 
-		it('renders carousel with default settings', function(){
+		it('renders carousel with default settings', function() {
 			// load test fixture
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 
@@ -166,7 +189,7 @@ define([
 			expect($('.flow-carousel-wrap').length).toEqual(1);
 		});
 
-		it('renders carousel vertically', function(){
+		it('renders carousel vertically', function() {
 			// load test fixture
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 
@@ -178,7 +201,7 @@ define([
 			expect($('.flow-carousel-wrap').hasClass('flow-carousel-vertical')).toEqual(true);
 		});
 
-		it('requesting invalid orientation throws error', function(){
+		it('requesting invalid orientation throws error', function() {
 			// load test fixture
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 
@@ -196,8 +219,6 @@ define([
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 
 			spyOn(carousel, '_reLayout').and.callFake(function() {
-				console.log('spy', arguments);
-
 				expect(carousel._reLayout).toHaveBeenCalled();
 
 				done();
@@ -230,7 +251,7 @@ define([
 			}, 300);
 		});
 
-		it('calling "_getWrapSize" with invalid orientation throws error', function(){
+		it('calling "_getWrapSize" with invalid orientation throws error', function() {
 			// load test fixture
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 
@@ -243,7 +264,7 @@ define([
 			expect(requestInvalidOrientation).toThrow();
 		});
 
-		it('calling "_getExtraSize" with invalid orientation throws error', function(){
+		it('calling "_getExtraSize" with invalid orientation throws error', function() {
 			// load test fixture
 			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
 

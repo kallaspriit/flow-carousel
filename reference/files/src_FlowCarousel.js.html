@@ -41,6 +41,8 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/AbstractAnimator.html">AbstractAnimator</a></li>
+            
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
                 <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
@@ -48,6 +50,8 @@
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
             
                 <li><a href="../classes/Config.html">Config</a></li>
+            
+                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
             
@@ -98,10 +102,12 @@
     <pre class="code prettyprint linenums">
 define([
 	&#x27;Config&#x27;,
-	&#x27;ArrayDataSource&#x27;,
 	&#x27;AbstractDataSource&#x27;,
+	&#x27;ArrayDataSource&#x27;,
+	&#x27;AbstractAnimator&#x27;,
+	&#x27;DefaultAnimator&#x27;,
 	&#x27;Util&#x27;,
-], function(Config, ArrayDataSource, AbstractDataSource, util) {
+], function(Config, AbstractDataSource, ArrayDataSource, AbstractAnimator, DefaultAnimator, util) {
 	&#x27;use strict&#x27;;
 
 	// expect jQuery to exists outside of this component
@@ -164,11 +170,22 @@ define([
 		/**
 		 * Renderer used to render the data.
 		 *
+		 * @property _renderer
 		 * @type {AbstractRenderer}
 		 * @default null
 		 * @private
 		 */
 		this._renderer = null;
+
+		/**
+		 * Animator to use.
+		 *
+		 * @property _animator
+		 * @type {AbstractAnimator}
+		 * @default null
+		 * @private
+		 */
+		this._animator = null;
 
 		/**
 		 * Selector of elements to turn into a carousel.
@@ -225,16 +242,30 @@ define([
 
 		this._selector = selector;
 
+		// extend the config with user-provided values if available
 		if (util.isObject(userConfig)) {
 			this._config.extend(userConfig);
 		}
 
+		// use provided data source or a simple array if provided
 		if (data instanceof AbstractDataSource || util.isArray(data)) {
 			this.setDataSource(data);
 		} else if (typeof data !== &#x27;undefined&#x27; &amp;&amp; data !== null) {
 			throw new Error(&#x27;Unexpected data type &quot;&#x27; + typeof(data) + &#x27;&quot; provided&#x27;);
 		}
 
+		// use custom animator if provided or the DefaultAnimator if not
+		if (this._config.animator !== null) {
+			if (this._config.animator instanceof AbstractAnimator) {
+				this._animator = this._config.animator;
+			} else {
+				throw new Error(&#x27;Custom animator provided in config but it\&#x27;s not an instance of AbstractAnimator&#x27;);
+			}
+		} else {
+			this._animator = new DefaultAnimator(this);
+		}
+
+		// initialize the wraps that match given selector
 		this._setupWraps(this._selector);
 	};
 
@@ -246,6 +277,16 @@ define([
 	 */
 	FlowCarousel.prototype.getConfig = function() {
 		return this._config;
+	};
+
+	/**
+	 * Returns current animator instance.
+	 *
+	 * @method getAnimator
+	 * @return {Config}
+	 */
+	FlowCarousel.prototype.getAnimator = function() {
+		return this._animator;
 	};
 
 	/**
@@ -412,8 +453,6 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		console.log(&#x27;_reLayout&#x27;);
-
 		// just forward to _setupLayout
 		this._setupLayout(element, orientation);
 	};

@@ -4,20 +4,24 @@ define([
 ], function(AbstractDataSource, Deferred) {
 	'use strict';
 
+	// expect jQuery to exist
+	var $ = window.jQuery;
+
 	/**
 	 * Data source interface.
 	 *
-	 * @class ArrayDataSource
+	 * @class HtmlDataSource
 	 * @extends AbstractDataSource
 	 * @constructor
 	 */
-	function ArrayDataSource(data) {
+	function HtmlDataSource(wrap) {
 		AbstractDataSource.call(this);
 
-		this._data = data || [];
+		this._wrap = wrap;
+		this._data = this._setupData(this._wrap);
 	}
 
-	ArrayDataSource.prototype = Object.create(AbstractDataSource.prototype);
+	HtmlDataSource.prototype = Object.create(AbstractDataSource.prototype);
 
 	/**
 	 * Returns the number of items in the dataset.
@@ -25,7 +29,7 @@ define([
 	 * @method getItemCount
 	 * @return {number}
 	 */
-	ArrayDataSource.prototype.getItemCount = function() {
+	HtmlDataSource.prototype.getItemCount = function() {
 		return this._data.length;
 	};
 
@@ -44,7 +48,7 @@ define([
 	 * @param {number} [endIndex=length] Range end index to fetch
 	 * @return {Deferred.Promise}
 	 */
-	ArrayDataSource.prototype.getItems = function(startIndex, endIndex) {
+	HtmlDataSource.prototype.getItems = function(startIndex, endIndex) {
 		var deferred = new Deferred();
 
 		startIndex = startIndex || 0;
@@ -65,5 +69,25 @@ define([
 		return deferred.promise();
 	};
 
-	return ArrayDataSource;
+	/**
+	 * Extracts the HTML item elements from the given wrap and uses them as data.
+	 *
+	 * @method _setupData
+	 * @param {DOMElement} wrap Wrap to get items from
+	 * @return {array}
+	 */
+	HtmlDataSource.prototype._setupData = function(wrap) {
+		var elements = [];
+
+		$(wrap).children().each(function(index, element) {
+			elements.push(element);
+
+			// detach the original element from the dom
+			$(element).detach();
+		});
+
+		return elements;
+	};
+
+	return HtmlDataSource;
 });

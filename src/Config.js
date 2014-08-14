@@ -113,11 +113,36 @@ define([
 		};
 
 		/**
-		 * Custom animator to use.
+		 * Optional custom data source to use.
+		 *
+		 * As a special case, a simple array can be provided as data source which is converted to use
+		 * {{#crossLink "ArrayDataSource"}}{{/crossLink}} implementation.
+		 *
+		 * If none is provided then the {{#crossLink "HtmlDataSource"}}{{/crossLink}} is used.
+		 *
+		 * @property renderer
+		 * @type {AbstractRenderer|array}
+		 * @default null
+		 */
+		this.dataSource = null;
+
+		/**
+		 * Optional custom renderer to use.
+		 *
+		 * If none is provided then the {{#crossLink "HtmlRenderer"}}{{/crossLink}} is used.
+		 *
+		 * @property renderer
+		 * @type {AbstractRenderer}
+		 * @default null
+		 */
+		this.renderer = null;
+
+		/**
+		 * Optional custom animator to use.
 		 *
 		 * Should be an instance of {{#crossLink "AbstractAnimator"}}{{/crossLink}}.
 		 *
-		 * If none is set, the carousel uses the {{#crossLink "DefaultAnimator"}}{{/crossLink}}.
+		 * If none is provided then the {{#crossLink "DefaultAnimator"}}{{/crossLink}} is used.
 		 *
 		 * @property animator
 		 * @type {AbstractAnimator}

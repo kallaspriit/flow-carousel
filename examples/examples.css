@@ -6,6 +6,7 @@ BODY {
     overflow: hidden;
     margin-bottom: 40px;
     border: 10px solid #FFF;
+    background-color: #EEE;
 }
 .carousel-horizontal {
     height: 200px;
@@ -31,4 +32,12 @@ BODY {
 }
 .carousel-vertical > DIV {
 
+}
+
+/* special example styles */
+#basic-carousel > DIV {
+    opacity: 0.5;
+}
+#basic-carousel > DIV:nth-child(2n) {
+    background-color: #5EFF40;
 }

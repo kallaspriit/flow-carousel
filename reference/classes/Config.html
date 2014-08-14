@@ -53,7 +53,13 @@
             
                 <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
+                <li><a href="../classes/Deferred.html">Deferred</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
+            
+                <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -286,6 +292,20 @@
                             </li>
                         
                             <li class="index-item property">
+                                <a href="#property_renderer">renderer</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_renderer">renderer</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
                                 <a href="#property_responsiveBreakpoints">responsiveBreakpoints</a>
 
                                 
@@ -362,7 +382,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l143"><code>src\Config.js:143</code></a>
+        <a href="../files/src_Config.js.html#l168"><code>src\Config.js:168</code></a>
         
         </p>
 
@@ -454,7 +474,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l190"><code>src\Config.js:190</code></a>
+        <a href="../files/src_Config.js.html#l215"><code>src\Config.js:215</code></a>
         
         </p>
 
@@ -558,7 +578,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l164"><code>src\Config.js:164</code></a>
+        <a href="../files/src_Config.js.html#l189"><code>src\Config.js:189</code></a>
         
         </p>
 
@@ -637,7 +657,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l115"><code>src\Config.js:115</code></a>
+        <a href="../files/src_Config.js.html#l140"><code>src\Config.js:140</code></a>
         
         </p>
 
@@ -647,9 +667,9 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
     </div>
 
     <div class="description">
-        <p>Custom animator to use.</p>
+        <p>Optional custom animator to use.</p>
 <p>Should be an instance of <a href="../classes/AbstractAnimator.html" class="crosslink">AbstractAnimator</a>.</p>
-<p>If none is set, the carousel uses the <a href="../classes/DefaultAnimator.html" class="crosslink">DefaultAnimator</a>.</p>
+<p>If none is provided then the <a href="../classes/DefaultAnimator.html" class="crosslink">DefaultAnimator</a> is used.</p>
 
     </div>
 
@@ -922,7 +942,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l129"><code>src\Config.js:129</code></a>
+        <a href="../files/src_Config.js.html#l154"><code>src\Config.js:154</code></a>
         
         </p>
 
@@ -974,6 +994,104 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             </li>
             
         </ul>
+    
+</div>
+
+                
+                    <div id="property_renderer" class="property item">
+    <h3 class="name"><code>renderer</code></h3>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l115"><code>src\Config.js:115</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional custom data source to use.</p>
+<p>As a special case, a simple array can be provided as data source which is converted to use
+<a href="../classes/ArrayDataSource.html" class="crosslink">ArrayDataSource</a> implementation.</p>
+<p>If none is provided then the <a href="../classes/HtmlDataSource.html" class="crosslink">HtmlDataSource</a> is used.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_renderer" class="property item">
+    <h3 class="name"><code>renderer</code></h3>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l129"><code>src\Config.js:129</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional custom renderer to use.</p>
+<p>If none is provided then the <a href="../classes/HtmlRenderer.html" class="crosslink">HtmlRenderer</a> is used.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
     
 </div>
 

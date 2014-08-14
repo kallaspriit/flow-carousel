@@ -1,11 +1,8 @@
 define([
-	'AbstractAnimator'
-], function(AbstractAnimator) {
+	'AbstractAnimator',
+	'Deferred'
+], function(AbstractAnimator, Deferred) {
 	'use strict';
-
-	// using deferred implementation from jQuery
-	var $ = window.jQuery,
-		Deferred = $.Deferred;
 
 	/**
 	 * Data source interface.
@@ -26,16 +23,18 @@ define([
 	/**
 	 * Animates the carousel to given item index position.
 	 *
-	 * @method animateToIndex
+	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToIndex = function(itemIndex) {
+	DefaultAnimator.prototype.animateToItem = function(itemIndex) {
 		var deferred = new Deferred();
 
 		void(itemIndex);
 
 		deferred.resolve();
+
+		console.log('navigating to', itemIndex);
 
 		return deferred.promise();
 	};

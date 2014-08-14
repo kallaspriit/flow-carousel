@@ -53,7 +53,13 @@
             
                 <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
+                <li><a href="../classes/Deferred.html">Deferred</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
+            
+                <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -273,7 +279,7 @@
             
         
         
-        <a href="../files/src_AbstractRenderer.js.html#l29"><code>src\AbstractRenderer.js:29</code></a>
+        <a href="../files/src_AbstractRenderer.js.html#l32"><code>src\AbstractRenderer.js:32</code></a>
         
         </p>
 
@@ -350,6 +356,10 @@
     
 
     
+        <span class="returns-inline">
+            <span class="type">Deferred.Promise</span>
+        </span>
+    
 
     
 
@@ -387,6 +397,7 @@
     <div class="description">
         <p>Renders a carousel item.</p>
 <p>The data can be either a object of key-value pairs or an existing dom element to modify.</p>
+<p>Rendering an item can be asynchronous so a promise is returned.</p>
 
     </div>
 
@@ -448,6 +459,18 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Deferred.Promise</span>:
+                    
+                
+            </div>
+        </div>
     
 
     

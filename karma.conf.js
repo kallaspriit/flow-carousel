@@ -2,6 +2,9 @@
 module.exports = function(config) {
 	'use strict';
 
+	// enable debugging if some error occurs, removes code coverage
+	var debug = true;
+
     config.set({
  
         // base path, that will be used to resolve files and exclude
@@ -13,7 +16,7 @@ module.exports = function(config) {
 		// configure preprocessors
 		preprocessors: {
 			'test/**/*.html': ['html2js'],
-			'src/**/*.js': ['coverage']
+			'src/**/*.js': debug ? [] : ['coverage']
 		},
  
         // list of files / patterns to load in the browser

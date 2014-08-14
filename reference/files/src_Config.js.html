@@ -53,7 +53,13 @@
             
                 <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
+                <li><a href="../classes/Deferred.html">Deferred</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
+            
+                <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -215,11 +221,36 @@ define([
 		};
 
 		/**
-		 * Custom animator to use.
+		 * Optional custom data source to use.
+		 *
+		 * As a special case, a simple array can be provided as data source which is converted to use
+		 * {{#crossLink &quot;ArrayDataSource&quot;}}{{/crossLink}} implementation.
+		 *
+		 * If none is provided then the {{#crossLink &quot;HtmlDataSource&quot;}}{{/crossLink}} is used.
+		 *
+		 * @property renderer
+		 * @type {AbstractRenderer|array}
+		 * @default null
+		 */
+		this.dataSource = null;
+
+		/**
+		 * Optional custom renderer to use.
+		 *
+		 * If none is provided then the {{#crossLink &quot;HtmlRenderer&quot;}}{{/crossLink}} is used.
+		 *
+		 * @property renderer
+		 * @type {AbstractRenderer}
+		 * @default null
+		 */
+		this.renderer = null;
+
+		/**
+		 * Optional custom animator to use.
 		 *
 		 * Should be an instance of {{#crossLink &quot;AbstractAnimator&quot;}}{{/crossLink}}.
 		 *
-		 * If none is set, the carousel uses the {{#crossLink &quot;DefaultAnimator&quot;}}{{/crossLink}}.
+		 * If none is provided then the {{#crossLink &quot;DefaultAnimator&quot;}}{{/crossLink}} is used.
 		 *
 		 * @property animator
 		 * @type {AbstractAnimator}

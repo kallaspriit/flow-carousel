@@ -53,7 +53,13 @@
             
                 <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
+                <li><a href="../classes/Deferred.html">Deferred</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
+            
+                <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -118,6 +124,7 @@ define([
 		 * @method isObject
 		 * @param {*} arg Arguments to check
 		 * @return {boolean}
+		 * @static
 		 */
 		isObject: function(arg) {
 			return typeof arg === &#x27;object&#x27; &amp;&amp; arg !== null;
@@ -129,6 +136,7 @@ define([
 		 * @method isArray
 		 * @param {*} arg Arguments to check
 		 * @return {boolean}
+		 * @static
 		 */
 		isArray: function(arg) {
 			return Object.prototype.toString.call(arg) === &#x27;[object Array]&#x27;;

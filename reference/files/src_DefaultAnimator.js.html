@@ -53,7 +53,13 @@
             
                 <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
+                <li><a href="../classes/Deferred.html">Deferred</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
+            
+                <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -101,13 +107,10 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;AbstractAnimator&#x27;
-], function(AbstractAnimator) {
+	&#x27;AbstractAnimator&#x27;,
+	&#x27;Deferred&#x27;
+], function(AbstractAnimator, Deferred) {
 	&#x27;use strict&#x27;;
-
-	// using deferred implementation from jQuery
-	var $ = window.jQuery,
-		Deferred = $.Deferred;
 
 	/**
 	 * Data source interface.
@@ -128,16 +131,18 @@ define([
 	/**
 	 * Animates the carousel to given item index position.
 	 *
-	 * @method animateToIndex
+	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToIndex = function(itemIndex) {
+	DefaultAnimator.prototype.animateToItem = function(itemIndex) {
 		var deferred = new Deferred();
 
 		void(itemIndex);
 
 		deferred.resolve();
+
+		console.log(&#x27;navigating to&#x27;, itemIndex);
 
 		return deferred.promise();
 	};

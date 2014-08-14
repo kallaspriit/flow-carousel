@@ -53,7 +53,13 @@
             
                 <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
             
+                <li><a href="../classes/Deferred.html">Deferred</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
+            
+                <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
+            
+                <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -101,13 +107,10 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;AbstractDataSource&#x27;
-], function(AbstractDataSource) {
+	&#x27;AbstractDataSource&#x27;,
+	&#x27;Deferred&#x27;
+], function(AbstractDataSource, Deferred) {
 	&#x27;use strict&#x27;;
-
-	// using deferred implementation from jQuery
-	var $ = window.jQuery,
-		Deferred = $.Deferred;
 
 	/**
 	 * Data source interface.
@@ -155,11 +158,10 @@ define([
 		startIndex = startIndex || 0;
 		endIndex = endIndex || this._data.length;
 
+		// validate index range
 		if (startIndex &lt; 0) {
 			throw new Error(&#x27;Invalid negative start index &quot;&#x27; + startIndex + &#x27;&quot; requested&#x27;);
-		}
-
-		if (endIndex &gt; this._data.length) {
+		} else if (endIndex &gt; this._data.length) {
 			throw new Error(
 				&#x27;Too large end index &quot;&#x27; + endIndex + &#x27;&quot; requested, there are only &#x27; + this._data.length + &#x27; items&#x27;
 			);

@@ -16,6 +16,7 @@ define([
 		 * @method isObject
 		 * @param {*} arg Arguments to check
 		 * @return {boolean}
+		 * @static
 		 */
 		isObject: function(arg) {
 			return typeof arg === 'object' && arg !== null;
@@ -27,6 +28,7 @@ define([
 		 * @method isArray
 		 * @param {*} arg Arguments to check
 		 * @return {boolean}
+		 * @static
 		 */
 		isArray: function(arg) {
 			return Object.prototype.toString.call(arg) === '[object Array]';

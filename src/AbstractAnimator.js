@@ -16,11 +16,11 @@ define([
 	/**
 	 * Animates the carousel to given item index position.
 	 *
-	 * @method animateToIndex
+	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
 	 * @return {Deferred.Promise}
 	 */
-	AbstractAnimator.prototype.animateToIndex = function(itemIndex) {
+	AbstractAnimator.prototype.animateToItem = function(itemIndex) {
 		void(itemIndex);
 
 		throw new Error('Not implemented');

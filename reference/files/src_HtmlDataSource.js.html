@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\AbstractRenderer.js - FlowCarousel</title>
+    <title>src\HtmlDataSource.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -102,54 +102,102 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\AbstractRenderer.js</h1>
+                        <h1 class="file-heading">File: src\HtmlDataSource.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-], function() {
+	&#x27;AbstractDataSource&#x27;,
+	&#x27;Deferred&#x27;
+], function(AbstractDataSource, Deferred) {
 	&#x27;use strict&#x27;;
 
+	// expect jQuery to exist
+	var $ = window.jQuery;
+
 	/**
-	 * Renderer interface.
+	 * Data source interface.
 	 *
-	 * @class AbstractRenderer
+	 * @class HtmlDataSource
+	 * @extends AbstractDataSource
 	 * @constructor
 	 */
-	function AbstractRenderer() {}
+	function HtmlDataSource(wrap) {
+		AbstractDataSource.call(this);
+
+		this._wrap = wrap;
+		this._data = this._setupData(this._wrap);
+	}
+
+	HtmlDataSource.prototype = Object.create(AbstractDataSource.prototype);
 
 	/**
-	 * Renders a carousel item.
+	 * Returns the number of items in the dataset.
 	 *
-	 * The data can be either a object of key-value pairs or an existing dom element to modify.
+	 * @method getItemCount
+	 * @return {number}
+	 */
+	HtmlDataSource.prototype.getItemCount = function() {
+		return this._data.length;
+	};
+
+	/**
+	 * Fetches given range of items from the dataset.
 	 *
-	 * Rendering an item can be asynchronous so a promise is returned.
+	 * This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
+	 * available or rejected when an error occurs.
 	 *
-	 * @method renderItem
-	 * @param {Config} config Carousel configuration
-	 * @param {number} index Item position index
-	 * @param {object|DOMElement} data Item data object or existing dom element
+	 * By default the range is the entire dataset.
+	 *
+	 * Throws error if invalid range is requested.
+	 *
+	 * @method getItems
+	 * @param {number} [startIndex=0] Range start index to fetch
+	 * @param {number} [endIndex=length] Range end index to fetch
 	 * @return {Deferred.Promise}
 	 */
-	AbstractRenderer.prototype.renderItem = function(config, index, data) {
-		void(config, index, data);
+	HtmlDataSource.prototype.getItems = function(startIndex, endIndex) {
+		var deferred = new Deferred();
 
-		throw new Error(&#x27;Not implemented&#x27;);
+		startIndex = startIndex || 0;
+		endIndex = endIndex || this._data.length;
+
+		// validate index range
+		if (startIndex &lt; 0) {
+			throw new Error(&#x27;Invalid negative start index &quot;&#x27; + startIndex + &#x27;&quot; requested&#x27;);
+		} else if (endIndex &gt; this._data.length) {
+			throw new Error(
+				&#x27;Too large end index &quot;&#x27; + endIndex + &#x27;&quot; requested, there are only &#x27; + this._data.length + &#x27; items&#x27;
+			);
+		}
+
+		// resolve the deferred immediately as array data source is syncronous
+		deferred.resolve(this._data.slice(startIndex, endIndex));
+
+		return deferred.promise();
 	};
 
 	/**
-	 * Destroys a carousel item.
+	 * Extracts the HTML item elements from the given wrap and uses them as data.
 	 *
-	 * @method destroyItem
-	 * @param {number} index Item position index
+	 * @method _setupData
+	 * @param {DOMElement} wrap Wrap to get items from
+	 * @return {array}
 	 */
-	AbstractRenderer.prototype.destroyItem = function(index) {
-		void(index);
+	HtmlDataSource.prototype._setupData = function(wrap) {
+		var elements = [];
 
-		throw new Error(&#x27;Not implemented&#x27;);
+		$(wrap).children().each(function(index, element) {
+			elements.push(element);
+
+			// detach the original element from the dom
+			$(element).detach();
+		});
+
+		return elements;
 	};
 
-	return AbstractRenderer;
+	return HtmlDataSource;
 });
     </pre>
 </div>

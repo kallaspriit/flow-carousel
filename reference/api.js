@@ -7,7 +7,10 @@ YUI.add("yuidoc-meta", function(Y) {
         "ArrayDataSource",
         "Config",
         "DefaultAnimator",
+        "Deferred",
         "FlowCarousel",
+        "HtmlDataSource",
+        "HtmlRenderer",
         "Util"
     ],
     "modules": [],

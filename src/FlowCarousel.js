@@ -2,14 +2,29 @@ define([
 	'Config',
 	'AbstractDataSource',
 	'ArrayDataSource',
+	'HtmlDataSource',
 	'AbstractAnimator',
 	'DefaultAnimator',
+	'AbstractRenderer',
+	'HtmlRenderer',
+	'Deferred',
 	'Util',
-], function(Config, AbstractDataSource, ArrayDataSource, AbstractAnimator, DefaultAnimator, util) {
+], function(
+	Config,
+	AbstractDataSource,
+	ArrayDataSource,
+	HtmlDataSource,
+	AbstractAnimator,
+	DefaultAnimator,
+	AbstractRenderer,
+	HtmlRenderer,
+	Deferred,
+	Util
+) {
 	'use strict';
 
-	// expect jQuery to exists outside of this component
-	//var $ = window.jQuery;
+	// expect jQuery to exists outside of this component and use its deferred implementation
+	var $ = window.jQuery;
 
 	/**
 	 * FlowCarousel main class.
@@ -107,11 +122,23 @@ define([
 
 		/**
 		 * The top wrap elements jQuery object.
-		 * @type {jQuery}
+		 *
+		 * @property _wrap
+		 * @type {DOMElement}
 		 * @default null
 		 * @private
 		 */
-		this._$wrap = null;
+		this._wrap = null;
+
+		/**
+		 * Currently displayed page number starting from zero.
+		 *
+		 * @property _currentPageIndex
+		 * @type {number}
+		 * @default 0
+		 * @private
+		 */
+		this._currentPageIndex = 0;
 
 		/**
 		 * Shortcut to the list of possible orientations from Config.
@@ -131,25 +158,46 @@ define([
 	 * @param {string} selector Selector of elements to turn into a carousel
 	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
 	 * {{#crossLink "Config"}}{{/crossLink}}.
-	 * @param {object|AbstractDataSource} [data] Data to render
 	 */
-	FlowCarousel.prototype.init = function(selector, userConfig, data) {
+	FlowCarousel.prototype.init = function(selector, userConfig) {
+		this._selector = selector;
+
 		if (typeof selector !== 'string') {
 			throw new Error('Expected a string as the selector argument, but got ' + typeof selector);
 		}
 
-		this._selector = selector;
-
 		// extend the config with user-provided values if available
-		if (util.isObject(userConfig)) {
+		if (Util.isObject(userConfig)) {
 			this._config.extend(userConfig);
 		}
 
-		// use provided data source or a simple array if provided
-		if (data instanceof AbstractDataSource || util.isArray(data)) {
-			this.setDataSource(data);
-		} else if (typeof data !== 'undefined' && data !== null) {
-			throw new Error('Unexpected data type "' + typeof(data) + '" provided');
+		// initialize the wrap element that match given selector
+		this._setupElement(this._selector);
+
+		// use provided data source or a simple array if provided, use HtmlDataSource if nothing is provided
+		if (this._config.dataSource instanceof AbstractDataSource || Util.isArray(this._config.dataSource)) {
+			this.setDataSource(this._config.dataSource);
+		} else if (typeof this._config.dataSource !== 'undefined' && this._config.dataSource !== null) {
+			throw new Error('Unexpected data source type "' + typeof(this._config.dataSource) + '" provided');
+		} else {
+			this._dataSource = new HtmlDataSource(this._wrap);
+		}
+
+		// use custom renderer if provided or the HtmlRenderer if not
+		if (this._config.renderer !== null) {
+			if (this._config.renderer instanceof AbstractRenderer) {
+				this._renderer = this._config.renderer;
+			} else {
+				throw new Error('Custom renderer provided in config but it\'s not an instance of AbstractRenderer');
+			}
+		} else {
+			if (this._dataSource instanceof HtmlDataSource) {
+				this._renderer = new HtmlRenderer();
+			} else {
+				throw new Error(
+					'Expecting a custom "renderer" to be defined in the config if not using the HtmlDataSource'
+				);
+			}
 		}
 
 		// use custom animator if provided or the DefaultAnimator if not
@@ -163,8 +211,8 @@ define([
 			this._animator = new DefaultAnimator(this);
 		}
 
-		// initialize the wraps that match given selector
-		this._setupWraps(this._selector);
+		// setup the carousel rendering and events
+		this._setupCarousel(this._wrap, this._config.orientation);
 	};
 
 	/**
@@ -205,7 +253,7 @@ define([
 	FlowCarousel.prototype.setDataSource = function(data) {
 		if (data instanceof AbstractDataSource) {
 			this._dataSource = data;
-		} else if (util.isArray(data)) {
+		} else if (Util.isArray(data)) {
 			this._dataSource = new ArrayDataSource(data);
 		} else {
 			throw new Error(
@@ -230,30 +278,66 @@ define([
 	};
 
 	/**
-	 * Initializes the top-level wrap elements.
+	 * Navigates to a carousel item by index.
 	 *
-	 * @method _setupWraps
+	 * Throws error if out of bounds index is requested.
+	 *
+	 * Returns deferred promise that will be resolved once the animation completes.
+	 *
+	 * @method navigateToItem
+	 * @param {number} itemIndex Item index to navigate to.
+	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 */
+	FlowCarousel.prototype.navigateToItem = function(itemIndex) {
+		var itemCount = this._dataSource.getItemCount();
+
+		// validate index range
+		if (itemIndex < 0) {
+			throw new Error('Invalid negative  index "' + itemIndex + '" requested');
+		} else if (itemIndex > itemCount - 1) {
+			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
+		}
+
+		var promise = this._animator.animateToItem(itemIndex);
+
+		return promise;
+	};
+
+	/**
+	 * Initializes the top-level wrap element.
+	 *
+	 * If the selector matches multiple elements, only the first one is considered.
+	 *
+	 * If the selector does not match any elements, an error is thrown.
+	 *
+	 * @method _setupElement
 	 * @param {string} selector Wraps selector
 	 * @private
 	 */
-	FlowCarousel.prototype._setupWraps = function(selector) {
-		this._$wrap = $(selector);
+	FlowCarousel.prototype._setupElement = function(selector) {
+		var matches = $(selector);
 
-		this._$wrap.each(function(index, el) {
-			this._setupWrap(el, this._config.orientation);
-		}.bind(this));
+		if (matches.length === 0) {
+			throw new Error('Selector "' + selector + '" did not match any elements');
+		} else if (matches.length > 1) {
+			throw new Error(
+				'Selector "' + selector + '" matches more then one element, try using "' + selector + ':first"'
+			);
+		}
+
+		this._wrap = matches[0];
 	};
 
 	/**
 	 * Initializes a single wrap element.
 	 *
-	 * @method _setupWrap
-	 * @param {DOMelement} element Element to initialize
+	 * @method _setupCarousel
+	 * @param {DOMelement} wrap The carousel wrap to setup
 	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @private
 	 */
-	FlowCarousel.prototype._setupWrap = function(element, orientation) {
-		var $element = $(element),
+	FlowCarousel.prototype._setupCarousel = function(wrap, orientation) {
+		var $element = $(wrap),
 			className = {
 				wrap: this._config.getClassName('wrap'),
 				loading: this._config.getClassName('loading'),
@@ -276,15 +360,12 @@ define([
 			throw new Error('Unexpected orientation "' + orientation + '" provided');
 		}
 
-		// add item class to all immediate children
-		$element.children().addClass(className.item);
-
 		// setup the individual elements
-		this._setupLayout(element, orientation);
+		this._setupLayout(wrap, orientation);
 
 		// if we're using responsive layout then we need to recalculate sizes and positions if the wrap size changes
 		if (this._config.useResponsiveLayout) {
-			this._setupResponsiveLayoutListener(element, orientation);
+			this._setupResponsiveLayoutListener(wrap, orientation);
 		}
 
 		// remove the loading class
@@ -293,51 +374,165 @@ define([
 	};
 
 	/**
-	 * Initializes items in a wrap.
+	 * Sets up the layout and renders the initial set of items.
+	 *
+	 * Since fetching and rendering items can be asyncronous, this method returns a promise.
 	 *
 	 * @method _setupLayout
 	 * @param {DOMelement} element Element to setup items in
 	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @return {Deferred.Promise}
 	 * @private
 	 */
 	FlowCarousel.prototype._setupLayout = function(element, orientation) {
+		var wrapSize = this._getWrapSize(element, orientation),
+			itemsPerPage = this._config.getItemsPerPage(wrapSize),
+			renderRange = this._getRenderRangeForPage(this._currentPageIndex, itemsPerPage);
+
+		// render the items
+		return this._renderItemRange(renderRange.start, renderRange.end);
+	};
+
+	/**
+	 * Returns the range of items that should be rendered to display given page.
+	 *
+	 * @method _getRenderRangeForPage
+	 * @param {number} pageIndex Page number starting from zero
+	 * @param {number} itemsPerPage How many items are shown on one page
+	 * @return {object} The start and end index of range to render
+	 * @private
+	 */
+	FlowCarousel.prototype._getRenderRangeForPage = function(pageIndex, itemsPerPage) {
+		return {
+			start: pageIndex * itemsPerPage,
+			end: (pageIndex + 1) * itemsPerPage
+		};
+	};
+
+	/**
+	 * Renders a range of carousel items.
+	 *
+	 * @method _renderItemRange
+	 * @param {number} startIndex Range start index
+	 * @param {number} endIndex Range end index
+	 * @return {Deferred.Promise}
+	 * @private
+	 */
+	FlowCarousel.prototype._renderItemRange = function(startIndex, endIndex) {
+		var deferred = new Deferred();
+
+		console.log('render range', startIndex, endIndex);
+
+		this._dataSource.getItems(startIndex, endIndex)
+			.done(function(items) {
+				console.log('got items', items);
+
+				this._renderItems(items, startIndex);
+			}.bind(this))
+			.fail(function() {
+				throw new Error('Loading item range ' + startIndex + ' to ' + endIndex + ' failed');
+			}.bind(this));
+
+		return deferred.promise();
+	};
+
+	/**
+	 * Renders given carousel items.
+	 *
+	 * @method _renderItems
+	 * @param {array} items Items to render
+	 * @param {number} startIndex Range start index
+	 * @return {Deferred.Promise}
+	 * @private
+	 */
+	FlowCarousel.prototype._renderItems = function(items, startIndex) {
+		var deferred = new Deferred(),
+			promises = [],
+			i,
+			itemIndex,
+			item,
+			promise;
+
+		for (i = 0; i < items.length; i++) {
+			item = items[i];
+			itemIndex = startIndex + i;
+
+			promise = this._renderer.renderItem(this._config, itemIndex, item);
+
+			promises.push(promise);
+		}
+
+		// wait for all the elements to get rendered
+		// TODO Add each element as soon as it renders?
+		Deferred.when.apply($, promises)
+			.done(function() {
+				this._insertRenderedElements(arguments, startIndex);
+
+				deferred.resolve();
+			}.bind(this))
+			.fail(function() {
+				deferred.reject();
+			});
+
+		return deferred.promise();
+	};
+
+	FlowCarousel.prototype._insertRenderedElements = function(elements, startIndex) {
+		var i,
+			elementIndex;
+
+		for (i = 0; i < elements.length; i++) {
+			elementIndex = startIndex + i;
+
+			this._insertRenderedElement(elements[i], elementIndex);
+		}
+	};
+
+	FlowCarousel.prototype._insertRenderedElement = function(element, index) {
+		// calculate the properties of the element
 		var $element = $(element),
-			wrapSize = this._getWrapSize(element, orientation),
+			orientation = this._config.orientation,
+			wrapSize = this._getWrapSize(this._wrap, orientation),
 			oppositeOrientation = orientation === Config.Orientation.HORIZONTAL
 				? Config.Orientation.VERTICAL
 				: Config.Orientation.HORIZONTAL,
-			wrapOppositeSize = this._getWrapSize(element, oppositeOrientation),
+			wrapOppositeSize = this._getWrapSize(this._wrap, oppositeOrientation),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			itemMargin = this._config.margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			effectiveOffset = 0,
-			effectiveSize,
-			extraSize,
-			cssProperties;
+			effectiveOffset = index * itemSize + (itemMargin - index * gapPerItem),
+			cssProperties = {},
+			//extraSize = this._getExtraSize(element, orientation),
+			extraSize = 0,
+			effectiveSize = itemSize - extraSize - gapPerItem,
+			$wrapper = $('<div></div>', {
+				'class': this._config.getClassName('item')
+			}),
+			$wrappedElement;
 
-		$element.children().each(function(index, el) {
-			// calculate the extra size of an element
-			extraSize = this._getExtraSize(el, orientation);
-			effectiveSize = itemSize - extraSize - gapPerItem;
-			cssProperties = {};
+		// the properties to set depends on the orientation
+		if (orientation === Config.Orientation.HORIZONTAL) {
+			cssProperties.width = effectiveSize;
+			cssProperties.left = effectiveOffset;
+			cssProperties.height = wrapOppositeSize;
 
-			// the properties to set depends on the orientation
-			if (orientation === Config.Orientation.HORIZONTAL) {
-				cssProperties.width = effectiveSize;
-				cssProperties.left = effectiveOffset;
-				cssProperties.height = wrapOppositeSize;
+		} else if (orientation === Config.Orientation.VERTICAL) {
+			cssProperties.height = effectiveSize;
+			cssProperties.top = effectiveOffset;
+			cssProperties.width = wrapOppositeSize;
+		}
 
-			} else if (orientation === Config.Orientation.VERTICAL) {
-				cssProperties.height = effectiveSize;
-				cssProperties.top = effectiveOffset;
-				cssProperties.width = wrapOppositeSize;
-			}
+		// wrap the item element in a carousel wrapper
+		$wrappedElement = $element.wrap($wrapper).parent();
 
-			$(el).css(cssProperties);
+		// apply the css styles and add carousel item class
+		$wrappedElement.css(cssProperties);
+		$wrappedElement.addClass(this._config.getClassName('item'));
 
-			effectiveOffset += itemSize + (itemMargin - gapPerItem);
-		}.bind(this));
+		//effectiveOffset += itemSize + (itemMargin - gapPerItem);
+
+		$(this._wrap).append($wrappedElement);
 	};
 
 	/**
@@ -345,14 +540,17 @@ define([
 	 *
 	 * Used to apply responsive layout when the wrap size changes.
 	 *
+	 * Since fetching and rendering items can be asynchronous, this method returns a promise.
+	 *
 	 * @method _reLayout
 	 * @param {DOMelement} element Element to layout
 	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @return {Deferred.Promise}
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
 		// just forward to _setupLayout
-		this._setupLayout(element, orientation);
+		return this._setupLayout(element, orientation);
 	};
 
 	/**

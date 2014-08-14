@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\AbstractRenderer.js - FlowCarousel</title>
+    <title>src\Deferred.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -102,7 +102,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\AbstractRenderer.js</h1>
+                        <h1 class="file-heading">File: src\Deferred.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -111,45 +111,19 @@ define([
 	&#x27;use strict&#x27;;
 
 	/**
-	 * Renderer interface.
+	 * Provides utility functionality.
 	 *
-	 * @class AbstractRenderer
+	 * Uses the jQuery deferred implementation.
+	 *
+	 * @class Deferred
 	 * @constructor
 	 */
-	function AbstractRenderer() {}
+	var Deferred = window.jQuery.Deferred;
 
-	/**
-	 * Renders a carousel item.
-	 *
-	 * The data can be either a object of key-value pairs or an existing dom element to modify.
-	 *
-	 * Rendering an item can be asynchronous so a promise is returned.
-	 *
-	 * @method renderItem
-	 * @param {Config} config Carousel configuration
-	 * @param {number} index Item position index
-	 * @param {object|DOMElement} data Item data object or existing dom element
-	 * @return {Deferred.Promise}
-	 */
-	AbstractRenderer.prototype.renderItem = function(config, index, data) {
-		void(config, index, data);
+	// proxy to jQuery when()
+	Deferred.when = $.when;
 
-		throw new Error(&#x27;Not implemented&#x27;);
-	};
-
-	/**
-	 * Destroys a carousel item.
-	 *
-	 * @method destroyItem
-	 * @param {number} index Item position index
-	 */
-	AbstractRenderer.prototype.destroyItem = function(index) {
-		void(index);
-
-		throw new Error(&#x27;Not implemented&#x27;);
-	};
-
-	return AbstractRenderer;
+	return Deferred;
 });
     </pre>
 </div>

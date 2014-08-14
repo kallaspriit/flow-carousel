@@ -7,13 +7,13 @@ define([
 
 	describe('AbstractAnimator', function () {
 
-		it('has method "animateToIndex"', function () {
-			expect(abstractAnimator.animateToIndex).toEqual(jasmine.any(Function));
+		it('has method "animateToItem"', function () {
+			expect(abstractAnimator.animateToItem).toEqual(jasmine.any(Function));
 		});
 
-		it('calling "animateToIndex" on abstract instance throws an error', function () {
+		it('calling "animateToItem" on abstract instance throws an error', function () {
 			var call = function() {
-				abstractAnimator.animateToIndex();
+				abstractAnimator.animateToItem();
 			};
 
 			expect(call).toThrow();

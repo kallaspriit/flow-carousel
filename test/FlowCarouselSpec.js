@@ -165,5 +165,95 @@ define([
 
 			expect($('.flow-carousel-wrap').length).toEqual(1);
 		});
+
+		it('renders carousel vertically', function(){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			carousel.init('.carousel', {
+				orientation: carousel.Orientation.VERTICAL
+			});
+
+			expect($('.flow-carousel-wrap').length).toEqual(1);
+			expect($('.flow-carousel-wrap').hasClass('flow-carousel-vertical')).toEqual(true);
+		});
+
+		it('requesting invalid orientation throws error', function(){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			var requestInvalidOrientation = function() {
+				carousel.init('.carousel', {
+					orientation: 'foobar'
+				});
+			};
+
+			expect(requestInvalidOrientation).toThrow();
+		});
+
+		it('changing carousel wrap size triggers responsive layout', function(done){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			spyOn(carousel, '_reLayout').and.callFake(function() {
+				console.log('spy', arguments);
+
+				expect(carousel._reLayout).toHaveBeenCalled();
+
+				done();
+			});
+
+			carousel.init('.carousel');
+
+			// give it some time to change
+			window.setTimeout(function() {
+				$('.carousel').css('width', '300px');
+			}, 200);
+		});
+
+		it('changing carousel wrap size triggers responsive layout', function(done){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			spyOn(carousel, '_reLayout').and.callThrough();
+
+			carousel.init('.carousel');
+
+			// give it some time to change
+			window.setTimeout(function() {
+				$('.carousel').css('width', '300px');
+			}, 200);
+
+			// give it some time to change
+			window.setTimeout(function() {
+				done();
+			}, 300);
+		});
+
+		it('calling "_getWrapSize" with invalid orientation throws error', function(){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			carousel.init('.carousel');
+
+			var requestInvalidOrientation = function() {
+				carousel._getWrapSize(carousel._$wrap, 'foobar');
+			};
+
+			expect(requestInvalidOrientation).toThrow();
+		});
+
+		it('calling "_getExtraSize" with invalid orientation throws error', function(){
+			// load test fixture
+			document.body.innerHTML = window.__html__['test/fixtures/test.html'];
+
+			carousel.init('.carousel');
+
+			var requestInvalidOrientation = function() {
+				carousel._getExtraSize(carousel._$wrap, 'foobar');
+			};
+
+			expect(requestInvalidOrientation).toThrow();
+		});
 	});
 });

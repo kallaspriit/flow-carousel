@@ -99,6 +99,16 @@ define([
 		 * @private
 		 */
 		this._$wrap = null;
+
+		/**
+		 * Shortcut to the list of possible orientations from Config.
+		 *
+		 * @property Orientation
+		 * @param {string} Orientation.HORIZONTAL='horizontal' Horizontal orientation
+		 * @param {string} Orientation.VERTIAL='vertical' Vertical orientation
+		 * @type {object}
+		 */
+		this.Orientation = Config.Orientation;
 	}
 
 	/**
@@ -294,6 +304,23 @@ define([
 	};
 
 	/**
+	 * Re-initializes the layout.
+	 *
+	 * Used to apply responsive layout when the wrap size changes.
+	 *
+	 * @method _reLayout
+	 * @param {DOMelement} element Element to layout
+	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @private
+	 */
+	FlowCarousel.prototype._reLayout = function(element, orientation) {
+		console.log('_reLayout');
+
+		// just forward to _setupLayout
+		this._setupLayout(element, orientation);
+	};
+
+	/**
 	 * Sets up main wrap size change listener to apply responsive layout.
 	 *
 	 * @method _setupResponsiveLayoutListener
@@ -327,7 +354,7 @@ define([
 
 		// perform the layout routine if the wrap size has changed
 		if (currentSize !== lastSize) {
-			this._setupLayout(element, orientation);
+			this._reLayout(element, orientation);
 		}
 	};
 

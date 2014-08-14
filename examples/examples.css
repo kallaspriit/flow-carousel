@@ -4,7 +4,7 @@ BODY {
 }
 .carousel {
     overflow: hidden;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
     border: 10px solid #FFF;
 }
 .carousel-horizontal {

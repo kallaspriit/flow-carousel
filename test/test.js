@@ -8,8 +8,6 @@ for (var file in window.__karma__.files) {
     }
 }
 
-console.log('html', window.__html__, window.__karma__.__html__);
-
 require.config({
 
 	// base url for application scripts requested without a prefix

@@ -9,7 +9,7 @@
 <body>
 	<h1>FlowCarousel</h1>
 
-	<h2>Simple horizontal carousel</h2>
+	<h2>Basic horizontal carousel with default options</h2>
 	<div id="basic-carousel" class="carousel carousel-horizontal">
 		<div class="carousel-item">1</div>
 		<div class="carousel-item">2</div>
@@ -47,7 +47,7 @@
 		<button class="btn" data-action="next-page" data-target="#basic-carousel">Next page</button>
 	</div>
 
-	<h2>Half-width horizontal carousel</h2>
+	<h2>Half-width horizontal carousel with margin</h2>
 	<div id="half-width-carousel" class="carousel carousel-horizontal carousel-halfwidth">
 		<div class="carousel-item">1</div>
 		<div class="carousel-item">2</div>
@@ -151,8 +151,8 @@
 
 		basicCarousel.init('#basic-carousel');
 
-		halfWidthCarousel.init('#half-width-carousel', {
-			margin: 10
+		/*halfWidthCarousel.init('#half-width-carousel', {
+			margin: 60
 		});
 
 		verticalCarousel.init('#vertical-carousel', {
@@ -160,7 +160,7 @@
 			orientation: Config.Orientation.VERTICAL,
 			useResponsiveLayout: false,
 			itemsPerPage: 10
-		});
+		});*/
 
 		// setup buttons
 		$('.btn').click(function() {

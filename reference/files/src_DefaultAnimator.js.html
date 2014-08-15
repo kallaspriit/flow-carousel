@@ -112,6 +112,9 @@ define([
 ], function(AbstractAnimator, Deferred) {
 	&#x27;use strict&#x27;;
 
+	// expect jQuery to exist
+	var $ = window.jQuery;
+
 	/**
 	 * Data source interface.
 	 *
@@ -136,13 +139,30 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToItem = function(itemIndex) {
-		var deferred = new Deferred();
+		var deferred = new Deferred(),
+			orientation = this._carousel.getOrientation(),
+			itemSize = this._carousel.getItemSize(),
+			itemsPerPage = this._carousel.getItemsPerPage(),
+			itemMargin = this._carousel.getConfig().margin,
+			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
+			translatePosition = itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem),
+			$scrollerWrap = $(this._carousel.getScrollerWrap()),
+			translateCommand;
 
-		void(itemIndex);
+		// the translate command is different for horizontal and vertical carousels
+		if (orientation === this._carousel.Orientation.HORIZONTAL) {
+			translateCommand = &#x27;translate3d(&#x27; + -translatePosition + &#x27;px,0,0)&#x27;;
+		} else {
+			translateCommand = &#x27;translate3d(0,&#x27; + -translatePosition + &#x27;px,0)&#x27;;
+		}
 
-		deferred.resolve();
+		// apply the translate
+		$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
 
-		console.log(&#x27;navigating to&#x27;, itemIndex);
+		// wait for the transition to end and then resolve the deferred
+		$scrollerWrap.bind(&#x27;transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd&#x27;, function() {
+			deferred.resolve();
+		});
 
 		return deferred.promise();
 	};

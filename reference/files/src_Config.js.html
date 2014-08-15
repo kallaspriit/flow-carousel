@@ -223,6 +223,15 @@ define([
 		};
 
 		/**
+		 * The carousel instance is registered as the main wrap data with the dataTarget name.
+		 *
+		 * @property dataTarget
+		 * @type {string}
+		 * @default &#x27;flow-carousel&#x27;
+		 */
+		this.dataTarget = &#x27;flow-carousel&#x27;;
+
+		/**
 		 * Optional custom data source to use.
 		 *
 		 * As a special case, a simple array can be provided as data source which is converted to use
@@ -265,10 +274,10 @@ define([
 	 * Enumeration of possible carousel orientations.
 	 *
 	 * @property Orientation
+	 * @type {object}
 	 * @param {string} Orientation.HORIZONTAL=&#x27;horizontal&#x27; Horizontal orientation
 	 * @param {string} Orientation.VERTIAL=&#x27;vertical&#x27; Vertical orientation
 	 * @static
-	 * @type {object}
 	 */
 	Config.Orientation = {
 		HORIZONTAL: &#x27;horizontal&#x27;,

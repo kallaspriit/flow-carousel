@@ -34,7 +34,10 @@ define([
 		var deferred = new Deferred(),
 			orientation = this._carousel.getOrientation(),
 			itemSize = this._carousel.getItemSize(),
-			translatePosition = itemIndex * itemSize,
+			itemsPerPage = this._carousel.getItemsPerPage(),
+			itemMargin = this._carousel.getConfig().margin,
+			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
+			translatePosition = itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			translateCommand;
 

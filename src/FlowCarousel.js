@@ -196,6 +196,15 @@ define([
 		this._currentItemIndex = 0;
 
 		/**
+		 * List of item indexes that have been rendered.
+		 *
+		 * @property _renderedItemIndexes
+		 * @type {array}
+		 * @private
+		 */
+		this._renderedItemIndexes = [];
+
+		/**
 		 * Shortcut to the list of possible orientations from Config.
 		 *
 		 * @property Orientation
@@ -368,6 +377,18 @@ define([
 	};
 
 	/**
+	 * Returns the number of items displayed on a single page.
+	 *
+	 * @method getItemsPerPage
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemsPerPage = function() {
+		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation);
+
+		return this._config.getItemsPerPage(wrapSize);
+	};
+
+	/**
 	 * Returns the target item position index.
 	 *
 	 * This can be different from the return value of getCurrentItemIndex() if the carousel is animating.
@@ -491,6 +512,9 @@ define([
 		promise.done(function() {
 			this._currentItemIndex = itemIndex;
 			this._isAnimating = false;
+
+			// check whether we need to render or remove some items
+			this._validateItemsToRender();
 		}.bind(this));
 
 		return promise;
@@ -641,6 +665,40 @@ define([
 	};
 
 	/**
+	 * Validates whether all the required items have been rendered and initiates rendering them if not.
+	 *
+	 * @method _validateItemsToRender
+	 * @private
+	 */
+	FlowCarousel.prototype._validateItemsToRender = function() {
+		var itemsPerPage = this.getItemsPerPage(),
+			currentItemIndex = this._currentItemIndex,
+			itemCount = this._dataSource.getItemCount(),
+			renderRange = this._getRangeToRenderAtPosition(currentItemIndex, itemsPerPage, itemCount);
+
+		console.log('validate', this._renderedItemIndexes, itemsPerPage, renderRange);
+
+		return this._renderItemRange(renderRange.start, renderRange.end);
+	};
+
+	/**
+	 * Returns the range of items that should be rendered given current item index and items per page.
+	 *
+	 * @method _getRangeToRenderAtPosition
+	 * @param {number} currentItemIndex Currently scrolled position index
+	 * @param {number} itemsPerPage How many items are shown on a page
+	 * @param {number} itemCount How many items there are in total
+	 * @return {object} Render range with start and end keys
+	 * @private
+	 */
+	FlowCarousel.prototype._getRangeToRenderAtPosition = function(currentItemIndex, itemsPerPage, itemCount) {
+		return {
+			start: Math.max(currentItemIndex, 0),
+			end: Math.min(currentItemIndex + itemsPerPage, itemCount)
+		};
+	};
+
+	/**
 	 * Renders a range of carousel items.
 	 *
 	 * @method _renderItemRange
@@ -684,7 +742,12 @@ define([
 			item = items[i];
 			itemIndex = startIndex + i;
 
-			promise = this._renderer.renderItem(this._config, itemIndex, item);
+			// only render the item if it's not already rendered
+			if (this._renderedItemIndexes.indexOf(itemIndex) === -1) {
+				promise = this._renderer.renderItem(this._config, itemIndex, item);
+			} else {
+				promise = null;
+			}
 
 			promises.push(promise);
 		}
@@ -722,9 +785,17 @@ define([
 			i;
 
 		for (i = 0; i < elements.length; i++) {
+			// elements that were already rendered were set to null in _renderItems(), skip these
+			if (elements[i] === null) {
+				continue;
+			}
+
 			elementIndex = startIndex + i;
 
 			this._insertRenderedElement(elements[i], elementIndex);
+
+			// add the rendered and inserted items to the list of rendered items
+			this._renderedItemIndexes.push(elementIndex);
 		}
 
 		largestChildSize = this._getLargestChildSize(

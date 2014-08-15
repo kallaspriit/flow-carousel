@@ -3,7 +3,7 @@ module.exports = function(config) {
 	'use strict';
 
 	// enable debugging if some error occurs, removes code coverage
-	var debug = true;
+	var debug = false;
 
     config.set({
  

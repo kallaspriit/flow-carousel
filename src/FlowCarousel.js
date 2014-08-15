@@ -501,11 +501,9 @@ define([
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			itemMargin = this._config.margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			effectiveOffset = index * itemSize + (itemMargin - index * gapPerItem),
 			cssProperties = {},
-			//extraSize = this._getExtraSize(element, orientation),
-			extraSize = 0,
-			effectiveSize = itemSize - extraSize - gapPerItem,
+			effectiveSize = itemSize - gapPerItem,
+			effectiveOffset = index * itemSize + index * (itemMargin - gapPerItem),
 			$wrapper = $('<div></div>', {
 				'class': this._config.getClassName('item')
 			}),
@@ -550,6 +548,7 @@ define([
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
 		// just forward to _setupLayout
+		// TODO Dont just add new elements but move around existing ones if possible
 		return this._setupLayout(element, orientation);
 	};
 

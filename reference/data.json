@@ -991,7 +991,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 538,
+            "line": 536,
             "description": "Re-initializes the layout.\n\nUsed to apply responsive layout when the wrap size changes.\n\nSince fetching and rendering items can be asynchronous, this method returns a promise.",
             "itemtype": "method",
             "name": "_reLayout",
@@ -1017,7 +1017,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 556,
+            "line": 555,
             "description": "Sets up main wrap size change listener to apply responsive layout.",
             "itemtype": "method",
             "name": "_setupResponsiveLayoutListener",
@@ -1039,7 +1039,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 570,
+            "line": 569,
             "description": "Checks whether the carousel wrap size has changed and triggers re-layout if so.",
             "itemtype": "method",
             "name": "_validateResponsiveLayout",
@@ -1061,7 +1061,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 594,
+            "line": 593,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -1083,7 +1083,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 606,
+            "line": 605,
             "description": "Returns the outer size of an element.\n\nHorizontal orientation returns element innter width and vertical inner height.",
             "itemtype": "method",
             "name": "_getWrapSize",
@@ -1109,7 +1109,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 627,
+            "line": 626,
             "description": "Returns the extra padding+margin+border size of given element in given orientation.\n\nTODO handle border-box sizing",
             "itemtype": "method",
             "name": "_getExtraSize",

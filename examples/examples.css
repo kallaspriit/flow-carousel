@@ -24,6 +24,7 @@ BODY {
     padding: 0 20px;
     font-size: 40px;
     color: #FFF;
+    display: none;
 }
 .carousel-horizontal .carousel-item {
     height: 100%;
@@ -40,6 +41,6 @@ BODY {
 #basic-carousel .carousel-item {
 
 }
-#basic-carousel > DIV:nth-child(2n) .carousel-item {
+#basic-carousel > DIV > DIV > DIV:nth-child(2n) .carousel-item {
     background-color: #5EFF40;
 }

@@ -123,12 +123,33 @@ define([
 		/**
 		 * The top wrap elements jQuery object.
 		 *
-		 * @property _wrap
+		 * @property _mainWrap
 		 * @type {DOMElement}
 		 * @default null
 		 * @private
 		 */
-		this._wrap = null;
+		this._mainWrap = null;
+
+		/**
+		 * Wrap for the items that contains the {{#crossLink "FlowCarousel/_scrollerWrap:property"}}{{/crossLink}}
+		 * which in turn contains the actual item wrappers and items.
+		 *
+		 * @property _itemsWrap
+		 * @type {DOMElement}
+		 * @default null
+		 * @private
+		 */
+		this._itemsWrap = null;
+
+		/**
+		 * This is the wrap that's animated on navigation and contains the carousel element wraps.
+		 *
+		 * @property _scrollerWrap
+		 * @type {DOMElement}
+		 * @default null
+		 * @private
+		 */
+		this._scrollerWrap = null;
 
 		/**
 		 * Currently displayed page number starting from zero.
@@ -180,7 +201,7 @@ define([
 		} else if (typeof this._config.dataSource !== 'undefined' && this._config.dataSource !== null) {
 			throw new Error('Unexpected data source type "' + typeof(this._config.dataSource) + '" provided');
 		} else {
-			this._dataSource = new HtmlDataSource(this._wrap);
+			this._dataSource = new HtmlDataSource(this._mainWrap);
 		}
 
 		// use custom renderer if provided or the HtmlRenderer if not
@@ -212,7 +233,7 @@ define([
 		}
 
 		// setup the carousel rendering and events
-		this._setupCarousel(this._wrap, this._config.orientation);
+		this._setupCarousel(this._mainWrap, this._config.orientation);
 	};
 
 	/**
@@ -325,7 +346,7 @@ define([
 			);
 		}
 
-		this._wrap = matches[0];
+		this._mainWrap = matches[0];
 	};
 
 	/**
@@ -340,12 +361,36 @@ define([
 		var $element = $(wrap),
 			className = {
 				wrap: this._config.getClassName('wrap'),
+				items: this._config.getClassName('items'),
+				item: this._config.getClassName('item'),
+				scroller: this._config.getClassName('scroller'),
 				loading: this._config.getClassName('loading'),
 				ready: this._config.getClassName('ready'),
 				horizontal: this._config.getClassName('horizontal'),
-				vertical: this._config.getClassName('vertical'),
-				item: this._config.getClassName('item')
-			};
+				vertical: this._config.getClassName('vertical')
+			},
+			$itemsWrap,
+			$scrollerWrap;
+
+		// remove any existing content (HtmlDataSource should have done that already anyway
+		$element.empty();
+
+		// create the items and the scroller wraps
+		$itemsWrap = $('<div></div>', {
+			'class': className.items
+		});
+
+		$scrollerWrap = $('<div></div>', {
+			'class': className.scroller
+		});
+
+		// add the items and scroller wraps
+		$itemsWrap.append($scrollerWrap);
+		$element.append($itemsWrap);
+
+		// store references to the items and scroller wrap dom elements
+		this._itemsWrap = $itemsWrap[0];
+		this._scrollerWrap = $scrollerWrap[0];
 
 		// add main carousel class to the wrap element
 		$element.addClass(className.wrap);
@@ -492,11 +537,11 @@ define([
 		// calculate the properties of the element
 		var $element = $(element),
 			orientation = this._config.orientation,
-			wrapSize = this._getWrapSize(this._wrap, orientation),
+			wrapSize = this._getWrapSize(this._mainWrap, orientation),
 			oppositeOrientation = orientation === Config.Orientation.HORIZONTAL
 				? Config.Orientation.VERTICAL
 				: Config.Orientation.HORIZONTAL,
-			wrapOppositeSize = this._getWrapSize(this._wrap, oppositeOrientation),
+			wrapOppositeSize = this._getWrapSize(this._mainWrap, oppositeOrientation),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			itemMargin = this._config.margin,
@@ -528,9 +573,12 @@ define([
 		$wrappedElement.css(cssProperties);
 		$wrappedElement.addClass(this._config.getClassName('item'));
 
+		// the element may be display: none to begin with, make it visible
+		$element.css('display', 'block');
+
 		//effectiveOffset += itemSize + (itemMargin - gapPerItem);
 
-		$(this._wrap).append($wrappedElement);
+		$(this._scrollerWrap).append($wrappedElement);
 	};
 
 	/**

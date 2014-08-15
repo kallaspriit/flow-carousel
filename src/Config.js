@@ -105,11 +105,13 @@ define([
 		 */
 		this.cssClasses = {
 			wrap: 'wrap',
+			items: 'items',
+			item: 'item',
+			scroller: 'scroller',
 			horizontal: 'horizontal',
 			vertical: 'vertical',
-			item: 'item',
 			loading: 'loading',
-			ready: 'ready',
+			ready: 'ready'
 		};
 
 		/**

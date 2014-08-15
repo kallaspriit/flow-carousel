@@ -42,8 +42,11 @@
 		<div class="carousel-item">29</div>
 		<div class="carousel-item carousel-item-odd">30</div>
 	</div>
-	<div>
+	<div class="controls">
 		<button class="btn" data-action="previous-page" data-target="#basic-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#basic-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#basic-carousel">Next item</button>
 		<button class="btn" data-action="next-page" data-target="#basic-carousel">Next page</button>
 	</div>
 
@@ -80,8 +83,11 @@
 		<div class="carousel-item">29</div>
 		<div class="carousel-item">30</div>
 	</div>
-	<div>
+	<div class="controls">
 		<button class="btn" data-action="previous-page" data-target="#half-width-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#half-width-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#half-width-carousel">Next item</button>
 		<button class="btn" data-action="next-page" data-target="#half-width-carousel">Next page</button>
 	</div>
 
@@ -118,8 +124,11 @@
 		<div class="carousel-item">29</div>
 		<div class="carousel-item">30</div>
 	</div>
-	<div>
+	<div class="controls">
 		<button class="btn" data-action="previous-page" data-target="#vertical-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#vertical-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#vertical-carousel">Next item</button>
 		<button class="btn" data-action="next-page" data-target="#vertical-carousel">Next page</button>
 	</div>
 
@@ -151,7 +160,7 @@
 
 		basicCarousel.init('#basic-carousel');
 
-		/*halfWidthCarousel.init('#half-width-carousel', {
+		halfWidthCarousel.init('#half-width-carousel', {
 			margin: 60
 		});
 
@@ -160,7 +169,7 @@
 			orientation: Config.Orientation.VERTICAL,
 			useResponsiveLayout: false,
 			itemsPerPage: 10
-		});*/
+		});
 
 		// setup buttons
 		$('.btn').click(function() {
@@ -172,24 +181,33 @@
 
 			switch (action) {
 				case 'previous-page':
-					var currentItemIndex = carousel.getCurrentItemIndex(),
-						targetItemIndex = Math.max(currentItemIndex - 1, 0);
-
 					$btn.prop('disabled', true);
 
-					carousel.navigateToItem(targetItemIndex).done(function() {
+					carousel.navigateToPreviousPage().done(function() {
+						$btn.prop('disabled', false);
+					});
+				break;
+
+				case 'previous-item':
+					$btn.prop('disabled', true);
+
+					carousel.navigateToPreviousItem().done(function() {
+						$btn.prop('disabled', false);
+					});
+				break;
+
+				case 'next-item':
+					$btn.prop('disabled', true);
+
+					carousel.navigateToNextItem().done(function() {
 						$btn.prop('disabled', false);
 					});
 				break;
 
 				case 'next-page':
-					var currentItemIndex = carousel.getCurrentItemIndex(),
-						itemCount = carousel.getItemCount(),
-						targetItemIndex = Math.min(currentItemIndex + 1, itemCount - 1);
-
 					$btn.prop('disabled', true);
 
-					carousel.navigateToItem(targetItemIndex).done(function() {
+					carousel.navigateToNextPage().done(function() {
 						$btn.prop('disabled', false);
 					});
 				break;

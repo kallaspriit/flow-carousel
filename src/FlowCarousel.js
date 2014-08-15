@@ -152,16 +152,6 @@ define([
 		this._scrollerWrap = null;
 
 		/**
-		 * Currently displayed page number starting from zero.
-		 *
-		 * @property _currentPageIndex
-		 * @type {number}
-		 * @default 0
-		 * @private
-		 */
-		this._currentPageIndex = 0;
-
-		/**
 		 * Is the carousel currently animating.
 		 *
 		 * @property _isAnimating
@@ -387,6 +377,16 @@ define([
 	};
 
 	/**
+	 * Returns the number of pages the dataset contains given current wrap size.
+	 *
+	 * @method getPageCount
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getPageCount = function() {
+		return Math.ceil(this._dataSource.getItemCount() / this.getItemsPerPage());
+	};
+
+	/**
 	 * Returns the number of items displayed on a single page.
 	 *
 	 * @method getItemsPerPage
@@ -420,6 +420,22 @@ define([
 	 */
 	FlowCarousel.prototype.getCurrentItemIndex = function() {
 		return this._currentItemIndex;
+	};
+
+	/**
+	 * Returns currently visible page number.
+	 *
+	 * Always returns an integer flooring to the closest round page number.
+	 *
+	 * The page number starts at zero for first page.
+	 *
+	 * @method getCurrentPageIndex
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getCurrentPageIndex = function() {
+		var itemsPerPage = this.getItemsPerPage();
+
+		return Math.floor(this._currentItemIndex / itemsPerPage);
 	};
 
 	/**
@@ -484,7 +500,7 @@ define([
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
 	 * @method navigateToItem
-	 * @param {number} itemIndex Item index to navigate to.
+	 * @param {number} itemIndex Item index to navigate to
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex) {
@@ -528,6 +544,88 @@ define([
 		}.bind(this));
 
 		return promise;
+	};
+
+	/**
+	 * Navigates to given page number.
+	 *
+	 * Notice that page numbers start from zero.
+	 *
+	 * Throws error if out of bounds index is requested.
+	 *
+	 * Returns deferred promise that will be resolved once the animation completes.
+	 *
+	 * @method navigateToPage
+	 * @param {number} pageIndex Page index to navigate to
+	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 */
+	FlowCarousel.prototype.navigateToPage = function(pageIndex) {
+		var itemIndex = pageIndex * this.getItemsPerPage();
+
+		return this.navigateToItem(itemIndex);
+	};
+
+	/**
+	 * Navigates to next carousel item.
+	 *
+	 * Returns deferred promise that will be resolved once the animation completes.
+	 *
+	 * @method navigateToNextItem
+	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 */
+	FlowCarousel.prototype.navigateToNextItem = function() {
+		var currentItemIndex = this.getCurrentItemIndex(),
+			itemsPerPage = this.getItemsPerPage(),
+			itemCount = this.getItemCount(),
+			targetItemIndex = Math.min(currentItemIndex + 1, itemCount - itemsPerPage);
+
+		return this.navigateToItem(targetItemIndex);
+	};
+
+	/**
+	 * Navigates to previous carousel item.
+	 *
+	 * Returns deferred promise that will be resolved once the animation completes.
+	 *
+	 * @method navigateToPreviousItem
+	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 */
+	FlowCarousel.prototype.navigateToPreviousItem = function() {
+		var currentItemIndex = this.getCurrentItemIndex(),
+			targetItemIndex = Math.max(currentItemIndex - 1, 0);
+
+		return this.navigateToItem(targetItemIndex);
+	};
+
+	/**
+	 * Navigates to next page if available.
+	 *
+	 * Returns deferred promise that will be resolved once the animation completes.
+	 *
+	 * @method navigateToNextPage
+	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 */
+	FlowCarousel.prototype.navigateToNextPage = function() {
+		var currentPageIndex = this.getCurrentPageIndex(),
+			pageCount = this.getPageCount(),
+			targetPageIndex = Math.min(currentPageIndex + 1, pageCount - 1);
+
+		return this.navigateToPage(targetPageIndex);
+	};
+
+	/**
+	 * Navigates to previous page if available.
+	 *
+	 * Returns deferred promise that will be resolved once the animation completes.
+	 *
+	 * @method navigateToPreviousPage
+	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 */
+	FlowCarousel.prototype.navigateToPreviousPage = function() {
+		var currentPageIndex = this.getCurrentPageIndex(),
+			targetPageIndex = Math.max(currentPageIndex - 1, 0);
+
+		return this.navigateToPage(targetPageIndex);
 	};
 
 	/**

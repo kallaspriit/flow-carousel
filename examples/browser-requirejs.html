@@ -42,6 +42,10 @@
 		<div class="carousel-item">29</div>
 		<div class="carousel-item">30</div>
 	</div>
+	<div>
+		<button class="btn" data-action="previous-page" data-target="#basic-carousel">Previous page</button>
+		<button class="btn" data-action="next-page" data-target="#basic-carousel">Next page</button>
+	</div>
 
 	<h2>Half-width horizontal carousel</h2>
 	<div id="half-width-carousel" class="carousel carousel-horizontal carousel-halfwidth">
@@ -75,6 +79,10 @@
 		<div class="carousel-item">28</div>
 		<div class="carousel-item">29</div>
 		<div class="carousel-item">30</div>
+	</div>
+	<div>
+		<button class="btn" data-action="previous-page" data-target="#half-width-carousel">Previous page</button>
+		<button class="btn" data-action="next-page" data-target="#half-width-carousel">Next page</button>
 	</div>
 
 	<h2>Vertical non-responsive carousel</h2>
@@ -110,6 +118,12 @@
 		<div class="carousel-item">29</div>
 		<div class="carousel-item">30</div>
 	</div>
+	<div>
+		<button class="btn" data-action="previous-page" data-target="#vertical-carousel">Previous page</button>
+		<button class="btn" data-action="next-page" data-target="#vertical-carousel">Next page</button>
+	</div>
+
+
 	<script src="lib/require.js"></script>
 	<script>
 
@@ -146,6 +160,40 @@
 			orientation: Config.Orientation.VERTICAL,
 			useResponsiveLayout: false,
 			itemsPerPage: 10
+		});
+
+		// setup buttons
+		$('.btn').click(function() {
+			var $btn = $(this),
+				action = $(this).data('action'),
+				target = $(this).data('target'),
+				carouselWrap = $(target),
+				carousel = carouselWrap.data('flow-carousel');
+
+			switch (action) {
+				case 'previous-page':
+					var currentItemIndex = carousel.getCurrentItemIndex(),
+						targetItemIndex = Math.max(currentItemIndex - 1, 0);
+
+					$btn.prop('disabled', true);
+
+					carousel.navigateToItem(targetItemIndex).done(function() {
+						$btn.prop('disabled', false);
+					});
+				break;
+
+				case 'next-page':
+					var currentItemIndex = carousel.getCurrentItemIndex(),
+						itemCount = carousel.getItemCount(),
+						targetItemIndex = Math.min(currentItemIndex + 1, itemCount - 1);
+
+					$btn.prop('disabled', true);
+
+					carousel.navigateToItem(targetItemIndex).done(function() {
+						$btn.prop('disabled', false);
+					});
+				break;
+			}
 		});
 
 		// register globally for testing via console

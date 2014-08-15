@@ -28,6 +28,10 @@ define([
 
 	CustomDataSource.prototype = Object.create(AbstractDataSource.prototype);
 
+	CustomDataSource.prototype.getItemCount = function() {
+		return 0;
+	};
+
 	CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
 		var deferred = new Deferred();
 
@@ -327,11 +331,11 @@ define([
 			}, 300);
 		});
 
-		it('calling "_getWrapSize" with invalid orientation throws error', function() {
+		it('calling "_getElementSize" with invalid orientation throws error', function() {
 			carousel.init('.carousel');
 
 			var requestInvalidOrientation = function() {
-				carousel._getWrapSize(carousel._$wrap, 'foobar');
+				carousel._getElementSize(carousel._$wrap, 'foobar');
 			};
 
 			expect(requestInvalidOrientation).toThrow();

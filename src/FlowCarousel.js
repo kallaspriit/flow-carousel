@@ -162,6 +162,40 @@ define([
 		this._currentPageIndex = 0;
 
 		/**
+		 * Is the carousel currently animating.
+		 *
+		 * @property _isAnimating
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
+		this._isAnimating = false;
+
+		/**
+		 * Target item position index.
+		 *
+		 * This is set when animating to an index is requested.
+		 *
+		 * @property _targetItemIndex
+		 * @type {number}
+		 * @default 0
+		 * @private
+		 */
+		this._targetItemIndex = 0;
+
+		/**
+		 * Current item position index.
+		 *
+		 * This is updated once the animation completes.
+		 *
+		 * @property _currentItemIndex
+		 * @type {number}
+		 * @default 0
+		 * @private
+		 */
+		this._currentItemIndex = 0;
+
+		/**
 		 * Shortcut to the list of possible orientations from Config.
 		 *
 		 * @property Orientation
@@ -171,6 +205,20 @@ define([
 		 */
 		this.Orientation = Config.Orientation;
 	}
+
+	/**
+	 * Possible size modes used by {{#crossLink "FlowCarousel/_getWrapSize"}}{{/crossLink}}.
+	 *
+	 * @property SizeMode
+	 * @type {object}
+	 * @param {string} SizeMode.INNER='inner' Inner size
+	 * @param {string} SizeMode.OUTER='outer' Outer size
+	 * @static
+	 */
+	FlowCarousel.SizeMode = {
+		INNER: 'inner',
+		OUTER: 'outer'
+	};
 
 	/**
 	 * Initializes the carousel component.
@@ -257,6 +305,105 @@ define([
 	};
 
 	/**
+	 * Returns the main carousel wrap dom element.
+	 *
+	 * @method getMainWrap
+	 * @return {DOMElement}
+	 */
+	FlowCarousel.prototype.getMainWrap = function() {
+		return this._mainWrap;
+	};
+
+	/**
+	 * Returns the items wrap containing the scroller wrap.
+	 *
+	 * @method getItemsWrap
+	 * @return {DOMElement}
+	 */
+	FlowCarousel.prototype.getItemsWrap = function() {
+		return this._itemsWrap;
+	};
+
+	/**
+	 * Returns the scroller wrap containing the item wraps.
+	 *
+	 * @method getScrollerWrap
+	 * @return {DOMElement}
+	 */
+	FlowCarousel.prototype.getScrollerWrap = function() {
+		return this._scrollerWrap;
+	};
+
+	/**
+	 * Returns the orientation of the carousel.
+	 *
+	 * @method getOrientation
+	 * @return {Config/Orientation:property}
+	 */
+	FlowCarousel.prototype.getOrientation = function() {
+		return this._config.orientation;
+	};
+
+	/**
+	 * Returns the size of a single item given current wrap size.
+	 *
+	 * @method getItemSize
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemSize = function() {
+		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation),
+			itemsPerPage = this._config.getItemsPerPage(wrapSize);
+
+		return this._calculateItemSize(wrapSize, itemsPerPage);
+	};
+
+	/**
+	 * Returns the number of items in the dataset.
+	 *
+	 * @method getItemCount
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemCount = function() {
+		return this._dataSource.getItemCount();
+	};
+
+	/**
+	 * Returns the target item position index.
+	 *
+	 * This can be different from the return value of getCurrentItemIndex() if the carousel is animating.
+	 *
+	 * @method getTargetItemIndex
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getTargetItemIndex = function() {
+		return this._targetItemIndex;
+	};
+
+	/**
+	 * Returns the current item position index.
+	 *
+	 * This can be different from the return value of getTargetItemIndex() if the carousel is animating.
+	 *
+	 * @method getCurrentItemIndex
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getCurrentItemIndex = function() {
+		return this._currentItemIndex;
+	};
+
+	/**
+	 * Returns the current item position index.
+	 *
+	 * This can be different from the return value of getTargetItemIndex() if the carousel is animating.
+	 *
+	 * @method getCurrentItemIndex
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.isAnimating = function() {
+		return this._isAnimating;
+	};
+
+	/**
 	 * Sets the data source to use.
 	 *
 	 * Expects either an instance of AbstractDataSource (you can roll your own) or a simple array that will be
@@ -310,7 +457,8 @@ define([
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex) {
-		var itemCount = this._dataSource.getItemCount();
+		var itemCount = this._dataSource.getItemCount(),
+			promise;
 
 		// validate index range
 		if (itemIndex < 0) {
@@ -319,7 +467,31 @@ define([
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
-		var promise = this._animator.animateToItem(itemIndex);
+		// TODO what if the carousel is already animating
+		if (this._isAnimating) {
+			throw new Error('Starting new animation while the last has not completed is not yet implemented');
+		}
+
+		// update the target item index
+		this._targetItemIndex = itemIndex;
+		this._isAnimating = true;
+
+		// animate to the new item position index if it's different from current item index
+		if (itemIndex !== this._currentItemIndex) {
+			// start animating to given item, this is an asynchronous process
+			promise = this._animator.animateToItem(itemIndex);
+		} else {
+			// if the currently active index is requested then just ignore the call and resolve immediately
+			promise = new Deferred();
+
+			promise.resolve();
+		}
+
+		// once the animation is complete, update the current item index
+		promise.done(function() {
+			this._currentItemIndex = itemIndex;
+			this._isAnimating = false;
+		}.bind(this));
 
 		return promise;
 	};
@@ -338,6 +510,7 @@ define([
 	FlowCarousel.prototype._setupElement = function(selector) {
 		var matches = $(selector);
 
+		// make sure that the selector matches only a single element and throw error otherwise
 		if (matches.length === 0) {
 			throw new Error('Selector "' + selector + '" did not match any elements');
 		} else if (matches.length > 1) {
@@ -346,7 +519,11 @@ define([
 			);
 		}
 
+		// store reference to the main wrap dom element
 		this._mainWrap = matches[0];
+
+		// register the carousel instance on the main wrap dom element data
+		$(this._mainWrap).data(this._config.dataTarget, this);
 	};
 
 	/**
@@ -430,9 +607,18 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._setupLayout = function(element, orientation) {
-		var wrapSize = this._getWrapSize(element, orientation),
+		var wrapSize = this._getElementSize(element, orientation),
+			itemCount = this._dataSource.getItemCount(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
+			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
+			totalSize = itemCount * itemSize,
+			sizeProp = orientation === Config.Orientation.HORIZONTAL
+				? 'width'
+				: 'height',
 			renderRange = this._getRenderRangeForPage(this._currentPageIndex, itemsPerPage);
+
+		// define the scroller wrap size to fit all items
+		$(this._scrollerWrap).css(sizeProp, totalSize);
 
 		// render the items
 		return this._renderItemRange(renderRange.start, renderRange.end);
@@ -466,12 +652,8 @@ define([
 	FlowCarousel.prototype._renderItemRange = function(startIndex, endIndex) {
 		var deferred = new Deferred();
 
-		console.log('render range', startIndex, endIndex);
-
 		this._dataSource.getItems(startIndex, endIndex)
 			.done(function(items) {
-				console.log('got items', items);
-
 				this._renderItems(items, startIndex);
 			}.bind(this))
 			.fail(function() {
@@ -522,36 +704,63 @@ define([
 		return deferred.promise();
 	};
 
+	/**
+	 * Inserts rendered dom elements into the carousel dom structure.
+	 *
+	 * @method _insertRenderedElements
+	 * @param {DOMElement[]} elements Elements to insert
+	 * @param {number} startIndex First element index in the carousel
+	 * @private
+	 */
 	FlowCarousel.prototype._insertRenderedElements = function(elements, startIndex) {
-		var i,
-			elementIndex;
+		var oppositeOrientation = this._getOppositeOrientation(this._config.orientation),
+			sizeProp = this._config.orientation === Config.Orientation.HORIZONTAL
+				? 'height'
+				: 'width',
+			elementIndex,
+			largestChildSize,
+			i;
 
 		for (i = 0; i < elements.length; i++) {
 			elementIndex = startIndex + i;
 
 			this._insertRenderedElement(elements[i], elementIndex);
 		}
+
+		largestChildSize = this._getLargestChildSize(
+			this._scrollerWrap,
+			oppositeOrientation,
+			FlowCarousel.SizeMode.OUTER
+		);
+
+		$(this._scrollerWrap).css(sizeProp, largestChildSize);
 	};
 
+	/**
+	 * Inserts a rendered dom element into the carousel dom structure.
+	 *
+	 * @method _insertRenderedElement
+	 * @param {DOMElement} element Element to insert
+	 * @param {number} index Element index
+	 * @private
+	 */
 	FlowCarousel.prototype._insertRenderedElement = function(element, index) {
 		// calculate the properties of the element
 		var $element = $(element),
 			orientation = this._config.orientation,
-			wrapSize = this._getWrapSize(this._mainWrap, orientation),
-			oppositeOrientation = orientation === Config.Orientation.HORIZONTAL
-				? Config.Orientation.VERTICAL
-				: Config.Orientation.HORIZONTAL,
-			wrapOppositeSize = this._getWrapSize(this._mainWrap, oppositeOrientation),
+			wrapSize = this._getElementSize(this._mainWrap, orientation),
+			oppositeOrientation = this._getOppositeOrientation(orientation),
+			wrapOppositeSize = this._getElementSize(this._mainWrap, oppositeOrientation),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
-			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			itemMargin = this._config.margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			cssProperties = {},
+			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			effectiveSize = itemSize - gapPerItem,
 			effectiveOffset = index * itemSize + index * (itemMargin - gapPerItem),
 			$wrapper = $('<div></div>', {
 				'class': this._config.getClassName('item')
 			}),
+			cssProperties = {},
 			$wrappedElement;
 
 		// the properties to set depends on the orientation
@@ -559,7 +768,6 @@ define([
 			cssProperties.width = effectiveSize;
 			cssProperties.left = effectiveOffset;
 			cssProperties.height = wrapOppositeSize;
-
 		} else if (orientation === Config.Orientation.VERTICAL) {
 			cssProperties.height = effectiveSize;
 			cssProperties.top = effectiveOffset;
@@ -576,8 +784,7 @@ define([
 		// the element may be display: none to begin with, make it visible
 		$element.css('display', 'block');
 
-		//effectiveOffset += itemSize + (itemMargin - gapPerItem);
-
+		// append the element to the scroller wrap
 		$(this._scrollerWrap).append($wrappedElement);
 	};
 
@@ -624,7 +831,7 @@ define([
 	 */
 	FlowCarousel.prototype._validateResponsiveLayout = function(element, orientation) {
 		var lastSize = $(element).data(this._config.cssPrefix + 'last-width') || null,
-			currentSize = this._getWrapSize(element, orientation);
+			currentSize = this._getElementSize(element, orientation);
 
 		$(element).data(this._config.cssPrefix + 'last-width', currentSize);
 
@@ -651,30 +858,65 @@ define([
 	};
 
 	/**
-	 * Returns the outer size of an element.
+	 * Returns the size of an element.
 	 *
-	 * Horizontal orientation returns element innter width and vertical inner height.
+	 * Horizontal orientation returns element width and vertical height.
 	 *
-	 * @method _getWrapSize
+	 * Mode sets whether to return the inner or outer width/height (defaults to inner).
+	 *
+	 * @method _getElementSize
 	 * @param {DOMelement} element Element to get size of
 	 * @param {Config/Orientation:property} orientation Orientation to get size of
+	 * @param {FlowCarousel.SizeMode:property} [mode=FlowCarousel.SizeMode.INNER] Size mode
 	 * @return {number}
 	 * @private
 	 */
-	FlowCarousel.prototype._getWrapSize = function(element, orientation) {
+	FlowCarousel.prototype._getElementSize = function(element, orientation, mode) {
+		mode = mode || FlowCarousel.SizeMode.INNER;
+
+		var methods = mode === FlowCarousel.SizeMode.INNER
+			? ['innerWidth', 'innerHeight']
+			: ['outerWidth', 'outerHeight'];
+
 		if (orientation === Config.Orientation.HORIZONTAL) {
-			return $(element).innerWidth();
+			return $(element)[methods[0]]();
 		} else if (orientation === Config.Orientation.VERTICAL) {
-			return $(element).innerHeight();
+			return $(element)[methods[1]]();
 		} else {
 			throw new Error('Invalid orientation "' + orientation + '" requested');
 		}
 	};
 
 	/**
-	 * Returns the extra padding+margin+border size of given element in given orientation.
+	 * Returns biggest element size in given wrap for given orientation and size mode.
 	 *
-	 * TODO handle border-box sizing
+	 * Horizontal orientation returns element width and vertical height.
+	 *
+	 * Mode sets whether to return the inner or outer width/height (defaults to inner).
+	 *
+	 * @method _getLargestChildSize
+	 * @param {DOMelement} wrap Element to get size of
+	 * @param {Config/Orientation:property} orientation Orientation to get size of
+	 * @param {FlowCarousel.SizeMode:property} [mode=FlowCarousel.SizeMode.INNER] Size mode
+	 * @return {number}
+	 * @private
+	 */
+	FlowCarousel.prototype._getLargestChildSize = function(wrap, orientation, mode) {
+		var biggestSize = 0;
+
+		$(wrap).children().each(function(index, element) {
+			var elementSize = this._getElementSize(element, orientation, mode);
+
+			if (elementSize > biggestSize) {
+				biggestSize = elementSize;
+			}
+		}.bind(this));
+
+		return biggestSize;
+	};
+
+	/**
+	 * Returns the extra padding+margin+border size of given element in given orientation.
 	 *
 	 * @method _getExtraSize
 	 * @param {DOMelement} element Element to get size of
@@ -710,6 +952,22 @@ define([
 		margin = parseInt($el.css(marginProp[0]), 10) + parseInt($el.css(marginProp[1]), 10);
 
 		return border + padding + margin;
+	};
+
+	/**
+	 * Returns the opposite orientation name.
+	 *
+	 * For Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.
+	 *
+	 * @method _getOppositeOrientation
+	 * @param {Config/Orientation:property} orientation Orientation to get opposite of
+	 * @return {Config/Orientation:property}
+	 * @private
+	 */
+	FlowCarousel.prototype._getOppositeOrientation = function(orientation) {
+		return orientation === Config.Orientation.HORIZONTAL
+			? Config.Orientation.VERTICAL
+			: Config.Orientation.HORIZONTAL;
 	};
 
 	return FlowCarousel;

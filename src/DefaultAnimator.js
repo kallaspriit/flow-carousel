@@ -4,6 +4,9 @@ define([
 ], function(AbstractAnimator, Deferred) {
 	'use strict';
 
+	// expect jQuery to exist
+	var $ = window.jQuery;
+
 	/**
 	 * Data source interface.
 	 *
@@ -28,13 +31,27 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToItem = function(itemIndex) {
-		var deferred = new Deferred();
+		var deferred = new Deferred(),
+			orientation = this._carousel.getOrientation(),
+			itemSize = this._carousel.getItemSize(),
+			translatePosition = itemIndex * itemSize,
+			$scrollerWrap = $(this._carousel.getScrollerWrap()),
+			translateCommand;
 
-		void(itemIndex);
+		// the translate command is different for horizontal and vertical carousels
+		if (orientation === this._carousel.Orientation.HORIZONTAL) {
+			translateCommand = 'translate3d(' + -translatePosition + 'px,0,0)';
+		} else {
+			translateCommand = 'translate3d(0,' + -translatePosition + 'px,0)';
+		}
 
-		deferred.resolve();
+		// apply the translate
+		$scrollerWrap.css('transform', translateCommand);
 
-		console.log('navigating to', itemIndex);
+		// wait for the transition to end and then resolve the deferred
+		$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function() {
+			deferred.resolve();
+		});
 
 		return deferred.promise();
 	};

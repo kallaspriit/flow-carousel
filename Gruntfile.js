@@ -30,13 +30,12 @@ module.exports = function (grunt) {
 		},
 
 		// generates a single file distribution version of the project
+		// TODO the combined files should not include jQuery
 		requirejs: {
 			combined: {
 				options: {
 					baseUrl: './src',
-					paths: {
-						jquery: 'examples/lib/jquery'
-					},
+					paths: {},
 					name: 'FlowCarousel',
 					out: 'dist/FlowCarousel.js',
 					almond: true,
@@ -50,9 +49,7 @@ module.exports = function (grunt) {
 			minified: {
 				options: {
 					baseUrl: './src',
-					paths: {
-						jquery: 'examples/lib/jquery'
-					},
+					paths: {},
 					name: 'FlowCarousel',
 					out: 'dist/FlowCarousel.min.js',
 					almond: true,

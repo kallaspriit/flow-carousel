@@ -1,11 +1,9 @@
 define([
+	'jquery',
 	'AbstractDataSource',
 	'Deferred'
-], function(AbstractDataSource, Deferred) {
+], function($, AbstractDataSource, Deferred) {
 	'use strict';
-
-	// expect jQuery to exist
-	var $ = window.jQuery;
 
 	/**
 	 * Data source interface.

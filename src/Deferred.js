@@ -1,5 +1,6 @@
 define([
-], function() {
+	'jquery'
+], function($) {
 	'use strict';
 
 	/**
@@ -10,7 +11,7 @@ define([
 	 * @class Deferred
 	 * @constructor
 	 */
-	var Deferred = window.jQuery.Deferred;
+	var Deferred = $.Deferred;
 
 	// proxy to jQuery when()
 	Deferred.when = $.when;

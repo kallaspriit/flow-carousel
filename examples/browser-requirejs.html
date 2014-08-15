@@ -11,6 +11,7 @@
 
 	<h2>Basic horizontal carousel with default options</h2>
 	<div id="basic-carousel" class="carousel carousel-horizontal">
+		<div class="carousel-item carousel-item-odd">0</div>
 		<div class="carousel-item">1</div>
 		<div class="carousel-item carousel-item-odd">2</div>
 		<div class="carousel-item">3</div>
@@ -40,7 +41,6 @@
 		<div class="carousel-item">27</div>
 		<div class="carousel-item carousel-item-odd">28</div>
 		<div class="carousel-item">29</div>
-		<div class="carousel-item carousel-item-odd">30</div>
 	</div>
 	<div class="controls">
 		<button class="btn" data-action="previous-page" data-target="#basic-carousel">Previous page</button>
@@ -52,6 +52,7 @@
 
 	<h2>Half-width horizontal carousel with margin</h2>
 	<div id="half-width-carousel" class="carousel carousel-horizontal carousel-halfwidth">
+		<div class="carousel-item">0</div>
 		<div class="carousel-item">1</div>
 		<div class="carousel-item">2</div>
 		<div class="carousel-item">3</div>
@@ -81,7 +82,6 @@
 		<div class="carousel-item">27</div>
 		<div class="carousel-item">28</div>
 		<div class="carousel-item">29</div>
-		<div class="carousel-item">30</div>
 	</div>
 	<div class="controls">
 		<button class="btn" data-action="previous-page" data-target="#half-width-carousel">Previous page</button>
@@ -93,6 +93,7 @@
 
 	<h2>Vertical non-responsive carousel</h2>
 	<div id="vertical-carousel" class="carousel carousel-vertical">
+		<div class="carousel-item">0</div>
 		<div class="carousel-item">1</div>
 		<div class="carousel-item">2</div>
 		<div class="carousel-item">3</div>
@@ -122,7 +123,6 @@
 		<div class="carousel-item">27</div>
 		<div class="carousel-item">28</div>
 		<div class="carousel-item">29</div>
-		<div class="carousel-item">30</div>
 	</div>
 	<div class="controls">
 		<button class="btn" data-action="previous-page" data-target="#vertical-carousel">Previous page</button>
@@ -132,31 +132,91 @@
 		<button class="btn" data-action="next-page" data-target="#vertical-carousel">Next page</button>
 	</div>
 
+	<h2>Custom asyncronous data source and renderer</h2>
+	<div id="async-carousel" class="carousel carousel-horizontal"></div>
+	<div class="controls">
+		<button class="btn" data-action="previous-page" data-target="#async-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#async-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#async-carousel">Next item</button>
+		<button class="btn" data-action="next-page" data-target="#async-carousel">Next page</button>
+	</div>
+
 
 	<script src="lib/require.js"></script>
+	<script src="lib/jquery.js"></script>
 	<script>
 
 	// configure RequireJS
 	require.config({
 		baseUrl: '../src',
-
-		paths: {
-			jquery: '../examples/lib/jquery'
-		},
-
-		// make sure jquery gets loaded before the FlowCarousel library
-		shim: {
-			'FlowCarousel': {
-				deps: ['jquery']
-			}
-		}
 	});
 
 	// fetch the carousel component and run it
-	require(['FlowCarousel', 'Config'], function(FlowCarousel, Config) {
+	require([
+		'FlowCarousel',
+		'Config',
+		'AbstractDataSource',
+		'AbstractRenderer',
+		'Deferred'
+	], function(
+		FlowCarousel,
+		Config,
+		AbstractDataSource,
+		AbstractRenderer,
+		Deferred
+	) {
+		// test asynchronous data source
+		function CustomDataSource() {
+			AbstractDataSource.call(this);
+
+			var itemCount = 1000,
+				i;
+
+			this._data = [];
+
+			for (i = 0; i < itemCount; i++) {
+				this._data.push(i);
+			}
+		}
+
+		CustomDataSource.prototype = Object.create(AbstractDataSource.prototype);
+
+		CustomDataSource.prototype.getItemCount = function() {
+			return this._data.length;
+		};
+
+		CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
+			var deferred = new Deferred(),
+				requestDuration = Math.random() * 3000;
+
+			// fake asyncronous request that takes some time to complete
+			window.setTimeout(function() {
+				deferred.resolve(this._data.slice(startIndex, endIndex));
+			}.bind(this), requestDuration);
+
+			return deferred.promise();
+		};
+
+		// renderer for the asyncronous data source
+		function CustomRenderer() {
+			AbstractRenderer.call(this);
+		}
+
+		CustomRenderer.prototype = Object.create(AbstractRenderer.prototype);
+
+		CustomRenderer.prototype.renderItem = function(config, index, data) {
+			var deferred = new Deferred();
+
+			deferred.resolve($('<div class="carousel-item">test #' + data + '</div>'));
+
+			return deferred.promise();
+		};
+
 		var basicCarousel = new FlowCarousel(),
 			halfWidthCarousel = new FlowCarousel(),
-			verticalCarousel = new FlowCarousel();
+			verticalCarousel = new FlowCarousel(),
+			asyncCarousel = new FlowCarousel();
 
 		basicCarousel.init('#basic-carousel');
 
@@ -169,6 +229,12 @@
 			orientation: Config.Orientation.VERTICAL,
 			useResponsiveLayout: false,
 			itemsPerPage: 10
+		});
+
+		asyncCarousel.init('#async-carousel', {
+			margin: 10,
+			dataSource: new CustomDataSource(),
+			renderer: new CustomRenderer()
 		});
 
 		// setup buttons

@@ -1,4 +1,5 @@
 define([
+	'jquery',
 	'Config',
 	'AbstractDataSource',
 	'ArrayDataSource',
@@ -10,6 +11,7 @@ define([
 	'Deferred',
 	'Util',
 ], function(
+	$,
 	Config,
 	AbstractDataSource,
 	ArrayDataSource,
@@ -22,9 +24,6 @@ define([
 	Util
 ) {
 	'use strict';
-
-	// expect jQuery to exists outside of this component and use its deferred implementation
-	var $ = window.jQuery;
 
 	/**
 	 * FlowCarousel main class.

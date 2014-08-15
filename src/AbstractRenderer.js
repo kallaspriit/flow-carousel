@@ -1,9 +1,7 @@
 define([
-], function() {
+	'jquery'
+], function($) {
 	'use strict';
-
-	// expect jQuery to exist
-	var $ = window.jQuery;
 
 	/**
 	 * Renderer interface.

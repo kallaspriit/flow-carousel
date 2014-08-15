@@ -1,11 +1,9 @@
 define([
+	'jquery',
 	'AbstractAnimator',
 	'Deferred'
-], function(AbstractAnimator, Deferred) {
+], function($, AbstractAnimator, Deferred) {
 	'use strict';
-
-	// expect jQuery to exist
-	var $ = window.jQuery;
 
 	/**
 	 * Data source interface.

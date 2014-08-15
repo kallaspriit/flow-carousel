@@ -107,13 +107,11 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
+	&#x27;jquery&#x27;,
 	&#x27;AbstractDataSource&#x27;,
 	&#x27;Deferred&#x27;
-], function(AbstractDataSource, Deferred) {
+], function($, AbstractDataSource, Deferred) {
 	&#x27;use strict&#x27;;
-
-	// expect jQuery to exist
-	var $ = window.jQuery;
 
 	/**
 	 * Data source interface.

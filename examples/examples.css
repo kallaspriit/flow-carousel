@@ -41,6 +41,6 @@ BODY {
 #basic-carousel .carousel-item {
 
 }
-#basic-carousel > DIV > DIV > DIV:nth-child(2n) .carousel-item {
-    background-color: #5EFF40;
+.carousel-item-odd {
+    background-color: #5EFF40 !important;
 }

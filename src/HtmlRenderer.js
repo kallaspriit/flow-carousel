@@ -41,17 +41,5 @@ define([
 		return deferred.promise();
 	};
 
-	/**
-	 * Destroys a carousel item.
-	 *
-	 * @method destroyItem
-	 * @param {number} index Item position index
-	 */
-	HtmlRenderer.prototype.destroyItem = function(index) {
-		void(index);
-
-		throw new Error('Not implemented');
-	};
-
 	return HtmlRenderer;
 });

@@ -241,7 +241,7 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_destroyItem" class="method item">
+                    <div id="method_destroyItem" class="method item inherited">
     <h3 class="name"><code>destroyItem</code></h3>
 
     
@@ -250,7 +250,7 @@
             
                 <li class="arg">
                     
-                        <code>index</code>
+                        <code>element</code>
                     
                 </li>
             
@@ -274,16 +274,13 @@
 
     <div class="meta">
         
-            <p>Inherited from
-            <a href="../classes/AbstractRenderer.html#method_destroyItem">
-                AbstractRenderer
-            </a>
             
-            but overwritten in
+                <p>Inherited from
+                <a href="../classes/AbstractRenderer.html#method_destroyItem">AbstractRenderer</a>:
             
         
         
-        <a href="../files/src_HtmlRenderer.js.html#l44"><code>src\HtmlRenderer.js:44</code></a>
+        <a href="../files/src_AbstractRenderer.js.html#l35"><code>src\AbstractRenderer.js:35</code></a>
         
         </p>
 
@@ -295,6 +292,7 @@
 
     <div class="description">
         <p>Destroys a carousel item.</p>
+<p>By default just removes the element using jQuery, but inheriting classes may choose to do something fancier.</p>
 
     </div>
 
@@ -306,14 +304,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">index</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <code class="param-name">element</code>
+                        <span class="type">DOMElement</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>Item position index</p>
+                        <p>DOM element to destroy</p>
 
                     </div>
 

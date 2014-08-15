@@ -268,6 +268,25 @@ define([
 		 * @default null
 		 */
 		this.animator = null;
+
+		/**
+		 * Returns the range of items that should be rendered given current item index and items per page.
+		 *
+		 * By default returns one page before the current page and one after but one may choose to override it.
+		 *
+		 * @method getRenderRange
+		 * @param {number} currentItemIndex Currently scrolled position index
+		 * @param {number} itemsPerPage How many items are shown on a page
+		 * @param {number} itemCount How many items there are in total
+		 * @return {object} Render range with start and end keys
+		 * @private
+		 */
+		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount) {
+			return {
+				start: Math.max(currentItemIndex - itemsPerPage, 0),
+				end: Math.min(currentItemIndex + itemsPerPage * 2, itemCount)
+			};
+		};
 	}
 
 	/**

@@ -2,6 +2,9 @@ define([
 ], function() {
 	'use strict';
 
+	// expect jQuery to exist
+	var $ = window.jQuery;
+
 	/**
 	 * Renderer interface.
 	 *
@@ -32,13 +35,13 @@ define([
 	/**
 	 * Destroys a carousel item.
 	 *
+	 * By default just removes the element using jQuery, but inheriting classes may choose to do something fancier.
+	 *
 	 * @method destroyItem
-	 * @param {number} index Item position index
+	 * @param {DOMElement} element DOM element to destroy
 	 */
-	AbstractRenderer.prototype.destroyItem = function(index) {
-		void(index);
-
-		throw new Error('Not implemented');
+	AbstractRenderer.prototype.destroyItem = function(element) {
+		$(element).remove();
 	};
 
 	return AbstractRenderer;

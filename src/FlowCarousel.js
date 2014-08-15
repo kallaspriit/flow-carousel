@@ -205,6 +205,16 @@ define([
 		this._renderedItemIndexes = [];
 
 		/**
+		 * Mapping of renderer item indexes to their dom elements.
+		 *
+		 * @property _itemIndexToElementMap
+		 * @type {object}
+		 * @default {}
+		 * @private
+		 */
+		this._itemIndexToElementMap = {};
+
+		/**
 		 * Shortcut to the list of possible orientations from Config.
 		 *
 		 * @property Orientation
@@ -638,30 +648,13 @@ define([
 			totalSize = itemCount * itemSize,
 			sizeProp = orientation === Config.Orientation.HORIZONTAL
 				? 'width'
-				: 'height',
-			renderRange = this._getRenderRangeForPage(this._currentPageIndex, itemsPerPage);
+				: 'height';
 
 		// define the scroller wrap size to fit all items
 		$(this._scrollerWrap).css(sizeProp, totalSize);
 
 		// render the items
-		return this._renderItemRange(renderRange.start, renderRange.end);
-	};
-
-	/**
-	 * Returns the range of items that should be rendered to display given page.
-	 *
-	 * @method _getRenderRangeForPage
-	 * @param {number} pageIndex Page number starting from zero
-	 * @param {number} itemsPerPage How many items are shown on one page
-	 * @return {object} The start and end index of range to render
-	 * @private
-	 */
-	FlowCarousel.prototype._getRenderRangeForPage = function(pageIndex, itemsPerPage) {
-		return {
-			start: pageIndex * itemsPerPage,
-			end: (pageIndex + 1) * itemsPerPage
-		};
+		this._validateItemsToRender();
 	};
 
 	/**
@@ -674,28 +667,61 @@ define([
 		var itemsPerPage = this.getItemsPerPage(),
 			currentItemIndex = this._currentItemIndex,
 			itemCount = this._dataSource.getItemCount(),
-			renderRange = this._getRangeToRenderAtPosition(currentItemIndex, itemsPerPage, itemCount);
+			renderRange = this._config.getRenderRange(currentItemIndex, itemsPerPage, itemCount),
+			filteredRenderedItemIndexes = [],
+			itemIndex,
+			itemElement,
+			i;
 
-		console.log('validate', this._renderedItemIndexes, itemsPerPage, renderRange);
+		// destroy items out of the render range
+		for (i = 0; i < this._renderedItemIndexes.length; i++) {
+			itemIndex = this._renderedItemIndexes[i];
+
+			if (itemIndex < renderRange.start || itemIndex >= renderRange.end) {
+				itemElement = this._getItemElementByIndex(itemIndex);
+
+				if (itemElement === null) {
+					throw new Error('Item element at index #' + itemIndex + ' not found, this should not happen');
+				}
+
+				this._renderer.destroyItem(itemElement);
+
+				delete this._itemIndexToElementMap[itemIndex];
+			} else {
+				filteredRenderedItemIndexes.push(itemIndex);
+			}
+		}
+
+		this._renderedItemIndexes = filteredRenderedItemIndexes;
 
 		return this._renderItemRange(renderRange.start, renderRange.end);
 	};
 
 	/**
-	 * Returns the range of items that should be rendered given current item index and items per page.
+	 * Returns the item dom element by item index.
 	 *
-	 * @method _getRangeToRenderAtPosition
-	 * @param {number} currentItemIndex Currently scrolled position index
-	 * @param {number} itemsPerPage How many items are shown on a page
-	 * @param {number} itemCount How many items there are in total
-	 * @return {object} Render range with start and end keys
+	 * Throws error if invalid index is requested.
+	 *
+	 * @method _getItemElementByIndex
+	 * @param {number} itemIndex Item index to fetch element of
+	 * @return {DOMElement|null} Item dom element or null if not found
 	 * @private
 	 */
-	FlowCarousel.prototype._getRangeToRenderAtPosition = function(currentItemIndex, itemsPerPage, itemCount) {
-		return {
-			start: Math.max(currentItemIndex, 0),
-			end: Math.min(currentItemIndex + itemsPerPage, itemCount)
-		};
+	FlowCarousel.prototype._getItemElementByIndex = function(itemIndex) {
+		var itemCount = this.getItemCount();
+
+		// validate index range
+		if (itemIndex < 0) {
+			throw new Error('Invalid negative  index "' + itemIndex + '" requested');
+		} else if (itemIndex > itemCount - 1) {
+			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
+		}
+
+		if (typeof this._itemIndexToElementMap[itemIndex] === 'undefined') {
+			return null;
+		}
+
+		return this._itemIndexToElementMap[itemIndex];
 	};
 
 	/**
@@ -794,7 +820,7 @@ define([
 
 			this._insertRenderedElement(elements[i], elementIndex);
 
-			// add the rendered and inserted items to the list of rendered items
+			// add the rendered and inserted items to the list of rendered items and the index to element mapping
 			this._renderedItemIndexes.push(elementIndex);
 		}
 
@@ -857,6 +883,9 @@ define([
 
 		// append the element to the scroller wrap
 		$(this._scrollerWrap).append($wrappedElement);
+
+		// add the wrapped element to the index to element map
+		this._itemIndexToElementMap[index] = $wrappedElement[0];
 	};
 
 	/**

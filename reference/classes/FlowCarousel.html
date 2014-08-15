@@ -235,6 +235,13 @@ Released under the MIT license
                             </li>
                         
                             <li class="index-item method private">
+                                <a href="#method__getItemElementByIndex">_getItemElementByIndex</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
                                 <a href="#method__getLargestChildSize">_getLargestChildSize</a>
 
                                 
@@ -243,20 +250,6 @@ Released under the MIT license
                         
                             <li class="index-item method private">
                                 <a href="#method__getOppositeOrientation">_getOppositeOrientation</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method__getRangeToRenderAtPosition">_getRangeToRenderAtPosition</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method__getRenderRangeForPage">_getRenderRangeForPage</a>
 
                                 
                                 
@@ -511,6 +504,13 @@ Released under the MIT license
                             </li>
                         
                             <li class="index-item property private">
+                                <a href="#property__itemIndexToElementMap">_itemIndexToElementMap</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
                                 <a href="#property__itemsWrap">_itemsWrap</a>
 
                                 
@@ -653,7 +653,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l919"><code>src\FlowCarousel.js:919</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l948"><code>src\FlowCarousel.js:948</code></a>
         
         </p>
 
@@ -776,7 +776,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l931"><code>src\FlowCarousel.js:931</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l960"><code>src\FlowCarousel.js:960</code></a>
         
         </p>
 
@@ -924,7 +924,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l989"><code>src\FlowCarousel.js:989</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l1018"><code>src\FlowCarousel.js:1018</code></a>
         
         </p>
 
@@ -999,6 +999,116 @@ Released under the MIT license
 </div>
 
                 
+                    <div id="method__getItemElementByIndex" class="method item private">
+    <h3 class="name"><code>_getItemElementByIndex</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>itemIndex</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">DOMElement | Null</span>
+        </span>
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l700"><code>src\FlowCarousel.js:700</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns the item dom element by item index.</p>
+<p>Throws error if invalid index is requested.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">itemIndex</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Item index to fetch element of</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">DOMElement | Null</span>:
+                    
+                    <p>Item dom element or null if not found</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
                     <div id="method__getLargestChildSize" class="method item private">
     <h3 class="name"><code>_getLargestChildSize</code></h3>
 
@@ -1059,7 +1169,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l961"><code>src\FlowCarousel.js:961</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l990"><code>src\FlowCarousel.js:990</code></a>
         
         </p>
 
@@ -1201,7 +1311,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l1028"><code>src\FlowCarousel.js:1028</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l1057"><code>src\FlowCarousel.js:1057</code></a>
         
         </p>
 
@@ -1261,290 +1371,6 @@ Released under the MIT license
 </div>
 
                 
-                    <div id="method__getRangeToRenderAtPosition" class="method item private">
-    <h3 class="name"><code>_getRangeToRenderAtPosition</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>currentItemIndex</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>itemsPerPage</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>itemCount</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-        </span>
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l684"><code>src\FlowCarousel.js:684</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Returns the range of items that should be rendered given current item index and items per page.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">currentItemIndex</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Currently scrolled position index</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">itemsPerPage</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>How many items are shown on a page</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">itemCount</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>How many items there are in total</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
-                    
-                    <p>Render range with start and end keys</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method__getRenderRangeForPage" class="method item private">
-    <h3 class="name"><code>_getRenderRangeForPage</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>pageIndex</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>itemsPerPage</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-        </span>
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l651"><code>src\FlowCarousel.js:651</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Returns the range of items that should be rendered to display given page.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">pageIndex</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Page number starting from zero</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">itemsPerPage</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>How many items are shown on one page</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
-                    
-                    <p>The start and end index of range to render</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
                     <div id="method__insertRenderedElement" class="method item private">
     <h3 class="name"><code>_insertRenderedElement</code></h3>
 
@@ -1595,7 +1421,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l810"><code>src\FlowCarousel.js:810</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l836"><code>src\FlowCarousel.js:836</code></a>
         
         </p>
 
@@ -1708,7 +1534,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l770"><code>src\FlowCarousel.js:770</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l796"><code>src\FlowCarousel.js:796</code></a>
         
         </p>
 
@@ -1825,7 +1651,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l862"><code>src\FlowCarousel.js:862</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l891"><code>src\FlowCarousel.js:891</code></a>
         
         </p>
 
@@ -1956,7 +1782,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l701"><code>src\FlowCarousel.js:701</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l727"><code>src\FlowCarousel.js:727</code></a>
         
         </p>
 
@@ -2085,7 +1911,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l724"><code>src\FlowCarousel.js:724</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l750"><code>src\FlowCarousel.js:750</code></a>
         
         </p>
 
@@ -2210,7 +2036,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l553"><code>src\FlowCarousel.js:553</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l563"><code>src\FlowCarousel.js:563</code></a>
         
         </p>
 
@@ -2317,7 +2143,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l523"><code>src\FlowCarousel.js:523</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l533"><code>src\FlowCarousel.js:533</code></a>
         
         </p>
 
@@ -2420,7 +2246,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l622"><code>src\FlowCarousel.js:622</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l632"><code>src\FlowCarousel.js:632</code></a>
         
         </p>
 
@@ -2546,7 +2372,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l881"><code>src\FlowCarousel.js:881</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l910"><code>src\FlowCarousel.js:910</code></a>
         
         </p>
 
@@ -2643,7 +2469,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l667"><code>src\FlowCarousel.js:667</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l660"><code>src\FlowCarousel.js:660</code></a>
         
         </p>
 
@@ -2716,7 +2542,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l895"><code>src\FlowCarousel.js:895</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l924"><code>src\FlowCarousel.js:924</code></a>
         
         </p>
 
@@ -2815,7 +2641,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l306"><code>src\FlowCarousel.js:306</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l316"><code>src\FlowCarousel.js:316</code></a>
         
         </p>
 
@@ -2886,7 +2712,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l296"><code>src\FlowCarousel.js:296</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l306"><code>src\FlowCarousel.js:306</code></a>
         
         </p>
 
@@ -2957,7 +2783,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l403"><code>src\FlowCarousel.js:403</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l425"><code>src\FlowCarousel.js:425</code></a>
         
         </p>
 
@@ -3029,7 +2855,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l415"><code>src\FlowCarousel.js:415</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l413"><code>src\FlowCarousel.js:413</code></a>
         
         </p>
 
@@ -3101,7 +2927,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l457"><code>src\FlowCarousel.js:457</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l467"><code>src\FlowCarousel.js:467</code></a>
         
         </p>
 
@@ -3175,7 +3001,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l369"><code>src\FlowCarousel.js:369</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l379"><code>src\FlowCarousel.js:379</code></a>
         
         </p>
 
@@ -3246,7 +3072,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l356"><code>src\FlowCarousel.js:356</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l366"><code>src\FlowCarousel.js:366</code></a>
         
         </p>
 
@@ -3317,7 +3143,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l379"><code>src\FlowCarousel.js:379</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l389"><code>src\FlowCarousel.js:389</code></a>
         
         </p>
 
@@ -3388,7 +3214,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l326"><code>src\FlowCarousel.js:326</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l336"><code>src\FlowCarousel.js:336</code></a>
         
         </p>
 
@@ -3459,7 +3285,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l316"><code>src\FlowCarousel.js:316</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l326"><code>src\FlowCarousel.js:326</code></a>
         
         </p>
 
@@ -3530,7 +3356,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l346"><code>src\FlowCarousel.js:346</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l356"><code>src\FlowCarousel.js:356</code></a>
         
         </p>
 
@@ -3601,7 +3427,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l336"><code>src\FlowCarousel.js:336</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l346"><code>src\FlowCarousel.js:346</code></a>
         
         </p>
 
@@ -3672,7 +3498,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l391"><code>src\FlowCarousel.js:391</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l401"><code>src\FlowCarousel.js:401</code></a>
         
         </p>
 
@@ -3756,7 +3582,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l232"><code>src\FlowCarousel.js:232</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l242"><code>src\FlowCarousel.js:242</code></a>
         
         </p>
 
@@ -3867,7 +3693,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l469"><code>src\FlowCarousel.js:469</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l479"><code>src\FlowCarousel.js:479</code></a>
         
         </p>
 
@@ -3978,7 +3804,7 @@ Released under the MIT license
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l427"><code>src\FlowCarousel.js:427</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l437"><code>src\FlowCarousel.js:437</code></a>
         
         </p>
 
@@ -4387,6 +4213,55 @@ converted to an ArrayDataSource.</p>
 
     
         <p><strong>Default:</strong> false</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__itemIndexToElementMap" class="property item private">
+    <h3 class="name"><code>_itemIndexToElementMap</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l207"><code>src\FlowCarousel.js:207</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Mapping of renderer item indexes to their dom elements.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> {}</p>
     
 
     
@@ -4810,7 +4685,7 @@ which in turn contains the actual item wrappers and items.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l207"><code>src\FlowCarousel.js:207</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l217"><code>src\FlowCarousel.js:217</code></a>
         
         </p>
 
@@ -4891,7 +4766,7 @@ which in turn contains the actual item wrappers and items.</p>
             
         
         
-        <a href="../files/src_FlowCarousel.js.html#l218"><code>src\FlowCarousel.js:218</code></a>
+        <a href="../files/src_FlowCarousel.js.html#l228"><code>src\FlowCarousel.js:228</code></a>
         
         </p>
 

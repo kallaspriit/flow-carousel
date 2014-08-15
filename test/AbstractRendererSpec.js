@@ -22,13 +22,5 @@ define([
 
 			expect(call).toThrow();
 		});
-
-		it('calling "destroyItem" on abstract instance throws an error', function () {
-			var call = function() {
-				abstractRenderer.destroyItem();
-			};
-
-			expect(call).toThrow();
-		});
 	});
 });

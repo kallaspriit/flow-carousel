@@ -19,19 +19,18 @@ define([
 		 *
 		 * @property orientation
 		 * @type {Config/Orientation:property}
+		 * @default Config.Orientation.VERTICAL
 		 */
 		this.orientation = Config.Orientation.HORIZONTAL;
 
 		/**
-		 * Number of items to render side-by-side when not using responsive layout.
+		 * The size mode to use, defaults to matching item sizes to wrap size.
 		 *
-		 * This parameter is ignored when using responsive layout strategy.
-		 *
-		 * @property itemsPerPage
-		 * @type number
-		 * @default 5
+		 * @property sizeMode
+		 * @type {Config/SizeMode:property}
+		 * @default Config.SizeMode.MATCH_WRAP
 		 */
-		this.itemsPerPage = 5;
+		this.sizeMode = Config.SizeMode.MATCH_WRAP;
 
 		/**
 		 * Item margin to use.
@@ -50,6 +49,17 @@ define([
 		 * @default true
 		 */
 		this.useResponsiveLayout = true;
+
+		/**
+		 * Number of items to render side-by-side when not using responsive layout.
+		 *
+		 * This parameter is ignored when using responsive layout strategy.
+		 *
+		 * @property itemsPerPage
+		 * @type number
+		 * @default 5
+		 */
+		this.itemsPerPage = 5;
 
 		/**
 		 * List of default responsive layout breakpoint.
@@ -108,6 +118,8 @@ define([
 			items: 'items',
 			item: 'item',
 			scroller: 'scroller',
+			sizeModeMatchWrap: 'size-mode-match-wrap',
+			sizeModeMatchLargestItem: 'size-mode-match-largest-item',
 			horizontal: 'horizontal',
 			vertical: 'vertical',
 			loading: 'loading',
@@ -193,6 +205,22 @@ define([
 	Config.Orientation = {
 		HORIZONTAL: 'horizontal',
 		VERTICAL: 'vertical'
+	};
+
+	/**
+	 * There are two different strategies for setting the size of the wrap and the items:
+	 * > MATCH_WRAP - the size of the items is set to match the wrap size
+	 * > MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item
+	 *
+	 * @property SizeMode
+	 * @type {object}
+	 * @param {string} Orientation.MATCH_WRAP='match-wrap' Items size is based on wrap size
+	 * @param {string} Orientation.MATCH_LARGEST_ITEM='match-largest-item' Wrap size is based on items size
+	 * @static
+	 */
+	Config.SizeMode = {
+		MATCH_WRAP: 'match-wrap',
+		MATCH_LARGEST_ITEM: 'match-largest-item'
 	};
 
 	/**

@@ -54,6 +54,14 @@ define([
 			deferred.resolve();
 		});
 
+		// PhantomJS does not support 3d transforms, fake the transition end event
+		/* istanbul ignore if */
+		if (navigator.userAgent.toLowerCase().indexOf('phantomjs') !== -1) {
+			window.setTimeout(function() {
+				deferred.resolve();
+			}, 200);
+		}
+
 		return deferred.promise();
 	};
 

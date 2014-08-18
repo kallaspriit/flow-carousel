@@ -30,7 +30,6 @@ module.exports = function (grunt) {
 		},
 
 		// generates a single file distribution version of the project
-		// TODO the combined files should not include jQuery
 		requirejs: {
 			combined: {
 				options: {

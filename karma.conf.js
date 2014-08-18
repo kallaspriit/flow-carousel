@@ -24,11 +24,11 @@ module.exports = function(config) {
 			// we need some shims for example bind()
 			{pattern: 'test/shim/**/*.js', included: true, watched: true, served: true},
 
-			// get carousel css files
-			{pattern: 'dist/**/*.css', included: false, watched: true, served: true},
+			// get carousel css files, include these so they will be loaded by the time tests start
+			{pattern: 'dist/**/*.css', included: true, watched: true, served: true},
 
-			// get example css and libraries
-			{pattern: 'examples/**/*.css', included: false, watched: true, served: true},
+			// get example css and libraries, include css
+			{pattern: 'examples/**/*.css', included: true, watched: true, served: true},
 			{pattern: 'examples/lib/**/*.js', included: true, watched: true, served: true},
 
 			// get the actual sources
@@ -60,9 +60,9 @@ module.exports = function(config) {
         // Start these browsers
         browsers: [
 			'PhantomJS',
-			//'Chrome',
-			//'Firefox',
-			//'IE'
+			'Chrome',
+			'Firefox',
+			'IE'
 			//'ChromeWithoutSecurity'
 		],
 

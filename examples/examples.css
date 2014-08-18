@@ -13,6 +13,9 @@ BODY {
 .carousel-horizontal {
     height: 200px;
 }
+.match-largest-element-carousel {
+
+}
 .carousel-halfwidth {
     width: 50%;
 }

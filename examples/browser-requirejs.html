@@ -50,6 +50,47 @@
 		<button class="btn" data-action="next-page" data-target="#basic-carousel">Next page</button>
 	</div>
 
+	<h2>Carousel wrap matches the largest item size</h2>
+	<div id="match-largest-element-carousel" class="carousel carousel-match-largest-element">
+		<div class="carousel-item carousel-item-odd">0</div>
+		<div class="carousel-item">1</div>
+		<div class="carousel-item carousel-item-odd">2</div>
+		<div class="carousel-item">3</div>
+		<div class="carousel-item carousel-item-odd">4</div>
+		<div class="carousel-item">5</div>
+		<div class="carousel-item carousel-item-odd">6</div>
+		<div class="carousel-item">7</div>
+		<div class="carousel-item carousel-item-odd">8</div>
+		<div class="carousel-item">9</div>
+		<div class="carousel-item carousel-item-odd">10</div>
+		<div class="carousel-item">11</div>
+		<div class="carousel-item carousel-item-odd">12</div>
+		<div class="carousel-item">13</div>
+		<div class="carousel-item carousel-item-odd">14</div>
+		<div class="carousel-item">15</div>
+		<div class="carousel-item carousel-item-odd">16</div>
+		<div class="carousel-item">17</div>
+		<div class="carousel-item carousel-item-odd">18</div>
+		<div class="carousel-item">19</div>
+		<div class="carousel-item carousel-item-odd">20</div>
+		<div class="carousel-item">21</div>
+		<div class="carousel-item carousel-item-odd">22</div>
+		<div class="carousel-item">23</div>
+		<div class="carousel-item carousel-item-odd">24</div>
+		<div class="carousel-item">25</div>
+		<div class="carousel-item carousel-item-odd">26</div>
+		<div class="carousel-item">27</div>
+		<div class="carousel-item carousel-item-odd">28</div>
+		<div class="carousel-item">29</div>
+	</div>
+	<div class="controls">
+		<button class="btn" data-action="previous-page" data-target="#match-largest-element-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#match-largest-element-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#match-largest-element-carousel">Next item</button>
+		<button class="btn" data-action="next-page" data-target="#match-largest-element-carousel">Next page</button>
+	</div>
+
 	<h2>Half-width horizontal carousel with margin</h2>
 	<div id="half-width-carousel" class="carousel carousel-horizontal carousel-halfwidth">
 		<div class="carousel-item">0</div>
@@ -214,11 +255,21 @@
 		};
 
 		var basicCarousel = new FlowCarousel(),
+			matchLargestElementCarousel = new FlowCarousel(),
 			halfWidthCarousel = new FlowCarousel(),
 			verticalCarousel = new FlowCarousel(),
 			asyncCarousel = new FlowCarousel();
 
 		basicCarousel.init('#basic-carousel');
+
+		// set random heights for the items
+		$('#match-largest-element-carousel .carousel-item').each(function() {
+			$(this).css('height', (100 + Math.random() * 200) + 'px');
+		});
+
+		matchLargestElementCarousel.init('#match-largest-element-carousel', {
+			sizeMode: matchLargestElementCarousel.SizeMode.MATCH_LARGEST_ITEM
+		});
 
 		halfWidthCarousel.init('#half-width-carousel', {
 			margin: 60
@@ -235,6 +286,8 @@
 			margin: 10,
 			dataSource: new CustomDataSource(),
 			renderer: new CustomRenderer()
+		}).done(function() {
+			console.log('async carousel initiated');
 		});
 
 		// setup buttons

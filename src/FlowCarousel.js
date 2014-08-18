@@ -194,6 +194,17 @@ define([
 		this._renderedItemIndexes = [];
 
 		/**
+		 * List of placeholder indexes that have been rendered.
+		 *
+		 * TODO consider getting rid of this index list
+		 *
+		 * @property _renderedPlaceholderIndexes
+		 * @type {array}
+		 * @private
+		 */
+		this._renderedPlaceholderIndexes = [];
+
+		/**
 		 * Mapping of renderer item indexes to their dom elements.
 		 *
 		 * @property _itemIndexToElementMap
@@ -275,7 +286,7 @@ define([
 		if (this._config.dataSource instanceof AbstractDataSource || Util.isArray(this._config.dataSource)) {
 			this.setDataSource(this._config.dataSource);
 		} else if (typeof this._config.dataSource !== 'undefined' && this._config.dataSource !== null) {
-			throw new Error('Unexpected data source type "' + typeof(this._config.dataSource) + '" provided');
+			throw new Error('Unexpected data source type "' + typeof this._config.dataSource + '" provided');
 		} else {
 			this._dataSource = new HtmlDataSource(this._mainWrap);
 		}
@@ -458,6 +469,23 @@ define([
 	};
 
 	/**
+	 * Returns the range of items that should be rendered for current item index and config.
+	 *
+	 * @method getRenderRange
+	 * @param {number} [itemIndex=this._currentItemIndex] Optional item index to use, defaults to current
+	 * @return {object} Render range with start and end keys
+	 * @private
+	 */
+	FlowCarousel.prototype.getRenderRange = function(itemIndex) {
+		itemIndex = itemIndex || this._currentItemIndex;
+
+		var itemsPerPage = this.getItemsPerPage(),
+			itemCount = this._dataSource.getItemCount();
+
+		return this._config.getRenderRange(itemIndex, itemsPerPage, itemCount);
+	};
+
+	/**
 	 * Returns the current item position index.
 	 *
 	 * This can be different from the return value of getTargetItemIndex() if the carousel is animating.
@@ -524,7 +552,7 @@ define([
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex) {
 		var itemCount = this._dataSource.getItemCount(),
-			promise;
+			animationPromise;
 
 		// validate index range
 		if (itemIndex < 0) {
@@ -545,18 +573,26 @@ define([
 		// animate to the new item position index if it's different from current item index
 		if (itemIndex !== this._currentItemIndex) {
 			// start animating to given item, this is an asynchronous process
-			promise = this._animator.animateToItem(itemIndex);
+			animationPromise = this._animator.animateToItem(itemIndex);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
-			promise = new Deferred();
+			animationPromise = new Deferred();
 
-			promise.resolve();
+			animationPromise.resolve();
+		}
+
+		// render placeholders that are later replaced with real loaded items
+		if (this._config.usePlaceholders && this._dataSource.isAsynchronous()) {
+			this._renderTargetIndexPlaceholders();
 		}
 
 		// once the animation is complete, update the current item index
-		promise.done(function() {
+		animationPromise.done(function() {
 			this._currentItemIndex = itemIndex;
 			this._isAnimating = false;
+
+			// remove items that have moved out of range
+			this._removeInvalidItems();
 
 			// check whether we need to render or remove some items
 			this._validateItemsToRender();
@@ -565,7 +601,7 @@ define([
 			this._setScrollerSizeToLargestVisibleChildSize();
 		}.bind(this));
 
-		return promise;
+		return animationPromise;
 	};
 
 	/**
@@ -860,6 +896,11 @@ define([
 		// define the scroller wrap size to fit all items
 		$(this._scrollerWrap).css(sizeProp, totalSize);
 
+		// render placeholders that are later replaced with real loaded items
+		if (this._config.usePlaceholders && this._dataSource.isAsynchronous()) {
+			this._renderTargetIndexPlaceholders();
+		}
+
 		// render the items
 		return this._validateItemsToRender();
 	};
@@ -872,20 +913,54 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._validateItemsToRender = function() {
-		var itemsPerPage = this.getItemsPerPage(),
-			currentItemIndex = this._currentItemIndex,
-			itemCount = this._dataSource.getItemCount(),
-			renderRange = this._config.getRenderRange(currentItemIndex, itemsPerPage, itemCount),
+		var renderRange = this.getRenderRange();
+
+		return this._renderItemRange(renderRange.start, renderRange.end);
+	};
+
+	/**
+	 * Removes items that have gone out of the render range.
+	 *
+	 * @method _removeInvalidItems
+	 * @private
+	 */
+	FlowCarousel.prototype._removeInvalidItems = function() {
+		var renderRange = this.getRenderRange(),
+			filteredPlaceholderItemIndexes = [],
 			filteredRenderedItemIndexes = [],
 			itemIndex,
 			itemElement,
 			i;
 
-		// destroy items out of the render range
+		// destroy rendered items out of the render range
+		for (i = 0; i < this._renderedPlaceholderIndexes.length; i++) {
+			itemIndex = this._renderedPlaceholderIndexes[i];
+
+			if (itemIndex < renderRange.start || itemIndex >= renderRange.end - 1) {
+				itemElement = this.getItemElementByIndex(itemIndex);
+
+				/* istanbul ignore if */
+				if (itemElement === null) {
+					throw new Error(
+						'Placeholder element at index #' + itemIndex + ' not found, this should not happen'
+					);
+				}
+
+				this._renderer.destroyItem(itemElement);
+
+				delete this._itemIndexToElementMap[itemIndex];
+			} else {
+				filteredPlaceholderItemIndexes.push(itemIndex);
+			}
+		}
+
+		this._renderedPlaceholderIndexes = filteredPlaceholderItemIndexes;
+
+		// destroy rendered items out of the render range
 		for (i = 0; i < this._renderedItemIndexes.length; i++) {
 			itemIndex = this._renderedItemIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex >= renderRange.end) {
+			if (itemIndex < renderRange.start || itemIndex >= renderRange.end - 1) {
 				itemElement = this.getItemElementByIndex(itemIndex);
 
 				/* istanbul ignore if */
@@ -902,8 +977,6 @@ define([
 		}
 
 		this._renderedItemIndexes = filteredRenderedItemIndexes;
-
-		return this._renderItemRange(renderRange.start, renderRange.end);
 	};
 
 	/**
@@ -930,6 +1003,51 @@ define([
 	};
 
 	/**
+	 * Renders the item placeholders for current target index.
+	 *
+	 * @method _renderTargetIndexPlaceholders
+	 * @private
+	 */
+	FlowCarousel.prototype._renderTargetIndexPlaceholders = function() {
+		var targetItemIndex = this._targetItemIndex,
+			renderRange = this.getRenderRange(targetItemIndex);
+
+		// render placeholders that are later replaced with real loaded items
+		// TODO this is not needed for syncronous data source
+		this._renderItemPlaceholders(renderRange.start, renderRange.end);
+	};
+
+	/**
+	 * Renders the item placeholders that will later be replaced with the actual items.
+	 *
+	 * Gives the user some "loading" feedback.
+	 *
+	 * @method _renderItemPlaceholders
+	 * @param {number} startIndex The starting index
+	 * @param {number} endIndex The end item index
+	 * @private
+	 */
+	FlowCarousel.prototype._renderItemPlaceholders = function(startIndex, endIndex) {
+		var elements = [],
+			element,
+			itemIndex;
+
+		for (itemIndex = startIndex; itemIndex < endIndex; itemIndex++) {
+			// don't render a placeholder onto already existing rendered item
+			if (this._renderedItemIndexes.indexOf(itemIndex) !== -1) {
+				elements.push(null);
+			} else {
+				// request the placeholder element from the renderer
+				element = this._renderer.renderPlaceholder(this._config, itemIndex);
+
+				elements.push(element);
+			}
+		}
+
+		this._insertRenderedElements(elements, startIndex, true);
+	};
+
+	/**
 	 * Renders given carousel items.
 	 *
 	 * @method _renderItems
@@ -940,18 +1058,40 @@ define([
 	 */
 	FlowCarousel.prototype._renderItems = function(items, startIndex) {
 		var deferred = new Deferred(),
+			renderRange = this.getRenderRange(),
 			promises = [],
-			i,
+			outOfRange,
 			itemIndex,
 			item,
-			promise;
+			promise,
+			existingElement,
+			existingElementPos,
+			i;
 
 		for (i = 0; i < items.length; i++) {
 			item = items[i];
 			itemIndex = startIndex + i;
+			outOfRange = itemIndex < renderRange.start || itemIndex > renderRange.end - 1;
 
-			// only render the item if it's not already rendered
-			if (this._renderedItemIndexes.indexOf(itemIndex) === -1) {
+			if (outOfRange) {
+				existingElement = this._itemIndexToElementMap[itemIndex];
+
+				if (typeof existingElement !== 'undefined') {
+					this._renderer.destroyItem(existingElement);
+
+					delete this._itemIndexToElementMap[itemIndex];
+
+					// remove the item from the placeholder item indexes list if exists
+					existingElementPos = this._renderedPlaceholderIndexes.indexOf(itemIndex);
+
+					if (existingElementPos !== -1) {
+						this._renderedPlaceholderIndexes.splice(existingElementPos, 1);
+					}
+				}
+			}
+
+			// only render the item if it's not already rendered and it's not out of current render range
+			if (this._renderedItemIndexes.indexOf(itemIndex) === -1 && !outOfRange) {
 				promise = this._renderer.renderItem(this._config, itemIndex, item);
 			} else {
 				promise = null;
@@ -978,11 +1118,19 @@ define([
 	 * @method _insertRenderedElements
 	 * @param {DOMElement[]} elements Elements to insert
 	 * @param {number} startIndex First element index in the carousel
+	 * @param {boolean} [arePlaceholders=false] Are the elements placeholders
 	 * @private
 	 */
-	FlowCarousel.prototype._insertRenderedElements = function(elements, startIndex) {
+	FlowCarousel.prototype._insertRenderedElements = function(elements, startIndex, arePlaceholders) {
 		var elementIndex,
+			placeholderPos,
+			placeholderElement,
 			i;
+
+		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
+		if ($(this._mainWrap).parent().length === 0) {
+			return;
+		}
 
 		for (i = 0; i < elements.length; i++) {
 			// elements that were already rendered were set to null in _renderItems(), skip these
@@ -992,10 +1140,31 @@ define([
 
 			elementIndex = startIndex + i;
 
-			this._insertRenderedElement(elements[i], elementIndex);
-
 			// add the rendered and inserted items to the list of rendered items and the index to element mapping
-			this._renderedItemIndexes.push(elementIndex);
+			if (!arePlaceholders) {
+				placeholderPos = this._renderedPlaceholderIndexes.indexOf(elementIndex);
+
+				// remove placeholder if exists
+				if (placeholderPos !== -1 && typeof this._itemIndexToElementMap[elementIndex] !== 'undefined') {
+					placeholderElement = this._itemIndexToElementMap[elementIndex];
+
+					this._renderer.destroyItem(placeholderElement);
+
+					delete this._itemIndexToElementMap[elementIndex];
+					this._renderedPlaceholderIndexes.splice(placeholderPos, 1);
+				}
+
+				this._insertRenderedElement(elements[i], elementIndex);
+
+				this._renderedItemIndexes.push(elementIndex);
+			} else {
+				// only add placeholders if they don't already exist
+				if (this._renderedPlaceholderIndexes.indexOf(elementIndex) === -1) {
+					this._insertRenderedElement(elements[i], elementIndex);
+
+					this._renderedPlaceholderIndexes.push(elementIndex);
+				}
+			}
 		}
 
 		// set the scroller wrap size to the largest currently visible item size
@@ -1033,7 +1202,15 @@ define([
 		// make sure the wrap has size if wrap size matching is used
 		/* istanbul ignore if */
 		if (sizeMode == Config.SizeMode.MATCH_WRAP && wrapOppositeSize === 0) {
-			throw new Error('The wrap opposite size was calculated to be zero, this should not happen');
+			//throw new Error('The wrap opposite size was calculated to be zero, this should not happen');
+			console.log(
+				'The wrap opposite size was calculated to be zero, this should not happen',
+				$(this._mainWrap).width(),
+				$(this._mainWrap).height(),
+				orientation
+			);
+
+			wrapOppositeSize = 100;
 		}
 
 		// the properties to set depends on the orientation
@@ -1065,6 +1242,11 @@ define([
 
 		// append the element to the scroller wrap
 		$(this._scrollerWrap).append($wrappedElement);
+
+		/* istanbul ignore if */
+		if (typeof this._itemIndexToElementMap[index] !== 'undefined') {
+			throw new Error('Element at index #' + index + ' already exists, this should not happen');
+		}
 
 		// add the wrapped element to the index to element map
 		this._itemIndexToElementMap[index] = $wrappedElement[0];

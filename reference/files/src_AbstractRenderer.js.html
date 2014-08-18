@@ -139,6 +139,27 @@ define([
 	};
 
 	/**
+	 * Renders a loading item placeholder.
+	 *
+	 * By default returns a simple div with the
+	 * {{#crossLink &quot;Config/cssClasses/placeholder:property&quot;}}{{/crossLink}} class.
+	 *
+	 * You may override this in your custom renderer.
+	 *
+	 * @method renderPlaceholder
+	 * @param {Config} config Carousel configuration
+	 * @param {number} index Item position index
+	 * @return {DOMElement}
+	 */
+	AbstractRenderer.prototype.renderPlaceholder = function(config, index) {
+		void(index);
+
+		return $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;, {
+			&#x27;class&#x27;: config.getClassName(&#x27;placeholder&#x27;)
+		})[0];
+	};
+
+	/**
 	 * Destroys a carousel item.
 	 *
 	 * By default just removes the element using jQuery, but inheriting classes may choose to do something fancier.

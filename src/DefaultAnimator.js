@@ -58,7 +58,7 @@ define([
 		/* istanbul ignore if */
 		if (navigator.userAgent.toLowerCase().indexOf('phantomjs') !== -1) {
 			window.setTimeout(function() {
-				deferred.resolve();
+				$scrollerWrap.trigger('transitionend');
 			}, 200);
 		}
 

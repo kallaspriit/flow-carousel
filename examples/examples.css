@@ -13,9 +13,6 @@ BODY {
 .carousel-horizontal {
     height: 200px;
 }
-.match-largest-element-carousel {
-
-}
 .carousel-halfwidth {
     width: 50%;
 }
@@ -23,15 +20,22 @@ BODY {
     width: 300px;
     height: 1000px;
 }
-.carousel .carousel-item {
+.carousel .carousel-item,
+.flow-carousel-placeholder {
     background-color: #4F9BFF;
     line-height: 60px;
     padding: 0 20px;
     font-size: 40px;
     color: #FFF;
+}
+.carousel .carousel-item {
     display: none;
 }
-.carousel-horizontal .carousel-item {
+.flow-carousel-placeholder {
+    background-color: #CCC;
+}
+.carousel-horizontal .carousel-item,
+.carousel-horizontal .flow-carousel-placeholder {
     height: 100%;
 }
 .carousel-vertical .carousel-item {
@@ -43,9 +47,6 @@ BODY {
 }
 
 /* special example styles */
-#basic-carousel .carousel-item {
-
-}
 .carousel-item-odd {
     background-color: #5EFF40 !important;
 }

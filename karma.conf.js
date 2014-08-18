@@ -63,19 +63,10 @@ module.exports = function(config) {
 			'Chrome',
 			'Firefox',
 			'IE'
-			//'ChromeWithoutSecurity'
 		],
 
 		// Loggers to use
 		loggers: [{type: 'console'}],
-
-		// Create custom launchers
-		customLaunchers: {
-			ChromeWithoutSecurity: {
-				base: 'Chrome',
-				flags: ['--disable-web-security']
-			}
-		},
  
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout: 60000,

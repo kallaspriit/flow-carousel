@@ -9,6 +9,16 @@
 <body>
 	<h1>FlowCarousel</h1>
 
+	<h2>Custom asyncronous data source and renderer</h2>
+	<div id="async-carousel" class="carousel carousel-horizontal"></div>
+	<div class="controls">
+		<button class="btn" data-action="previous-page" data-target="#async-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#async-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#async-carousel">Next item</button>
+		<button class="btn" data-action="next-page" data-target="#async-carousel">Next page</button>
+	</div>
+
 	<h2>Basic horizontal carousel with default options</h2>
 	<div id="basic-carousel" class="carousel carousel-horizontal">
 		<div class="carousel-item carousel-item-odd">0</div>
@@ -173,16 +183,6 @@
 		<button class="btn" data-action="next-page" data-target="#vertical-carousel">Next page</button>
 	</div>
 
-	<h2>Custom asyncronous data source and renderer</h2>
-	<div id="async-carousel" class="carousel carousel-horizontal"></div>
-	<div class="controls">
-		<button class="btn" data-action="previous-page" data-target="#async-carousel">Previous page</button>
-		<button class="btn" data-action="previous-item" data-target="#async-carousel">Previous item</button>
-		-
-		<button class="btn" data-action="next-item" data-target="#async-carousel">Next item</button>
-		<button class="btn" data-action="next-page" data-target="#async-carousel">Next page</button>
-	</div>
-
 
 	<script src="lib/require.js"></script>
 	<script src="lib/jquery.js"></script>
@@ -227,9 +227,13 @@
 			return this._data.length;
 		};
 
+		CustomDataSource.prototype.isAsynchronous = function() {
+			return true;
+		};
+
 		CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
 			var deferred = new Deferred(),
-				requestDuration = Math.random() * 3000;
+				requestDuration = 1000 + Math.random() * 4000;
 
 			// fake asyncronous request that takes some time to complete
 			window.setTimeout(function() {
@@ -252,6 +256,10 @@
 			deferred.resolve($('<div class="carousel-item">test #' + data + '</div>'));
 
 			return deferred.promise();
+		};
+
+		CustomRenderer.prototype.renderPlaceholder = function(config, index) {
+			return $('<div class="' + config.getClassName('placeholder') + '">loading #' + index + '...</div>')[0];
 		};
 
 		var basicCarousel = new FlowCarousel(),
@@ -334,7 +342,7 @@
 		});
 
 		// register globally for testing via console
-		window.c = basicCarousel;
+		window.c = asyncCarousel;
 	});
 
 	</script>

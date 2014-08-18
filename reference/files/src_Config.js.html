@@ -159,6 +159,15 @@ define([
 		this.useResponsiveLayout = true;
 
 		/**
+		 * Should placeholders be generated while loading actual items.
+		 *
+		 * @property usePlaceholders
+		 * @type boolean
+		 * @default true
+		 */
+		this.usePlaceholders = true;
+
+		/**
 		 * Number of items to render side-by-side when not using responsive layout.
 		 *
 		 * This parameter is ignored when using responsive layout strategy.
@@ -225,6 +234,7 @@ define([
 			wrap: &#x27;wrap&#x27;,
 			items: &#x27;items&#x27;,
 			item: &#x27;item&#x27;,
+			placeholder: &#x27;placeholder&#x27;,
 			scroller: &#x27;scroller&#x27;,
 			sizeModeMatchWrap: &#x27;size-mode-match-wrap&#x27;,
 			sizeModeMatchLargestItem: &#x27;size-mode-match-largest-item&#x27;,

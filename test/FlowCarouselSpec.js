@@ -41,6 +41,10 @@ define([
 		return this._data.length;
 	};
 
+	CustomDataSource.prototype.isAsynchronous = function() {
+		return true;
+	};
+
 	CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
 		var deferred = new Deferred(),
 			requestDuration = Math.random() * 3000;
@@ -68,6 +72,10 @@ define([
 		return deferred.promise();
 	};
 
+	/*CustomRenderer.prototype.renderPlaceholder = function(config, index) {
+		return $('<div class="' + config.getClassName('placeholder') + '">loading #' + index + '...</div>')[0];
+	};*/
+
 	describe('FlowCarousel', function () {
 		var defaultConfig = new Config(),
 			carousel;
@@ -91,11 +99,11 @@ define([
 
 		// release it after
 		afterEach(function() {
-			//var fixtureWrap = $('#fixture-wrap');
+			var fixtureWrap = $('#fixture-wrap');
 
 			carousel = null;
 
-			//fixtureWrap.html('test completed');
+			fixtureWrap.html('<em>test completed</em>');
 		});
 
 		it('exists', function () {
@@ -274,6 +282,20 @@ define([
 			});
 		});
 
+		it('renders placeholders for async custom data source', function (done) {
+			var customDataSource = new CustomDataSource(),
+				customRenderer = new CustomRenderer();
+
+			carousel.init('.carousel', {
+				dataSource: customDataSource,
+				renderer: customRenderer
+			}).done(function() {
+				carousel.navigateToNextPage().done(function() {
+					done();
+				});
+			});
+		});
+
 		it('using custom data source without a custom renderer throws error', function () {
 			var customDataSource = new CustomDataSource(),
 				initWithoutRenderer = function() {
@@ -387,6 +409,62 @@ define([
 			}, 400);
 		});
 
+		it('supports navigating to next item', function(done) {
+			carousel.init('.carousel');
+
+			var currentIndex = carousel.getCurrentItemIndex();
+
+			carousel.navigateToNextItem().done(function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(currentIndex + 1);
+
+				done();
+			});
+		});
+
+		it('supports navigating to previous item', function(done) {
+			carousel.init('.carousel');
+
+			var startIndex = 5;
+
+			carousel.navigateToItem(startIndex).done(function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
+
+				carousel.navigateToPreviousItem().done(function() {
+					expect(carousel.getCurrentItemIndex()).toEqual(startIndex - 1);
+
+					done();
+				});
+			});
+		});
+
+		it('supports navigating to next page', function(done) {
+			carousel.init('.carousel');
+
+			var currentIndex = carousel.getCurrentPageIndex();
+
+			carousel.navigateToNextPage().done(function() {
+				expect(carousel.getCurrentPageIndex()).toEqual(currentIndex + 1);
+
+				done();
+			});
+		});
+
+		it('supports navigating to previous page', function(done) {
+			carousel.init('.carousel');
+
+			var startIndex = 2;
+
+			carousel.navigateToPage(startIndex).done(function() {
+				expect(carousel.getCurrentPageIndex()).toEqual(startIndex);
+
+				carousel.navigateToPreviousPage().done(function() {
+					expect(carousel.getCurrentPageIndex()).toEqual(startIndex - 1);
+
+					done();
+				});
+			});
+		});
+
 		it('calling "_getElementSize" with invalid orientation throws error', function() {
 			carousel.init('.carousel');
 
@@ -470,66 +548,10 @@ define([
 		});
 
 		// used only for code coverage
-		it('navigating to current page index resolves immediately', function() {
+		it('navigating to current page index resolves immediately', function(done) {
 			carousel.init('.carousel');
 
-			carousel.navigateToItem(0);
-		});
-
-		it('supports navigating to next item', function(done) {
-			carousel.init('.carousel');
-
-			var currentIndex = carousel.getCurrentItemIndex();
-
-			carousel.navigateToNextItem().done(function() {
-				expect(carousel.getCurrentItemIndex()).toEqual(currentIndex + 1);
-
-				done();
-			});
-		});
-
-		it('supports navigating to previous item', function(done) {
-			carousel.init('.carousel');
-
-			var startIndex = 5;
-
-			carousel.navigateToItem(startIndex).done(function() {
-				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
-
-				carousel.navigateToPreviousItem().done(function() {
-					expect(carousel.getCurrentItemIndex()).toEqual(startIndex - 1);
-
-					done();
-				});
-			});
-		});
-
-		it('supports navigating to next page', function(done) {
-			carousel.init('.carousel');
-
-			var currentIndex = carousel.getCurrentPageIndex();
-
-			carousel.navigateToNextPage().done(function() {
-				expect(carousel.getCurrentPageIndex()).toEqual(currentIndex + 1);
-
-				done();
-			});
-		});
-
-		it('supports navigating to previous page', function(done) {
-			carousel.init('.carousel');
-
-			var startIndex = 2;
-
-			carousel.navigateToPage(startIndex).done(function() {
-				expect(carousel.getCurrentPageIndex()).toEqual(startIndex);
-
-				carousel.navigateToPreviousPage().done(function() {
-					expect(carousel.getCurrentPageIndex()).toEqual(startIndex - 1);
-
-					done();
-				});
-			});
+			carousel.navigateToItem(0).done(done);
 		});
 
 		it('method "getMainWrap" returns the carousel main wrap element', function() {
@@ -574,7 +596,7 @@ define([
 			expect(carousel.getPageCount() > 0).toEqual(true);
 		});
 
-		it('method "getTargetItemIndex" returns the target item index to animate to', function() {
+		it('method "getTargetItemIndex" returns the target item index to animate to', function(done) {
 			var targetIndex = 5;
 
 			carousel.init('.carousel');
@@ -582,7 +604,7 @@ define([
 			expect(carousel.getTargetItemIndex()).toEqual(0);
 			expect(carousel.getCurrentItemIndex()).toEqual(0);
 
-			carousel.navigateToItem(targetIndex);
+			carousel.navigateToItem(targetIndex).done(done);
 
 			expect(carousel.getTargetItemIndex()).toEqual(targetIndex);
 			expect(carousel.getCurrentItemIndex()).toEqual(0);

@@ -46,9 +46,7 @@ define([
 	AbstractRenderer.prototype.renderPlaceholder = function(config, index) {
 		void(index);
 
-		return $('<div></div>', {
-			'class': config.getClassName('placeholder')
-		})[0];
+		return $('<div></div>')[0];
 	};
 
 	/**

@@ -55,6 +55,8 @@
             
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
+                <li><a href="../classes/EventEmitter Manages event registering and emitting..html">EventEmitter Manages event registering and emitting.</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
             
                 <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
@@ -154,9 +156,7 @@ define([
 	AbstractRenderer.prototype.renderPlaceholder = function(config, index) {
 		void(index);
 
-		return $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;, {
-			&#x27;class&#x27;: config.getClassName(&#x27;placeholder&#x27;)
-		})[0];
+		return $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;)[0];
 	};
 
 	/**

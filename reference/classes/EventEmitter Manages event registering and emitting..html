@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\AbstractAnimator.js - FlowCarousel</title>
+    <title>EventEmitter Manages event registering and emitting. - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -104,41 +104,64 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\AbstractAnimator.js</h1>
+                        <h1>EventEmitter Manages event registering and emitting. Class</h1>
+<div class="box meta">
+    
 
-<div class="file">
-    <pre class="code prettyprint linenums">
-define([
-], function() {
-	&#x27;use strict&#x27;;
+    
 
-	/**
-	 * Animator interface.
-	 *
-	 * @class AbstractAnimator
-	 * @constructor
-	 * @param {FlowCarousel} carousel The carousel component
-	 */
-	function AbstractAnimator(carousel) {
-		void(carousel);
-	}
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_EventEmitter.js.html#l11"><code>src\EventEmitter.js:11</code></a>
+        </div>
+    
 
-	/**
-	 * Animates the carousel to given item index position.
-	 *
-	 * @method animateToItem
-	 * @param {number} itemIndex Index of the item
-	 * @return {Deferred.Promise}
-	 */
-	AbstractAnimator.prototype.animateToItem = function(itemIndex) {
-		void(itemIndex);
+    
 
-		throw new Error(&#x27;Not implemented&#x27;);
-	};
+    
+</div>
 
-	return AbstractAnimator;
-});
-    </pre>
+
+
+<div class="box intro">
+    <p>Class for managing events.
+Can be extended to provide event functionality in other classes.</p>
+
+</div>
+
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>

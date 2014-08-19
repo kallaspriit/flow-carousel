@@ -21,21 +21,22 @@ BODY {
     height: 1000px;
 }
 .carousel .carousel-item,
-.flow-carousel-placeholder {
+.flow-carousel-placeholder > DIV {
     background-color: #4F9BFF;
     line-height: 60px;
     padding: 0 20px;
     font-size: 40px;
     color: #FFF;
+    text-align: right;
 }
 .carousel .carousel-item {
     display: none;
 }
-.flow-carousel-placeholder {
+.flow-carousel-placeholder > DIV {
     background-color: #CCC;
 }
 .carousel-horizontal .carousel-item,
-.carousel-horizontal .flow-carousel-placeholder {
+.carousel-horizontal .flow-carousel-placeholder > DIV {
     height: 100%;
 }
 .carousel-vertical .carousel-item {

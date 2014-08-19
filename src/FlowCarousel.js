@@ -10,6 +10,7 @@ define([
 	'HtmlRenderer',
 	'Deferred',
 	'Util',
+	'EventEmitter',
 ], function(
 	$,
 	Config,
@@ -21,7 +22,8 @@ define([
 	AbstractRenderer,
 	HtmlRenderer,
 	Deferred,
-	Util
+	Util,
+	EventEmitter
 ) {
 	'use strict';
 
@@ -35,6 +37,7 @@ define([
 	 * https://github.com/kallaspriit/flow-carousel
 	 *
 	 * @class FlowCarousel
+	 * @extends EventEmitter
 	 * @constructor
 	 */
 	function FlowCarousel() {
@@ -241,6 +244,8 @@ define([
 		 */
 		this.SizeMode = Config.SizeMode;
 	}
+
+	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
 
 	/**
 	 * Possible size modes used by {{#crossLink "FlowCarousel/_getWrapSize"}}{{/crossLink}}.
@@ -803,10 +808,9 @@ define([
 				items: this._config.getClassName('items'),
 				item: this._config.getClassName('item'),
 				scroller: this._config.getClassName('scroller'),
-				sizeModeMatchWrap: this._config.getClassName('sizeModeMatchWrap'),
-				sizeModeMatchLargestItem: this._config.getClassName('sizeModeMatchLargestItem'),
-				loading: this._config.getClassName('loading'),
-				ready: this._config.getClassName('ready'),
+				matchWrap: this._config.getClassName('matchWrap'),
+				matchLargestItem: this._config.getClassName('matchLargestItem'),
+				initiating: this._config.getClassName('initiating'),
 				horizontal: this._config.getClassName('horizontal'),
 				vertical: this._config.getClassName('vertical')
 			},
@@ -829,9 +833,9 @@ define([
 
 		// add size mode class to the main wrap element
 		if (sizeMode === Config.SizeMode.MATCH_WRAP) {
-			$(this._mainWrap).addClass(className.sizeModeMatchWrap);
+			$(this._mainWrap).addClass(className.matchWrap);
 		} else if (sizeMode === Config.SizeMode.MATCH_LARGEST_ITEM) {
-			$(this._mainWrap).addClass(className.sizeModeMatchLargestItem);
+			$(this._mainWrap).addClass(className.matchLargestItem);
 		} else {
 			throw new Error('Invalid size mode "' + sizeMode + '" defined');
 		}
@@ -846,7 +850,7 @@ define([
 
 		// add main carousel class to the wrap element
 		$element.addClass(className.wrap);
-		$element.addClass(className.loading);
+		$element.addClass(className.initiating);
 
 		// add class to wrap based on orientation
 		if (orientation === Config.Orientation.HORIZONTAL) {
@@ -866,8 +870,7 @@ define([
 		}
 
 		// remove the loading class
-		$element.removeClass(className.loading);
-		$element.addClass(className.ready);
+		$element.removeClass(className.initiating);
 
 		return promise;
 	};
@@ -989,10 +992,20 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._renderItemRange = function(startIndex, endIndex) {
-		var deferred = new Deferred();
+		var deferred = new Deferred(),
+			loadingClassName = this._config.getClassName('loading');
+
+		// for asyncronous data source add the loading class to the main wrap for the duration of the async request
+		if (this._dataSource.isAsynchronous()) {
+			$(this._mainWrap).addClass(loadingClassName);
+		}
 
 		this._dataSource.getItems(startIndex, endIndex)
 			.done(function(items) {
+				if (this._dataSource.isAsynchronous()) {
+					$(this._mainWrap).removeClass(loadingClassName);
+				}
+
 				this._renderItems(items, startIndex)
 					.done(function() {
 						deferred.resolve();
@@ -1059,6 +1072,7 @@ define([
 	FlowCarousel.prototype._renderItems = function(items, startIndex) {
 		var deferred = new Deferred(),
 			renderRange = this.getRenderRange(),
+			renderingClassName = this._config.getClassName('rendering'),
 			promises = [],
 			outOfRange,
 			itemIndex,
@@ -1068,11 +1082,19 @@ define([
 			existingElementPos,
 			i;
 
+		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
+		if ($(this._mainWrap).parent().length === 0) {
+			deferred.resolve();
+
+			return deferred.promise();
+		}
+
 		for (i = 0; i < items.length; i++) {
 			item = items[i];
 			itemIndex = startIndex + i;
 			outOfRange = itemIndex < renderRange.start || itemIndex > renderRange.end - 1;
 
+			/* istanbul ignore if */
 			if (outOfRange) {
 				existingElement = this._itemIndexToElementMap[itemIndex];
 
@@ -1100,10 +1122,15 @@ define([
 			promises.push(promise);
 		}
 
+		// add the rendering class to the main wrap for the duration of the rendering process
+		$(this._mainWrap).addClass(renderingClassName);
+
 		// wait for all the elements to get rendered
 		// TODO Add each element as soon as it renders?
 		Deferred.when.apply($, promises)
 			.done(function() {
+				$(this._mainWrap).removeClass(renderingClassName);
+
 				this._insertRenderedElements(arguments, startIndex);
 
 				deferred.resolve();
@@ -1128,6 +1155,7 @@ define([
 			i;
 
 		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
+		/* istanbul ignore if */
 		if ($(this._mainWrap).parent().length === 0) {
 			return;
 		}
@@ -1160,7 +1188,7 @@ define([
 			} else {
 				// only add placeholders if they don't already exist
 				if (this._renderedPlaceholderIndexes.indexOf(elementIndex) === -1) {
-					this._insertRenderedElement(elements[i], elementIndex);
+					this._insertRenderedElement(elements[i], elementIndex, true);
 
 					this._renderedPlaceholderIndexes.push(elementIndex);
 				}
@@ -1177,9 +1205,10 @@ define([
 	 * @method _insertRenderedElement
 	 * @param {DOMElement} element Element to insert
 	 * @param {number} index Element index
+	 * @param {boolean} isPlaceholder Is the element a placeholder
 	 * @private
 	 */
-	FlowCarousel.prototype._insertRenderedElement = function(element, index) {
+	FlowCarousel.prototype._insertRenderedElement = function(element, index, isPlaceholder) {
 		// calculate the properties of the element
 		var $element = $(element),
 			orientation = this._config.orientation,
@@ -1193,9 +1222,7 @@ define([
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			effectiveSize = itemSize - gapPerItem,
 			effectiveOffset = index * itemSize + index * (itemMargin - gapPerItem),
-			$wrapper = $('<div></div>', {
-				'class': this._config.getClassName('item')
-			}),
+			$wrapper = $('<div></div>'),
 			cssProperties = {},
 			$wrappedElement;
 
@@ -1236,6 +1263,11 @@ define([
 		// apply the css styles and add carousel item class
 		$wrappedElement.css(cssProperties);
 		$wrappedElement.addClass(this._config.getClassName('item'));
+
+		// add the placeholder class as well if the element is a placeholder
+		if (isPlaceholder) {
+			$wrappedElement.addClass(this._config.getClassName('placeholder'));
+		}
 
 		// the element may be display: none to begin with, make it visible
 		$element.css('display', 'block');
@@ -1297,9 +1329,10 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		// just forward to _setupLayout
-		// TODO Dont just add new elements but move around existing ones if possible
-		return this._setupLayout(element, orientation);
+		// TODO implement
+		void(element, orientation);
+
+		//return this._setupLayout(element, orientation);
 	};
 
 	/**

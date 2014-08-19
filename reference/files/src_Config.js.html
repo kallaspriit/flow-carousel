@@ -55,6 +55,8 @@
             
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
+                <li><a href="../classes/EventEmitter Manages event registering and emitting..html">EventEmitter Manages event registering and emitting.</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
             
                 <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
@@ -227,21 +229,39 @@ define([
 		/**
 		 * CSS class names to use.
 		 *
+		 * The class name is combined with the {{#crossLink &quot;Config/cssPrefix:property&quot;}}{{/crossLink}} property
+		 * so if the prefix is &quot;flow-carousel-&quot; and the wrap class is &quot;wrap&quot; then the main wrap will get the
+		 * &quot;flow-carousel-wrap&quot; class.
+		 *
 		 * @property cssClasses
+		 * @param {string} cssClasses.wrap=&#x27;wrap&#x27; Assigned to the main wrap element
+		 * @param {string} cssClasses.items=&#x27;items&#x27; Assigned to the items wrap element in the main wrap
+		 * @param {string} cssClasses.scroller=&#x27;scroller&#x27; Assigned to the animated scroller wrap in the items wrap
+		 * @param {string} cssClasses.item=&#x27;item&#x27; Assigned to each item wrapper containing the actual item
+		 * @param {string} cssClasses.placeholder=&#x27;placeholder&#x27; Assigned to each item wrapper that is a placeholder
+		 * @param {string} cssClasses.matchWrap=&#x27;match-wrap&#x27; Assigned to main wrap when using the wrap size match mode
+		 * @param {string} cssClasses.matchLargestItem=&#x27;match-largest-item&#x27; Assigned to main wrap when matching the wrap
+		 * 				   size to the largest item size
+		 * @param {string} cssClasses.horizontal=&#x27;horizontal&#x27; Assigned to main wrap for horizontal orientation
+		 * @param {string} cssClasses.vertical=&#x27;vertical&#x27; Assigned to main wrap for vertical orientation
+		 * @param {string} cssClasses.initiating=&#x27;initiating&#x27; Assigned to main wrap during initialization procedure
+		 * @param {string} cssClasses.loading=&#x27;loading&#x27; Assigned to main wrap during loading of items
+		 * @param {string} cssClasses.rendering=&#x27;rendering&#x27; Assigned to main wrap during rendering of items
 		 * @type {object}
 		 */
 		this.cssClasses = {
 			wrap: &#x27;wrap&#x27;,
 			items: &#x27;items&#x27;,
+			scroller: &#x27;scroller&#x27;,
 			item: &#x27;item&#x27;,
 			placeholder: &#x27;placeholder&#x27;,
-			scroller: &#x27;scroller&#x27;,
-			sizeModeMatchWrap: &#x27;size-mode-match-wrap&#x27;,
-			sizeModeMatchLargestItem: &#x27;size-mode-match-largest-item&#x27;,
+			matchWrap: &#x27;match-wrap&#x27;,
+			matchLargestItem: &#x27;match-largest-item&#x27;,
 			horizontal: &#x27;horizontal&#x27;,
 			vertical: &#x27;vertical&#x27;,
+			initiating: &#x27;initiating&#x27;,
 			loading: &#x27;loading&#x27;,
-			ready: &#x27;ready&#x27;
+			rendering: &#x27;rendering&#x27;
 		};
 
 		/**

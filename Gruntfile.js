@@ -10,6 +10,7 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 
 		// lints the codebase for errors and typos
+		// https://github.com/gruntjs/grunt-contrib-jshint
 		jshint: {
 			library: {
 				options: {
@@ -17,6 +18,7 @@ module.exports = function (grunt) {
 				},
 				src: [
 					'src/**/*.js',
+					'!src/EventEmitter.js', // ignore EventEmitter by Wolfy87 https://github.com/Wolfy87/EventEmitter
 				]
 			},
 			tests: {
@@ -30,6 +32,7 @@ module.exports = function (grunt) {
 		},
 
 		// generates a single file distribution version of the project
+		// https://github.com/asciidisco/grunt-requirejs
 		requirejs: {
 			combined: {
 				options: {
@@ -64,6 +67,7 @@ module.exports = function (grunt) {
 		},
 
 		// executes tests using karma test runner
+		// https://github.com/karma-runner/grunt-karma
 		karma: {
             unit: {
                 configFile: 'karma.conf.js'
@@ -71,6 +75,7 @@ module.exports = function (grunt) {
         },
 
 		// generates the reference documentation
+		// https://github.com/gruntjs/grunt-contrib-yuidoc
 		yuidoc: {
 			compile: {
 				name: '<%= pkg.name %>',
@@ -88,6 +93,7 @@ module.exports = function (grunt) {
 		},
 
 		// creates a local server for viewing the examples
+		// https://github.com/gruntjs/grunt-contrib-connect
 		connect: {
 			server: {
 				options: {

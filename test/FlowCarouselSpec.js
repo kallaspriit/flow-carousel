@@ -47,7 +47,7 @@ define([
 
 	CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
 		var deferred = new Deferred(),
-			requestDuration = Math.random() * 3000;
+			requestDuration = 3000; // fixed duration for better stability
 
 		// fake asyncronous request that takes some time to complete
 		window.setTimeout(function() {
@@ -67,13 +67,13 @@ define([
 	CustomRenderer.prototype.renderItem = function(config, index, data) {
 		var deferred = new Deferred();
 
-		deferred.resolve($('<div>test #' + data + '</div>'));
+		deferred.resolve($('<div class="carousel-item">test #' + data + '</div>'));
 
 		return deferred.promise();
 	};
 
 	/*CustomRenderer.prototype.renderPlaceholder = function(config, index) {
-		return $('<div class="' + config.getClassName('placeholder') + '">loading #' + index + '...</div>')[0];
+		return $('<div>loading #' + index + '...</div>')[0];
 	};*/
 
 	describe('FlowCarousel', function () {
@@ -290,8 +290,11 @@ define([
 				dataSource: customDataSource,
 				renderer: customRenderer
 			}).done(function() {
+				// try to get the out of range condition
 				carousel.navigateToNextPage().done(function() {
-					done();
+					carousel.navigateToNextPage().done(function() {
+						done();
+					});
 				});
 			});
 		});
@@ -678,13 +681,6 @@ define([
 		});
 
 		it('the current item index does not change before the end of the animation', function(done) {
-			// the transition end is not working on PhantomJS for some reason, ignore this test for now
-			/*if (navigator.userAgent.toLowerCase().indexOf('phantomjs') !== -1) {
-				done();
-
-				return;
-			}*/
-
 			var targetIndex = 5;
 
 			carousel.init('.carousel');

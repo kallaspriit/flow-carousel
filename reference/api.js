@@ -8,6 +8,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "Config",
         "DefaultAnimator",
         "Deferred",
+        "EventEmitter Manages event registering and emitting.",
         "FlowCarousel",
         "HtmlDataSource",
         "HtmlRenderer",

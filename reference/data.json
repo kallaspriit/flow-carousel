@@ -69,6 +69,15 @@
             "fors": {},
             "namespaces": {}
         },
+        "src\\EventEmitter.js": {
+            "name": "src\\EventEmitter.js",
+            "modules": {},
+            "classes": {
+                "EventEmitter Manages event registering and emitting.": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\FlowCarousel.js": {
             "name": "src\\FlowCarousel.js",
             "modules": {},
@@ -222,6 +231,18 @@
             "description": "Provides utility functionality.\n\nUses the jQuery deferred implementation.",
             "is_constructor": 1
         },
+        "EventEmitter Manages event registering and emitting.": {
+            "name": "EventEmitter Manages event registering and emitting.",
+            "shortname": "EventEmitter Manages event registering and emitting.",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\EventEmitter.js",
+            "line": 11,
+            "description": "Class for managing events.\nCan be extended to provide event functionality in other classes."
+        },
         "FlowCarousel": {
             "name": "FlowCarousel",
             "shortname": "FlowCarousel",
@@ -231,8 +252,9 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\FlowCarousel.js",
-            "line": 28,
+            "line": 30,
             "description": "FlowCarousel main class.\n\nResponsive paginated high-performance HTML5 carousel with AngularJS support.\n\nCopyright Stagnation Lab\nReleased under the MIT license\nhttps://github.com/kallaspriit/flow-carousel",
+            "extends": "EventEmitter",
             "is_constructor": 1
         },
         "HtmlDataSource": {
@@ -404,7 +426,7 @@
         },
         {
             "file": "src\\AbstractRenderer.js",
-            "line": 54,
+            "line": 52,
             "description": "Destroys a carousel item.\n\nBy default just removes the element using jQuery, but inheriting classes may choose to do something fancier.",
             "itemtype": "method",
             "name": "destroyItem",
@@ -550,15 +572,77 @@
         {
             "file": "src\\Config.js",
             "line": 119,
-            "description": "CSS class names to use.",
+            "description": "CSS class names to use.\n\nThe class name is combined with the {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}} property\nso if the prefix is \"flow-carousel-\" and the wrap class is \"wrap\" then the main wrap will get the\n\"flow-carousel-wrap\" class.",
             "itemtype": "property",
             "name": "cssClasses",
             "type": "{object}",
-            "class": "Config"
+            "class": "Config",
+            "subprops": [
+                {
+                    "name": "wrap='wrap'",
+                    "description": "Assigned to the main wrap element",
+                    "type": "String"
+                },
+                {
+                    "name": "items='items'",
+                    "description": "Assigned to the items wrap element in the main wrap",
+                    "type": "String"
+                },
+                {
+                    "name": "scroller='scroller'",
+                    "description": "Assigned to the animated scroller wrap in the items wrap",
+                    "type": "String"
+                },
+                {
+                    "name": "item='item'",
+                    "description": "Assigned to each item wrapper containing the actual item",
+                    "type": "String"
+                },
+                {
+                    "name": "placeholder='placeholder'",
+                    "description": "Assigned to each item wrapper that is a placeholder",
+                    "type": "String"
+                },
+                {
+                    "name": "matchWrap='match-wrap'",
+                    "description": "Assigned to main wrap when using the wrap size match mode",
+                    "type": "String"
+                },
+                {
+                    "name": "matchLargestItem='match-largest-item'",
+                    "description": "Assigned to main wrap when matching the wrap\n\t\t\t\t   size to the largest item size",
+                    "type": "String"
+                },
+                {
+                    "name": "horizontal='horizontal'",
+                    "description": "Assigned to main wrap for horizontal orientation",
+                    "type": "String"
+                },
+                {
+                    "name": "vertical='vertical'",
+                    "description": "Assigned to main wrap for vertical orientation",
+                    "type": "String"
+                },
+                {
+                    "name": "initiating='initiating'",
+                    "description": "Assigned to main wrap during initialization procedure",
+                    "type": "String"
+                },
+                {
+                    "name": "loading='loading'",
+                    "description": "Assigned to main wrap during loading of items",
+                    "type": "String"
+                },
+                {
+                    "name": "rendering='rendering'",
+                    "description": "Assigned to main wrap during rendering of items",
+                    "type": "String"
+                }
+            ]
         },
         {
             "file": "src\\Config.js",
-            "line": 139,
+            "line": 157,
             "description": "The carousel instance is registered as the main wrap data with the dataTarget name.",
             "itemtype": "property",
             "name": "dataTarget",
@@ -568,7 +652,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 148,
+            "line": 166,
             "description": "Optional custom data source to use.\n\nAs a special case, a simple array can be provided as data source which is converted to use\n{{#crossLink \"ArrayDataSource\"}}{{/crossLink}} implementation.\n\nIf none is provided then the {{#crossLink \"HtmlDataSource\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
@@ -578,7 +662,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 162,
+            "line": 180,
             "description": "Optional custom renderer to use.\n\nIf none is provided then the {{#crossLink \"HtmlRenderer\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
@@ -588,7 +672,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 173,
+            "line": 191,
             "description": "Optional custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is provided then the {{#crossLink \"DefaultAnimator\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "animator",
@@ -598,7 +682,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 186,
+            "line": 204,
             "description": "Returns the range of items that should be rendered given current item index and items per page.\n\nBy default returns one page before the current page and one after but one may choose to override it.",
             "itemtype": "method",
             "name": "getRenderRange",
@@ -629,7 +713,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 206,
+            "line": 224,
             "description": "Enumeration of possible carousel orientations.",
             "itemtype": "property",
             "name": "Orientation",
@@ -651,7 +735,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 220,
+            "line": 238,
             "description": "There are two different strategies for setting the size of the wrap and the items:\n> MATCH_WRAP - the size of the items is set to match the wrap size\n> MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item",
             "itemtype": "property",
             "name": "SizeMode",
@@ -673,7 +757,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 236,
+            "line": 254,
             "description": "Extends the base default configuration properties with user-defined values.",
             "itemtype": "method",
             "name": "extend",
@@ -688,7 +772,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 257,
+            "line": 275,
             "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
             "name": "getItemsPerPage",
@@ -703,7 +787,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 283,
+            "line": 301,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -740,8 +824,416 @@
             "class": "DefaultAnimator"
         },
         {
+            "file": "src\\EventEmitter.js",
+            "line": 24,
+            "description": "Finds the index of the listener for the event in it's storage array.",
+            "params": [
+                {
+                    "name": "listeners",
+                    "description": "Array of listeners to search through.",
+                    "type": "Function[]"
+                },
+                {
+                    "name": "listener",
+                    "description": "Method to look for.",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "Index of the specified listener, -1 if not found",
+                "type": "Number"
+            },
+            "api": "private",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 43,
+            "description": "Alias a method while keeping the context correct, to allow for overwriting of target method.",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the target method.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The aliased method",
+                "type": "Function"
+            },
+            "api": "private",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 56,
+            "description": "Returns the listener array for the specified event.\nWill initialise the event object and listener arrays if required.\nWill return an object if you use a regex search. The object contains keys for each matched event. So /ba[rz]/ might return an object containing bar and baz. But only if you have either defined them with defineEvent or added some listeners to them.\nEach property in the object response is an array of listener functions.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to return the listeners from.",
+                    "type": "String|RegExp"
+                }
+            ],
+            "return": {
+                "description": "All listener functions for the event.",
+                "type": "Function[]|Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 87,
+            "description": "Takes a list of listener objects and flattens it into a list of listener functions.",
+            "params": [
+                {
+                    "name": "listeners",
+                    "description": "Raw listener objects.",
+                    "type": "Object[]"
+                }
+            ],
+            "return": {
+                "description": "Just the listener functions.",
+                "type": "Function[]"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 104,
+            "description": "Fetches the requested listeners via getListeners but will always return the results inside an object. This is mainly for internal use but others may find it useful.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to return the listeners from.",
+                    "type": "String|RegExp"
+                }
+            ],
+            "return": {
+                "description": "All listener functions for an event in an object.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 122,
+            "description": "Adds a listener function to the specified event.\nThe listener will not be added if it is a duplicate.\nIf the listener returns true then it will be removed after it is called.\nIf you pass a regular expression as the event name then the listener will be added to all events that match it.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to attach the listener to.",
+                    "type": "String|RegExp"
+                },
+                {
+                    "name": "listener",
+                    "description": "Method to be called when the event is emitted. If the function returns true then it will be removed after calling.",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 149,
+            "description": "Alias of addListener",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 154,
+            "description": "Semi-alias of addListener. It will add a listener that will be\nautomatically removed after it's first execution.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to attach the listener to.",
+                    "type": "String|RegExp"
+                },
+                {
+                    "name": "listener",
+                    "description": "Method to be called when the event is emitted. If the function returns true then it will be removed after calling.",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 169,
+            "description": "Alias of addOnceListener.",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 174,
+            "description": "Defines an event name. This is required if you want to use a regex to add a listener to multiple events at once. If you don't do this then how do you expect it to know what event to add to? Should it just add to every possible match for a regex? No. That is scary and bad.\nYou need to tell it what event names should be matched by a regex.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to create.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 186,
+            "description": "Uses defineEvent to define multiple events.",
+            "params": [
+                {
+                    "name": "evts",
+                    "description": "An array of event names to define.",
+                    "type": "String[]"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 199,
+            "description": "Removes a listener function from the specified event.\nWhen passed a regular expression as the event name, it will remove the listener from all events that match it.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to remove the listener from.",
+                    "type": "String|RegExp"
+                },
+                {
+                    "name": "listener",
+                    "description": "Method to remove from the event.",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 225,
+            "description": "Alias of removeListener",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 230,
+            "description": "Adds listeners in bulk using the manipulateListeners method.\nIf you pass an object as the second argument you can add to multiple events at once. The object should contain key value pairs of events and listeners or listener arrays. You can also pass it an event name and an array of listeners to be added.\nYou can also pass it a regular expression to add the array of listeners to all events that match it.\nYeah, this function does quite a bit. That's probably a bad thing.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "An event name if you will pass an array of listeners next. An object if you wish to add to multiple events at once.",
+                    "type": "String|Object|RegExp"
+                },
+                {
+                    "name": "listeners",
+                    "description": "An optional array of listener functions to add.",
+                    "type": "Function[]",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 245,
+            "description": "Removes listeners in bulk using the manipulateListeners method.\nIf you pass an object as the second argument you can remove from multiple events at once. The object should contain key value pairs of events and listeners or listener arrays.\nYou can also pass it an event name and an array of listeners to be removed.\nYou can also pass it a regular expression to remove the listeners from all events that match it.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "An event name if you will pass an array of listeners next. An object if you wish to remove from multiple events at once.",
+                    "type": "String|Object|RegExp"
+                },
+                {
+                    "name": "listeners",
+                    "description": "An optional array of listener functions to remove.",
+                    "type": "Function[]",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 260,
+            "description": "Edits listeners in bulk. The addListeners and removeListeners methods both use this to do their job. You should really use those instead, this is a little lower level.\nThe first argument will determine if the listeners are removed (true) or added (false).\nIf you pass an object as the second argument you can add/remove from multiple events at once. The object should contain key value pairs of events and listeners or listener arrays.\nYou can also pass it an event name and an array of listeners to be added/removed.\nYou can also pass it a regular expression to manipulate the listeners of all events that match it.",
+            "params": [
+                {
+                    "name": "remove",
+                    "description": "True if you want to remove listeners, false if you want to add.",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "evt",
+                    "description": "An event name if you will pass an array of listeners next. An object if you wish to add/remove from multiple events at once.",
+                    "type": "String|Object|RegExp"
+                },
+                {
+                    "name": "listeners",
+                    "description": "An optional array of listener functions to add/remove.",
+                    "type": "Function[]",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 306,
+            "description": "Removes all listeners from a specified event.\nIf you do not specify an event then all listeners will be removed.\nThat means every event will be emptied.\nYou can also pass a regex to remove all events that match it.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Optional name of the event to remove all listeners for. Will remove from every event if not passed.",
+                    "type": "String|RegExp",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 341,
+            "description": "Alias of removeEvent.\n\nAdded to mirror the node API.",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 348,
+            "description": "Emits an event of your choice.\nWhen emitted, every listener attached to that event will be executed.\nIf you pass the optional argument array then those arguments will be passed to every listener upon execution.\nBecause it uses `apply`, your array of arguments will be passed as if you wrote them out separately.\nSo they will not arrive within the array on the other side, they will be separate.\nYou can also pass a regular expression to emit to all events that match it.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to emit and execute listeners for.",
+                    "type": "String|RegExp"
+                },
+                {
+                    "name": "args",
+                    "description": "Optional array of arguments to be passed to each listener.",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 392,
+            "description": "Alias of emitEvent",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 397,
+            "description": "Subtly different from emitEvent in that it will pass its arguments on to the listeners, as opposed to taking a single array of arguments to pass on.\nAs with emitEvent, you can pass a regex in place of the event name to emit to all events that match it.",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "Name of the event to emit and execute listeners for.",
+                    "type": "String|RegExp"
+                },
+                {
+                    "name": "Optional",
+                    "description": "additional arguments to be passed to each listener.",
+                    "type": "...*"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 410,
+            "description": "Sets the current value to check against when executing listeners. If a\nlisteners return value matches the one set here then it will be removed\nafter execution. This value defaults to true.",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "The new value to check for when executing listeners.",
+                    "type": "*"
+                }
+            ],
+            "return": {
+                "description": "Current instance of EventEmitter for chaining.",
+                "type": "Object"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 423,
+            "description": "Fetches the current value to check against when executing listeners. If\nthe listeners return value matches this one then it should be removed\nautomatically. It will return true by default.",
+            "return": {
+                "description": "The current value to check for or the default, true.",
+                "type": "*|Boolean"
+            },
+            "api": "private",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 440,
+            "description": "Fetches the events object and creates one if required.",
+            "return": {
+                "description": "The events storage object.",
+                "type": "Object"
+            },
+            "api": "private",
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
+            "file": "src\\EventEmitter.js",
+            "line": 450,
+            "description": "Reverts the global {@link EventEmitter} to its previous value and returns a reference to this version.",
+            "return": {
+                "description": "Non conflicting EventEmitter class.",
+                "type": "Function"
+            },
+            "class": "EventEmitter Manages event registering and emitting."
+        },
+        {
             "file": "src\\FlowCarousel.js",
-            "line": 41,
+            "line": 44,
             "description": "Component version number.",
             "itemtype": "property",
             "name": "version",
@@ -750,7 +1242,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 49,
+            "line": 52,
             "description": "Set to true once the component is initiated and to false once it's destroyed.",
             "itemtype": "property",
             "name": "_initiated",
@@ -762,7 +1254,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 59,
+            "line": 62,
             "description": "Carousel configuration.",
             "itemtype": "property",
             "name": "_config",
@@ -774,7 +1266,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 69,
+            "line": 72,
             "description": "Data source to use.\n\nData source is only set when the carousel is initiated with data or it's set with\n{{#crossLink \"FlowCarousel/setDataSource\"}}{{/crossLink}}.",
             "itemtype": "property",
             "name": "_dataSource",
@@ -786,7 +1278,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 82,
+            "line": 85,
             "description": "Renderer used to render the data.",
             "itemtype": "property",
             "name": "_renderer",
@@ -798,7 +1290,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 92,
+            "line": 95,
             "description": "Animator to use.",
             "itemtype": "property",
             "name": "_animator",
@@ -810,7 +1302,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 102,
+            "line": 105,
             "description": "Selector of elements to turn into a carousel.",
             "itemtype": "property",
             "name": "_selector",
@@ -822,7 +1314,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 112,
+            "line": 115,
             "description": "The interval reference for responsive layout changes.",
             "itemtype": "property",
             "name": "_responsiveLayoutListenerInterval",
@@ -834,7 +1326,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 122,
+            "line": 125,
             "description": "The top wrap elements jQuery object.",
             "itemtype": "property",
             "name": "_mainWrap",
@@ -846,7 +1338,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 132,
+            "line": 135,
             "description": "Wrap for the items that contains the {{#crossLink \"FlowCarousel/_scrollerWrap:property\"}}{{/crossLink}}\nwhich in turn contains the actual item wrappers and items.",
             "itemtype": "property",
             "name": "_itemsWrap",
@@ -858,7 +1350,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 143,
+            "line": 146,
             "description": "This is the wrap that's animated on navigation and contains the carousel element wraps.",
             "itemtype": "property",
             "name": "_scrollerWrap",
@@ -870,7 +1362,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 153,
+            "line": 156,
             "description": "Is the carousel currently animating.",
             "itemtype": "property",
             "name": "_isAnimating",
@@ -882,7 +1374,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 163,
+            "line": 166,
             "description": "Target item position index.\n\nThis is set when animating to an index is requested.",
             "itemtype": "property",
             "name": "_targetItemIndex",
@@ -894,7 +1386,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 175,
+            "line": 178,
             "description": "Current item position index.\n\nThis is updated once the animation completes.",
             "itemtype": "property",
             "name": "_currentItemIndex",
@@ -906,7 +1398,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 187,
+            "line": 190,
             "description": "List of item indexes that have been rendered.",
             "itemtype": "property",
             "name": "_renderedItemIndexes",
@@ -917,7 +1409,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 196,
+            "line": 199,
             "description": "List of placeholder indexes that have been rendered.\n\nTODO consider getting rid of this index list",
             "itemtype": "property",
             "name": "_renderedPlaceholderIndexes",
@@ -928,7 +1420,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 207,
+            "line": 210,
             "description": "Mapping of renderer item indexes to their dom elements.",
             "itemtype": "property",
             "name": "_itemIndexToElementMap",
@@ -940,7 +1432,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 217,
+            "line": 220,
             "description": "Enumeration of possible carousel orientations.\n\nShortcut to the list of possible orientations from Config.",
             "itemtype": "property",
             "name": "Orientation",
@@ -961,7 +1453,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 229,
+            "line": 232,
             "description": "There are two different strategies for setting the size of the wrap and the items:\n> MATCH_WRAP - the size of the items is set to match the wrap size\n> MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item\n\nShortcut to the list of possible size modes from Config.",
             "itemtype": "property",
             "name": "SizeMode",
@@ -983,7 +1475,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 245,
+            "line": 250,
             "description": "Possible size modes used by {{#crossLink \"FlowCarousel/_getWrapSize\"}}{{/crossLink}}.",
             "itemtype": "property",
             "name": "SizeMode",
@@ -1005,7 +1497,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 259,
+            "line": 264,
             "description": "Initializes the carousel component.\n\nReturns a promise that will be resolved once the carousel has been initiated.",
             "itemtype": "method",
             "name": "init",
@@ -1030,7 +1522,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 326,
+            "line": 331,
             "description": "Returns current configuration.",
             "itemtype": "method",
             "name": "getConfig",
@@ -1042,7 +1534,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 336,
+            "line": 341,
             "description": "Returns current animator instance.",
             "itemtype": "method",
             "name": "getAnimator",
@@ -1054,7 +1546,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 346,
+            "line": 351,
             "description": "Returns the main carousel wrap dom element.",
             "itemtype": "method",
             "name": "getMainWrap",
@@ -1066,7 +1558,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 356,
+            "line": 361,
             "description": "Returns the items wrap containing the scroller wrap.",
             "itemtype": "method",
             "name": "getItemsWrap",
@@ -1078,7 +1570,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 366,
+            "line": 371,
             "description": "Returns the scroller wrap containing the item wraps.",
             "itemtype": "method",
             "name": "getScrollerWrap",
@@ -1090,7 +1582,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 376,
+            "line": 381,
             "description": "Returns the orientation of the carousel.",
             "itemtype": "method",
             "name": "getOrientation",
@@ -1102,7 +1594,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 386,
+            "line": 391,
             "description": "Returns the size of a single item given current wrap size.",
             "itemtype": "method",
             "name": "getItemSize",
@@ -1114,7 +1606,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 399,
+            "line": 404,
             "description": "Returns the number of items in the dataset.",
             "itemtype": "method",
             "name": "getItemCount",
@@ -1126,7 +1618,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 409,
+            "line": 414,
             "description": "Returns the number of pages the dataset contains given current wrap size.",
             "itemtype": "method",
             "name": "getPageCount",
@@ -1138,7 +1630,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 419,
+            "line": 424,
             "description": "Returns the number of items displayed on a single page.",
             "itemtype": "method",
             "name": "getItemsPerPage",
@@ -1150,7 +1642,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 431,
+            "line": 436,
             "description": "Returns the target item position index.\n\nThis can be different from the return value of getCurrentItemIndex() if the carousel is animating.",
             "itemtype": "method",
             "name": "getTargetItemIndex",
@@ -1162,7 +1654,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 443,
+            "line": 448,
             "description": "Returns the current item position index.\n\nThis can be different from the return value of getTargetItemIndex() if the carousel is animating.",
             "itemtype": "method",
             "name": "getCurrentItemIndex",
@@ -1174,7 +1666,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 455,
+            "line": 460,
             "description": "Returns currently visible page number.\n\nAlways returns an integer flooring to the closest round page number.\n\nThe page number starts at zero for first page.",
             "itemtype": "method",
             "name": "getCurrentPageIndex",
@@ -1186,7 +1678,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 471,
+            "line": 476,
             "description": "Returns the range of items that should be rendered for current item index and config.",
             "itemtype": "method",
             "name": "getRenderRange",
@@ -1209,7 +1701,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 488,
+            "line": 493,
             "description": "Returns the current item position index.\n\nThis can be different from the return value of getTargetItemIndex() if the carousel is animating.",
             "itemtype": "method",
             "name": "getCurrentItemIndex",
@@ -1221,7 +1713,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 500,
+            "line": 505,
             "description": "Sets the data source to use.\n\nExpects either an instance of AbstractDataSource (you can roll your own) or a simple array that will be\nconverted to an ArrayDataSource.\n\nThis can optionally be set in the init method as second argument.\n\nThis method supports call chaining by returning itself.",
             "itemtype": "method",
             "name": "setDataSource",
@@ -1241,7 +1733,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 530,
+            "line": 535,
             "description": "Returns the data used for rendering the component.\n\nReturns null if the component has not yet been initialized.",
             "itemtype": "method",
             "name": "getDataSource",
@@ -1253,7 +1745,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 542,
+            "line": 547,
             "description": "Navigates to a carousel item by index.\n\nThrows error if out of bounds index is requested.\n\nReturns deferred promise that will be resolved once the animation completes.",
             "itemtype": "method",
             "name": "navigateToItem",
@@ -1272,7 +1764,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 607,
+            "line": 612,
             "description": "Navigates to given page number.\n\nNotice that page numbers start from zero.\n\nThrows error if out of bounds index is requested.\n\nReturns deferred promise that will be resolved once the animation completes.",
             "itemtype": "method",
             "name": "navigateToPage",
@@ -1291,7 +1783,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 626,
+            "line": 631,
             "description": "Navigates to next carousel item.\n\nReturns deferred promise that will be resolved once the animation completes.",
             "itemtype": "method",
             "name": "navigateToNextItem",
@@ -1303,7 +1795,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 643,
+            "line": 648,
             "description": "Navigates to previous carousel item.\n\nReturns deferred promise that will be resolved once the animation completes.",
             "itemtype": "method",
             "name": "navigateToPreviousItem",
@@ -1315,7 +1807,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 658,
+            "line": 663,
             "description": "Navigates to next page if available.\n\nReturns deferred promise that will be resolved once the animation completes.",
             "itemtype": "method",
             "name": "navigateToNextPage",
@@ -1327,7 +1819,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 674,
+            "line": 679,
             "description": "Navigates to previous page if available.\n\nReturns deferred promise that will be resolved once the animation completes.",
             "itemtype": "method",
             "name": "navigateToPreviousPage",
@@ -1339,7 +1831,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 689,
+            "line": 694,
             "description": "Returns the range of currently visible carousel item wrappers.",
             "itemtype": "method",
             "name": "getCurrentPageVisibleRange",
@@ -1351,7 +1843,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 707,
+            "line": 712,
             "description": "Returns the list of currently visible carousel item wrappers.",
             "itemtype": "method",
             "name": "getCurrentPageVisibleItemElements",
@@ -1363,7 +1855,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 733,
+            "line": 738,
             "description": "Returns the item dom element by item index.\n\nThrows error if invalid index is requested.",
             "itemtype": "method",
             "name": "getItemElementByIndex",
@@ -1384,7 +1876,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 760,
+            "line": 765,
             "description": "Initializes the top-level wrap element.\n\nIf the selector matches multiple elements, only the first one is considered.\n\nIf the selector does not match any elements, an error is thrown.",
             "itemtype": "method",
             "name": "_setupElement",
@@ -1401,7 +1893,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 790,
+            "line": 795,
             "description": "Initializes a single wrap element.",
             "itemtype": "method",
             "name": "_setupCarousel",
@@ -1427,7 +1919,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 875,
+            "line": 878,
             "description": "Sets up the layout and renders the initial set of items.\n\nSince fetching and rendering items can be asyncronous, this method returns a promise.",
             "itemtype": "method",
             "name": "_setupLayout",
@@ -1453,7 +1945,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 908,
+            "line": 911,
             "description": "Validates whether all the required items have been rendered and initiates rendering them if not.",
             "itemtype": "method",
             "name": "_validateItemsToRender",
@@ -1467,7 +1959,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 921,
+            "line": 924,
             "description": "Removes items that have gone out of the render range.",
             "itemtype": "method",
             "name": "_removeInvalidItems",
@@ -1477,7 +1969,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 982,
+            "line": 985,
             "description": "Renders a range of carousel items.",
             "itemtype": "method",
             "name": "_renderItemRange",
@@ -1503,7 +1995,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1005,
+            "line": 1018,
             "description": "Renders the item placeholders for current target index.",
             "itemtype": "method",
             "name": "_renderTargetIndexPlaceholders",
@@ -1513,7 +2005,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1020,
+            "line": 1033,
             "description": "Renders the item placeholders that will later be replaced with the actual items.\n\nGives the user some \"loading\" feedback.",
             "itemtype": "method",
             "name": "_renderItemPlaceholders",
@@ -1535,7 +2027,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1050,
+            "line": 1063,
             "description": "Renders given carousel items.",
             "itemtype": "method",
             "name": "_renderItems",
@@ -1561,7 +2053,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1115,
+            "line": 1142,
             "description": "Inserts rendered dom elements into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElements",
@@ -1590,7 +2082,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1174,
+            "line": 1202,
             "description": "Inserts a rendered dom element into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElement",
@@ -1604,6 +2096,11 @@
                     "name": "index",
                     "description": "Element index",
                     "type": "Number"
+                },
+                {
+                    "name": "isPlaceholder",
+                    "description": "Is the element a placeholder",
+                    "type": "Boolean"
                 }
             ],
             "access": "private",
@@ -1612,7 +2109,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1255,
+            "line": 1287,
             "description": "Sets the scroller wrap size to the largest visible child size.",
             "itemtype": "method",
             "name": "_setScrollerSizeToLargestVisibleChildSize",
@@ -1622,7 +2119,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1286,
+            "line": 1318,
             "description": "Re-initializes the layout.\n\nUsed to apply responsive layout when the wrap size changes.\n\nSince fetching and rendering items can be asynchronous, this method returns a promise.",
             "itemtype": "method",
             "name": "_reLayout",
@@ -1648,7 +2145,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1305,
+            "line": 1338,
             "description": "Sets up main wrap size change listener to apply responsive layout.",
             "itemtype": "method",
             "name": "_setupResponsiveLayoutListener",
@@ -1670,7 +2167,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1319,
+            "line": 1352,
             "description": "Checks whether the carousel wrap size has changed and triggers re-layout if so.",
             "itemtype": "method",
             "name": "_validateResponsiveLayout",
@@ -1692,7 +2189,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1343,
+            "line": 1376,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -1714,7 +2211,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1355,
+            "line": 1388,
             "description": "Returns the size of an element.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getElementSize",
@@ -1747,7 +2244,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1385,
+            "line": 1418,
             "description": "Returns biggest element size of given elements given orientation and size mode.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getLargestElementSize",
@@ -1780,7 +2277,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1413,
+            "line": 1446,
             "description": "Returns the opposite orientation name.\n\nFor Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.",
             "itemtype": "method",
             "name": "_getOppositeOrientation",
@@ -1935,6 +2432,122 @@
         }
     ],
     "warnings": [
+        {
+            "message": "unknown tag: api",
+            "line": " src\\EventEmitter.js:24"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " src\\EventEmitter.js:43"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " src\\EventEmitter.js:423"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " src\\EventEmitter.js:440"
+        },
+        {
+            "message": "Missing item type\nFinds the index of the listener for the event in it's storage array.",
+            "line": " src\\EventEmitter.js:24"
+        },
+        {
+            "message": "Missing item type\nAlias a method while keeping the context correct, to allow for overwriting of target method.",
+            "line": " src\\EventEmitter.js:43"
+        },
+        {
+            "message": "Missing item type\nReturns the listener array for the specified event.\nWill initialise the event object and listener arrays if required.\nWill return an object if you use a regex search. The object contains keys for each matched event. So /ba[rz]/ might return an object containing bar and baz. But only if you have either defined them with defineEvent or added some listeners to them.\nEach property in the object response is an array of listener functions.",
+            "line": " src\\EventEmitter.js:56"
+        },
+        {
+            "message": "Missing item type\nTakes a list of listener objects and flattens it into a list of listener functions.",
+            "line": " src\\EventEmitter.js:87"
+        },
+        {
+            "message": "Missing item type\nFetches the requested listeners via getListeners but will always return the results inside an object. This is mainly for internal use but others may find it useful.",
+            "line": " src\\EventEmitter.js:104"
+        },
+        {
+            "message": "Missing item type\nAdds a listener function to the specified event.\nThe listener will not be added if it is a duplicate.\nIf the listener returns true then it will be removed after it is called.\nIf you pass a regular expression as the event name then the listener will be added to all events that match it.",
+            "line": " src\\EventEmitter.js:122"
+        },
+        {
+            "message": "Missing item type\nAlias of addListener",
+            "line": " src\\EventEmitter.js:149"
+        },
+        {
+            "message": "Missing item type\nSemi-alias of addListener. It will add a listener that will be\nautomatically removed after it's first execution.",
+            "line": " src\\EventEmitter.js:154"
+        },
+        {
+            "message": "Missing item type\nAlias of addOnceListener.",
+            "line": " src\\EventEmitter.js:169"
+        },
+        {
+            "message": "Missing item type\nDefines an event name. This is required if you want to use a regex to add a listener to multiple events at once. If you don't do this then how do you expect it to know what event to add to? Should it just add to every possible match for a regex? No. That is scary and bad.\nYou need to tell it what event names should be matched by a regex.",
+            "line": " src\\EventEmitter.js:174"
+        },
+        {
+            "message": "Missing item type\nUses defineEvent to define multiple events.",
+            "line": " src\\EventEmitter.js:186"
+        },
+        {
+            "message": "Missing item type\nRemoves a listener function from the specified event.\nWhen passed a regular expression as the event name, it will remove the listener from all events that match it.",
+            "line": " src\\EventEmitter.js:199"
+        },
+        {
+            "message": "Missing item type\nAlias of removeListener",
+            "line": " src\\EventEmitter.js:225"
+        },
+        {
+            "message": "Missing item type\nAdds listeners in bulk using the manipulateListeners method.\nIf you pass an object as the second argument you can add to multiple events at once. The object should contain key value pairs of events and listeners or listener arrays. You can also pass it an event name and an array of listeners to be added.\nYou can also pass it a regular expression to add the array of listeners to all events that match it.\nYeah, this function does quite a bit. That's probably a bad thing.",
+            "line": " src\\EventEmitter.js:230"
+        },
+        {
+            "message": "Missing item type\nRemoves listeners in bulk using the manipulateListeners method.\nIf you pass an object as the second argument you can remove from multiple events at once. The object should contain key value pairs of events and listeners or listener arrays.\nYou can also pass it an event name and an array of listeners to be removed.\nYou can also pass it a regular expression to remove the listeners from all events that match it.",
+            "line": " src\\EventEmitter.js:245"
+        },
+        {
+            "message": "Missing item type\nEdits listeners in bulk. The addListeners and removeListeners methods both use this to do their job. You should really use those instead, this is a little lower level.\nThe first argument will determine if the listeners are removed (true) or added (false).\nIf you pass an object as the second argument you can add/remove from multiple events at once. The object should contain key value pairs of events and listeners or listener arrays.\nYou can also pass it an event name and an array of listeners to be added/removed.\nYou can also pass it a regular expression to manipulate the listeners of all events that match it.",
+            "line": " src\\EventEmitter.js:260"
+        },
+        {
+            "message": "Missing item type\nRemoves all listeners from a specified event.\nIf you do not specify an event then all listeners will be removed.\nThat means every event will be emptied.\nYou can also pass a regex to remove all events that match it.",
+            "line": " src\\EventEmitter.js:306"
+        },
+        {
+            "message": "Missing item type\nAlias of removeEvent.\n\nAdded to mirror the node API.",
+            "line": " src\\EventEmitter.js:341"
+        },
+        {
+            "message": "Missing item type\nEmits an event of your choice.\nWhen emitted, every listener attached to that event will be executed.\nIf you pass the optional argument array then those arguments will be passed to every listener upon execution.\nBecause it uses `apply`, your array of arguments will be passed as if you wrote them out separately.\nSo they will not arrive within the array on the other side, they will be separate.\nYou can also pass a regular expression to emit to all events that match it.",
+            "line": " src\\EventEmitter.js:348"
+        },
+        {
+            "message": "Missing item type\nAlias of emitEvent",
+            "line": " src\\EventEmitter.js:392"
+        },
+        {
+            "message": "Missing item type\nSubtly different from emitEvent in that it will pass its arguments on to the listeners, as opposed to taking a single array of arguments to pass on.\nAs with emitEvent, you can pass a regex in place of the event name to emit to all events that match it.",
+            "line": " src\\EventEmitter.js:397"
+        },
+        {
+            "message": "Missing item type\nSets the current value to check against when executing listeners. If a\nlisteners return value matches the one set here then it will be removed\nafter execution. This value defaults to true.",
+            "line": " src\\EventEmitter.js:410"
+        },
+        {
+            "message": "Missing item type\nFetches the current value to check against when executing listeners. If\nthe listeners return value matches this one then it should be removed\nautomatically. It will return true by default.",
+            "line": " src\\EventEmitter.js:423"
+        },
+        {
+            "message": "Missing item type\nFetches the events object and creates one if required.",
+            "line": " src\\EventEmitter.js:440"
+        },
+        {
+            "message": "Missing item type\nReverts the global {@link EventEmitter} to its previous value and returns a reference to this version.",
+            "line": " src\\EventEmitter.js:450"
+        },
         {
             "message": "Missing item type\nProvides a way to include jquery without actually including it in the build.\n\nExpects that jQuery is already loaded.",
             "line": " src\\jquery.js:5"

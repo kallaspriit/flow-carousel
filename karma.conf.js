@@ -16,7 +16,7 @@ module.exports = function(config) {
 		// configure preprocessors
 		preprocessors: {
 			'test/**/*.html': ['html2js'],
-			'src/**/*.js': debug ? [] : ['coverage']
+			'src/**/[!EventEmitter]*.js': debug ? [] : ['coverage']
 		},
  
         // list of files / patterns to load in the browser

@@ -119,21 +119,39 @@ define([
 		/**
 		 * CSS class names to use.
 		 *
+		 * The class name is combined with the {{#crossLink "Config/cssPrefix:property"}}{{/crossLink}} property
+		 * so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main wrap will get the
+		 * "flow-carousel-wrap" class.
+		 *
 		 * @property cssClasses
+		 * @param {string} cssClasses.wrap='wrap' Assigned to the main wrap element
+		 * @param {string} cssClasses.items='items' Assigned to the items wrap element in the main wrap
+		 * @param {string} cssClasses.scroller='scroller' Assigned to the animated scroller wrap in the items wrap
+		 * @param {string} cssClasses.item='item' Assigned to each item wrapper containing the actual item
+		 * @param {string} cssClasses.placeholder='placeholder' Assigned to each item wrapper that is a placeholder
+		 * @param {string} cssClasses.matchWrap='match-wrap' Assigned to main wrap when using the wrap size match mode
+		 * @param {string} cssClasses.matchLargestItem='match-largest-item' Assigned to main wrap when matching the wrap
+		 * 				   size to the largest item size
+		 * @param {string} cssClasses.horizontal='horizontal' Assigned to main wrap for horizontal orientation
+		 * @param {string} cssClasses.vertical='vertical' Assigned to main wrap for vertical orientation
+		 * @param {string} cssClasses.initiating='initiating' Assigned to main wrap during initialization procedure
+		 * @param {string} cssClasses.loading='loading' Assigned to main wrap during loading of items
+		 * @param {string} cssClasses.rendering='rendering' Assigned to main wrap during rendering of items
 		 * @type {object}
 		 */
 		this.cssClasses = {
 			wrap: 'wrap',
 			items: 'items',
+			scroller: 'scroller',
 			item: 'item',
 			placeholder: 'placeholder',
-			scroller: 'scroller',
-			sizeModeMatchWrap: 'size-mode-match-wrap',
-			sizeModeMatchLargestItem: 'size-mode-match-largest-item',
+			matchWrap: 'match-wrap',
+			matchLargestItem: 'match-largest-item',
 			horizontal: 'horizontal',
 			vertical: 'vertical',
+			initiating: 'initiating',
 			loading: 'loading',
-			ready: 'ready'
+			rendering: 'rendering'
 		};
 
 		/**

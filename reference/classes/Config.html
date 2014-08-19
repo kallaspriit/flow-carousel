@@ -55,6 +55,8 @@
             
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
+                <li><a href="../classes/EventEmitter Manages event registering and emitting..html">EventEmitter Manages event registering and emitting.</a></li>
+            
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
             
                 <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
@@ -419,7 +421,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l236"><code>src\Config.js:236</code></a>
+        <a href="../files/src_Config.js.html#l254"><code>src\Config.js:254</code></a>
         
         </p>
 
@@ -511,7 +513,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l283"><code>src\Config.js:283</code></a>
+        <a href="../files/src_Config.js.html#l301"><code>src\Config.js:301</code></a>
         
         </p>
 
@@ -615,7 +617,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l257"><code>src\Config.js:257</code></a>
+        <a href="../files/src_Config.js.html#l275"><code>src\Config.js:275</code></a>
         
         </p>
 
@@ -723,7 +725,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l186"><code>src\Config.js:186</code></a>
+        <a href="../files/src_Config.js.html#l204"><code>src\Config.js:204</code></a>
         
         </p>
 
@@ -848,7 +850,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l173"><code>src\Config.js:173</code></a>
+        <a href="../files/src_Config.js.html#l191"><code>src\Config.js:191</code></a>
         
         </p>
 
@@ -908,6 +910,9 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
 
     <div class="description">
         <p>CSS class names to use.</p>
+<p>The class name is combined with the <a href="../classes/Config.html#property_cssPrefix" class="crosslink">cssPrefix</a> property
+so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main wrap will get the
+"flow-carousel-wrap" class.</p>
 
     </div>
 
@@ -915,6 +920,181 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
 
     
 
+    
+        <h4>Sub-properties:</h4>
+
+        <ul class="params-list">
+            
+            <li class="param">
+                
+                    <code class="param-name">wrap=&#x27;wrap&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to the main wrap element</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">items=&#x27;items&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to the items wrap element in the main wrap</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">scroller=&#x27;scroller&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to the animated scroller wrap in the items wrap</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">item=&#x27;item&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to each item wrapper containing the actual item</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">placeholder=&#x27;placeholder&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to each item wrapper that is a placeholder</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">matchWrap=&#x27;match-wrap&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap when using the wrap size match mode</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">matchLargestItem=&#x27;match-largest-item&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap when matching the wrap
+                   size to the largest item size</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">horizontal=&#x27;horizontal&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap for horizontal orientation</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">vertical=&#x27;vertical&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap for vertical orientation</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">initiating=&#x27;initiating&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap during initialization procedure</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">loading=&#x27;loading&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap during loading of items</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">rendering=&#x27;rendering&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Assigned to main wrap during rendering of items</p>
+
+                </div>
+
+                
+            </li>
+            
+        </ul>
     
 </div>
 
@@ -989,7 +1169,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l139"><code>src\Config.js:139</code></a>
+        <a href="../files/src_Config.js.html#l157"><code>src\Config.js:157</code></a>
         
         </p>
 
@@ -1182,7 +1362,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l206"><code>src\Config.js:206</code></a>
+        <a href="../files/src_Config.js.html#l224"><code>src\Config.js:224</code></a>
         
         </p>
 
@@ -1261,7 +1441,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l148"><code>src\Config.js:148</code></a>
+        <a href="../files/src_Config.js.html#l166"><code>src\Config.js:166</code></a>
         
         </p>
 
@@ -1311,7 +1491,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l162"><code>src\Config.js:162</code></a>
+        <a href="../files/src_Config.js.html#l180"><code>src\Config.js:180</code></a>
         
         </p>
 
@@ -1504,7 +1684,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l220"><code>src\Config.js:220</code></a>
+        <a href="../files/src_Config.js.html#l238"><code>src\Config.js:238</code></a>
         
         </p>
 

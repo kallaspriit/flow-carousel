@@ -18,10 +18,11 @@ define([
 	 *
 	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise}
 	 */
-	AbstractAnimator.prototype.animateToItem = function(itemIndex) {
-		void(itemIndex);
+	AbstractAnimator.prototype.animateToItem = function(itemIndex, instant) {
+		void(itemIndex, instant);
 
 		throw new Error('Not implemented');
 	};

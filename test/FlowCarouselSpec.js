@@ -87,7 +87,8 @@ define([
 
 			if (fixtureWrap.length === 0) {
 				fixtureWrap = $('<div></div>', {
-					id: 'fixture-wrap'
+					id: 'fixture-wrap',
+					style: 'width: 1200px; height: 800px; background-color: #F8F8F8;'
 				}).appendTo(document.body);
 			}
 
@@ -126,6 +127,18 @@ define([
 			carousel.init('.carousel');
 
 			expect(carousel.getDataSource()).toEqual(jasmine.any(HtmlDataSource));
+		});
+
+		it('can be initiated at given start position', function (done) {
+			var startIndex = 5;
+
+			carousel.init('.carousel', {
+				startIndex: startIndex
+			}).done(function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
+
+				done();
+			});
 		});
 
 		it('init works without providing user config', function () {
@@ -698,7 +711,7 @@ define([
 			expect(carousel.getCurrentItemIndex()).toEqual(0);
 		});
 
-		it('can resize the main wrap based on the largest visible child element', function() {
+		it('can resize the main wrap based on the largest visible child element', function(done) {
 			$('.carousel .carousel-item').each(function() {
 				$(this).css('height', (100 + Math.random() * 200) + 'px');
 			});
@@ -707,21 +720,25 @@ define([
 				sizeMode: carousel.SizeMode.MATCH_LARGEST_ITEM,
 				useResponsiveLayout: false,
 				itemsPerPage: 5
+			}).done(function() {
+				var biggestSize = 0;
+
+				$('.carousel .carousel-item').each(function(index) {
+					if (index > 4) {
+						return;
+					}
+
+					if ($(this).height() > biggestSize) {
+						biggestSize = $(this).height();
+					}
+				});
+
+				// for whatever reason it seems to be impossible to get the height using normal method on PhantomJS
+				//expect($('.carousel .flow-carousel-scroller').css('height')).toEqual(biggestSize + 'px');
+				expect($('.carousel .flow-carousel-scroller').attr('style').indexOf(biggestSize) !== -1).toEqual(true);
+
+				done();
 			});
-
-			var biggestSize = 0;
-
-			$('.carousel .carousel-item').each(function(index) {
-				if (index > 4) {
-					return;
-				}
-
-				if ($(this).height() > biggestSize) {
-					biggestSize = $(this).height();
-				}
-			});
-
-			expect($('.carousel .flow-carousel-scroller').height()).toEqual(biggestSize);
 		});
 
 		it('supports vertical orientation', function(done) {

@@ -553,9 +553,10 @@ define([
 	 *
 	 * @method navigateToItem
 	 * @param {number} itemIndex Item index to navigate to
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToItem = function(itemIndex) {
+	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant) {
 		var itemCount = this._dataSource.getItemCount(),
 			animationPromise;
 
@@ -578,7 +579,7 @@ define([
 		// animate to the new item position index if it's different from current item index
 		if (itemIndex !== this._currentItemIndex) {
 			// start animating to given item, this is an asynchronous process
-			animationPromise = this._animator.animateToItem(itemIndex);
+			animationPromise = this._animator.animateToItem(itemIndex, instant);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
 			animationPromise = new Deferred();
@@ -817,7 +818,8 @@ define([
 			sizeMode = this._config.sizeMode,
 			$itemsWrap,
 			$scrollerWrap,
-			promise;
+			layoutPromise,
+			readyDeferred;
 
 		// remove any existing content (HtmlDataSource should have done that already anyway
 		$element.empty();
@@ -862,7 +864,7 @@ define([
 		}
 
 		// setup the individual elements
-		promise = this._setupLayout(wrap, orientation);
+		layoutPromise = this._setupLayout(wrap, orientation);
 
 		// if we're using responsive layout then we need to recalculate sizes and positions if the wrap size changes
 		if (this._config.useResponsiveLayout) {
@@ -872,7 +874,22 @@ define([
 		// remove the loading class
 		$element.removeClass(className.initiating);
 
-		return promise;
+		// navigate to the start index item immediately if set
+		if (this._config.startIndex !== null) {
+			readyDeferred = new Deferred();
+
+			// wait for the layout to complete and then perform the animation and resolve once that completes too
+			layoutPromise.done(function() {
+				this.navigateToItem(this._config.startIndex, !this._config.animateToStartIndex)
+					.done(function() {
+						readyDeferred.resolve();
+					});
+			}.bind(this));
+
+			return readyDeferred.promise();
+		} else {
+			return layoutPromise;
+		}
 	};
 
 	/**
@@ -1083,6 +1100,7 @@ define([
 			i;
 
 		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
+		/* istanbul ignore if */
 		if ($(this._mainWrap).parent().length === 0) {
 			deferred.resolve();
 
@@ -1229,15 +1247,7 @@ define([
 		// make sure the wrap has size if wrap size matching is used
 		/* istanbul ignore if */
 		if (sizeMode == Config.SizeMode.MATCH_WRAP && wrapOppositeSize === 0) {
-			//throw new Error('The wrap opposite size was calculated to be zero, this should not happen');
-			console.log(
-				'The wrap opposite size was calculated to be zero, this should not happen',
-				$(this._mainWrap).width(),
-				$(this._mainWrap).height(),
-				orientation
-			);
-
-			wrapOppositeSize = 100;
+			throw new Error('The wrap opposite size was calculated to be zero, this should not happen');
 		}
 
 		// the properties to set depends on the orientation
@@ -1312,7 +1322,7 @@ define([
 			throw new Error('Largest child size calculated to be zero, this should not happen');
 		}
 
-		$(this._scrollerWrap).css(sizeProp, largestChildSize);
+		$(this._scrollerWrap).css(sizeProp, largestChildSize + 'px');
 	};
 
 	/**

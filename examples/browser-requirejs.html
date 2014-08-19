@@ -101,7 +101,7 @@
 		<button class="btn" data-action="next-page" data-target="#match-largest-element-carousel">Next page</button>
 	</div>
 
-	<h2>Half-width horizontal carousel with margin</h2>
+	<h2>Half-width horizontal carousel with margin and start index of 3</h2>
 	<div id="half-width-carousel" class="carousel carousel-horizontal carousel-halfwidth">
 		<div class="carousel-item">0</div>
 		<div class="carousel-item">1</div>
@@ -280,7 +280,9 @@
 		});
 
 		halfWidthCarousel.init('#half-width-carousel', {
-			margin: 60
+			margin: 60,
+			startIndex: 3,
+			animateToStartIndex: false
 		});
 
 		verticalCarousel.init('#vertical-carousel', {

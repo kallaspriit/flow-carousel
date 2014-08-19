@@ -663,9 +663,10 @@ define([
 	 *
 	 * @method navigateToItem
 	 * @param {number} itemIndex Item index to navigate to
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToItem = function(itemIndex) {
+	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant) {
 		var itemCount = this._dataSource.getItemCount(),
 			animationPromise;
 
@@ -688,7 +689,7 @@ define([
 		// animate to the new item position index if it&#x27;s different from current item index
 		if (itemIndex !== this._currentItemIndex) {
 			// start animating to given item, this is an asynchronous process
-			animationPromise = this._animator.animateToItem(itemIndex);
+			animationPromise = this._animator.animateToItem(itemIndex, instant);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
 			animationPromise = new Deferred();
@@ -981,6 +982,11 @@ define([
 
 		// remove the loading class
 		$element.removeClass(className.initiating);
+
+		// navigate to the start index item immediately if set
+		if (this._config.startIndex !== null) {
+			this.navigateToItem(this._config.startIndex, true);
+		}
 
 		return promise;
 	};
@@ -1339,15 +1345,7 @@ define([
 		// make sure the wrap has size if wrap size matching is used
 		/* istanbul ignore if */
 		if (sizeMode == Config.SizeMode.MATCH_WRAP &amp;&amp; wrapOppositeSize === 0) {
-			//throw new Error(&#x27;The wrap opposite size was calculated to be zero, this should not happen&#x27;);
-			console.log(
-				&#x27;The wrap opposite size was calculated to be zero, this should not happen&#x27;,
-				$(this._mainWrap).width(),
-				$(this._mainWrap).height(),
-				orientation
-			);
-
-			wrapOppositeSize = 100;
+			throw new Error(&#x27;The wrap opposite size was calculated to be zero, this should not happen&#x27;);
 		}
 
 		// the properties to set depends on the orientation
@@ -1422,7 +1420,7 @@ define([
 			throw new Error(&#x27;Largest child size calculated to be zero, this should not happen&#x27;);
 		}
 
-		$(this._scrollerWrap).css(sizeProp, largestChildSize);
+		$(this._scrollerWrap).css(sizeProp, largestChildSize + &#x27;px&#x27;);
 	};
 
 	/**

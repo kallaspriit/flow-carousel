@@ -26,9 +26,10 @@ define([
 	 *
 	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToItem = function(itemIndex) {
+	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
 		var deferred = new Deferred(),
 			orientation = this._carousel.getOrientation(),
 			itemSize = this._carousel.getItemSize(),
@@ -37,6 +38,7 @@ define([
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
 			translatePosition = itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
+			instantAnimationClass = this._carousel.getConfig().getClassName('instantAnimation'),
 			translateCommand;
 
 		// the translate command is different for horizontal and vertical carousels
@@ -46,21 +48,21 @@ define([
 			translateCommand = 'translate3d(0,' + -translatePosition + 'px,0)';
 		}
 
+		if (instant === true) {
+			$scrollerWrap.addClass(instantAnimationClass);
+		}
+
 		// apply the translate
 		$scrollerWrap.css('transform', translateCommand);
 
 		// wait for the transition to end and then resolve the deferred
 		$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function() {
+			if (instant === true) {
+				$scrollerWrap.removeClass(instantAnimationClass);
+			}
+
 			deferred.resolve();
 		});
-
-		// PhantomJS does not support 3d transforms, fake the transition end event
-		/* istanbul ignore if */
-		if (navigator.userAgent.toLowerCase().indexOf('phantomjs') !== -1) {
-			window.setTimeout(function() {
-				$scrollerWrap.trigger('transitionend');
-			}, 200);
-		}
 
 		return deferred.promise();
 	};

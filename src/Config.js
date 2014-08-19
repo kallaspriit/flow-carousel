@@ -71,6 +71,31 @@ define([
 		this.itemsPerPage = 5;
 
 		/**
+		 * The index of the element to scroll to at startup.
+		 *
+		 * Set to a number value of valid range to enable.
+		 *
+		 * Default to showing the first element.
+		 *
+		 * @property startIndex
+		 * @type {number}
+		 * @default null
+		 */
+		this.startIndex = null;
+
+		/**
+		 * If {{#crossLink "Config/startIndex:property"}}{{/crossLink}} is set then should it animate to it or should
+		 * the position be set immediately.
+		 *
+		 * By default the position is set without animation.
+		 *
+		 * @property animateToStartIndex
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.animateToStartIndex = false,
+
+		/**
 		 * List of default responsive layout breakpoint.
 		 *
 		 * The list should be ordered from the smallest size to the largest.
@@ -134,6 +159,8 @@ define([
 		 * 				   size to the largest item size
 		 * @param {string} cssClasses.horizontal='horizontal' Assigned to main wrap for horizontal orientation
 		 * @param {string} cssClasses.vertical='vertical' Assigned to main wrap for vertical orientation
+		 * @param {string} cssClasses.instantAnimation='instant-animation' Assigned to main wrap if the animation is
+		 * 				   requested to be instantaneous
 		 * @param {string} cssClasses.initiating='initiating' Assigned to main wrap during initialization procedure
 		 * @param {string} cssClasses.loading='loading' Assigned to main wrap during loading of items
 		 * @param {string} cssClasses.rendering='rendering' Assigned to main wrap during rendering of items
@@ -149,6 +176,7 @@ define([
 			matchLargestItem: 'match-largest-item',
 			horizontal: 'horizontal',
 			vertical: 'vertical',
+			instantAnimation: 'instant-animation',
 			initiating: 'initiating',
 			loading: 'loading',
 			rendering: 'rendering'

@@ -181,6 +181,19 @@ define([
 		this.itemsPerPage = 5;
 
 		/**
+		 * The index of the element to scroll to at startup.
+		 *
+		 * Set to a number value of valid range to enable.
+		 *
+		 * Default to showing the first element.
+		 *
+		 * @property startIndex
+		 * @type {number}
+		 * @default null
+		 */
+		this.startIndex = null;
+
+		/**
 		 * List of default responsive layout breakpoint.
 		 *
 		 * The list should be ordered from the smallest size to the largest.
@@ -244,6 +257,8 @@ define([
 		 * 				   size to the largest item size
 		 * @param {string} cssClasses.horizontal=&#x27;horizontal&#x27; Assigned to main wrap for horizontal orientation
 		 * @param {string} cssClasses.vertical=&#x27;vertical&#x27; Assigned to main wrap for vertical orientation
+		 * @param {string} cssClasses.instantAnimation=&#x27;instant-animation&#x27; Assigned to main wrap if the animation is
+		 * 				   requested to be instantaneous
 		 * @param {string} cssClasses.initiating=&#x27;initiating&#x27; Assigned to main wrap during initialization procedure
 		 * @param {string} cssClasses.loading=&#x27;loading&#x27; Assigned to main wrap during loading of items
 		 * @param {string} cssClasses.rendering=&#x27;rendering&#x27; Assigned to main wrap during rendering of items
@@ -259,6 +274,7 @@ define([
 			matchLargestItem: &#x27;match-largest-item&#x27;,
 			horizontal: &#x27;horizontal&#x27;,
 			vertical: &#x27;vertical&#x27;,
+			instantAnimation: &#x27;instant-animation&#x27;,
 			initiating: &#x27;initiating&#x27;,
 			loading: &#x27;loading&#x27;,
 			rendering: &#x27;rendering&#x27;

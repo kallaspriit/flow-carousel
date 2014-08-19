@@ -56,13 +56,20 @@ define([
 		$scrollerWrap.css('transform', translateCommand);
 
 		// wait for the transition to end and then resolve the deferred
-		$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function() {
+		$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
 			if (instant === true) {
 				$scrollerWrap.removeClass(instantAnimationClass);
 			}
 
 			deferred.resolve();
 		});
+
+		// the transition end event does not get automatically triggered when using 0ms transitions
+		if (instant === true) {
+			window.setTimeout(function() {
+				$scrollerWrap.trigger('transitionend');
+			}, 0);
+		}
 
 		return deferred.promise();
 	};

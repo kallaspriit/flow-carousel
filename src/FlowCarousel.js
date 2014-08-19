@@ -218,6 +218,15 @@ define([
 		this._itemIndexToElementMap = {};
 
 		/**
+		 * Map of delayed tasks used by {{#crossLink "FlowCarousel/_performDelayed"}}{{/crossLink}}.
+		 *
+		 * @property _delayedTasks
+		 * @type {object}
+		 * @private
+		 */
+		this._delayedTasks = {};
+
+		/**
 		 * Enumeration of possible carousel orientations.
 		 *
 		 * Shortcut to the list of possible orientations from Config.
@@ -1356,10 +1365,36 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		// TODO implement
-		void(element, orientation);
+		var lastItemIndex = this._currentItemIndex;
 
-		//return this._setupLayout(element, orientation);
+		// reset current state
+		this._reset();
+
+		// pre-navigate to the correct position
+		this.navigateToItem(lastItemIndex, true);
+
+		// re-do the layout and render items
+		return this._setupLayout(element, orientation);
+	};
+
+	/**
+	 * Resets the component state and removes all rendered items.
+	 *
+	 * @method _reset
+	 * @private
+	 */
+	FlowCarousel.prototype._reset = function() {
+		$(this._scrollerWrap)
+			.empty()
+			.attr('style', null);
+
+		this._itemIndexToElementMap = {};
+		this._isAnimating = false;
+		this._targetItemIndex = 0;
+		this._currentItemIndex = 0;
+		this._renderedItemIndexes = [];
+		this._renderedPlaceholderIndexes = [];
+		this._itemIndexToElementMap = {};
 	};
 
 	/**
@@ -1396,7 +1431,11 @@ define([
 
 		// perform the layout routine if the wrap size has changed
 		if (currentSize !== lastSize) {
-			this._reLayout(element, orientation);
+			// perform the re-layout routine only when the wrap size has not changed for some time
+			this._performDelayed('re-layout', this._config.responsiveLayoutDelay)
+				.done(function() {
+					this._reLayout(element, orientation);
+				}.bind(this));
 		}
 	};
 
@@ -1457,10 +1496,23 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._getLargestElementSize = function(elements, orientation, mode) {
-		var biggestSize = 0;
+		var biggestSize = 0,
+			children,
+			inspectElement,
+			elementSize;
 
 		$(elements).each(function(index, element) {
-			var elementSize = this._getElementSize(element, orientation, mode);
+			children = $(element).children();
+
+			// use the first child for reference if possible
+			/* istanbul ignore else */
+			if (children.length > 0) {
+				inspectElement = children[0];
+			} else {
+				inspectElement = element;
+			}
+
+			elementSize = this._getElementSize(inspectElement, orientation, mode);
 
 			if (elementSize > biggestSize) {
 				biggestSize = elementSize;
@@ -1484,6 +1536,37 @@ define([
 		return orientation === Config.Orientation.HORIZONTAL
 			? Config.Orientation.VERTICAL
 			: Config.Orientation.HORIZONTAL;
+	};
+
+	/**
+	 * Performs some action delayed by given amount.
+	 *
+	 * If the method is called several times with the same name, the action is executed only once after the time
+	 * has passed from the last call.
+	 *
+	 * @method performDelayed
+	 * @param {String} name Name of the action
+	 * @param {Number} [delay=1000] The delay, default to 1000 ms
+	 */
+	FlowCarousel.prototype._performDelayed = function(name, delay) {
+		var deferred = new Deferred(),
+			promise = deferred.promise();
+
+		delay = delay || 1000;
+
+		if (typeof this._delayedTasks[name] !== 'undefined' && this._delayedTasks[name] !== null) {
+			window.clearTimeout(this._delayedTasks[name]);
+
+			this._delayedTasks[name] = null;
+		}
+
+		this._delayedTasks[name] = window.setTimeout(function() {
+			this._delayedTasks[name] = null;
+
+			deferred.resolve();
+		}.bind(this), delay);
+
+		return promise;
 	};
 
 	return FlowCarousel;

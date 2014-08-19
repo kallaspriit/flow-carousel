@@ -446,19 +446,23 @@ define([
 		});
 
 		it('changing carousel wrap size triggers responsive layout', function(done) {
-			spyOn(carousel, '_reLayout').and.callThrough();
+			carousel.init('.carousel').done(function() {
+				// give it some time to change
+				window.setTimeout(function() {
+					$('.carousel').css('width', '100px');
+				}, 200);
 
-			carousel.init('.carousel');
+				window.setTimeout(function() {
+					$('.carousel').css('width', '150px');
+				}, 250);
 
-			// give it some time to change
-			window.setTimeout(function() {
-				$('.carousel').css('width', '300px');
-			}, 200);
+				// give it some time to change
+				window.setTimeout(function() {
+					expect(carousel.getItemsPerPage()).toEqual(1);
 
-			// give it some time to change
-			window.setTimeout(function() {
-				done();
-			}, 400);
+					done();
+				}, 1000);
+			});
 		});
 
 		it('supports navigating to next item', function(done) {

@@ -154,6 +154,20 @@ define([
 		this.responsiveLayoutListenerInterval = 100;
 
 		/**
+		 * How long to wait for the wrap size to stay the same before starting the responsive layout routine.
+		 *
+		 * This is useful so when the user is resizing the browser window then the carousel won't try to re-layout
+		 * itself on every frame but rather waits for the size to normalize.
+		 *
+		 * Value is in milliseconds.
+		 *
+		 * @property responsiveLayoutDelay
+		 * @type {number}
+		 * @default 300
+		 */
+		this.responsiveLayoutDelay = 300;
+
+		/**
 		 * The css classes prefix to use.
 		 *
 		 * @property cssPrefix

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\ArrayDataSource.js - FlowCarousel</title>
+    <title>src\KeyboardNavigator.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -108,78 +108,131 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\ArrayDataSource.js</h1>
+                        <h1 class="file-heading">File: src\KeyboardNavigator.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;AbstractDataSource&#x27;,
-	&#x27;Deferred&#x27;
-], function(AbstractDataSource, Deferred) {
+	&#x27;AbstractNavigator&#x27;
+], function(AbstractNavigator) {
 	&#x27;use strict&#x27;;
 
 	/**
-	 * Data source interface.
+	 * Keyboard navigator.
 	 *
-	 * @class ArrayDataSource
-	 * @extends AbstractDataSource
+	 * @class KeyboardNavigator
+	 * @extends AbstractNavigator
+	 * @param {KeyboardNavigator/Mode:property} [mode=KeyboardNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
 	 * @constructor
 	 */
-	function ArrayDataSource(data) {
-		AbstractDataSource.call(this);
+	function KeyboardNavigator(mode) {
+		AbstractNavigator.call(this);
 
-		this._data = data || [];
+		this._mouseEntered = false;
+		this._mode = mode || KeyboardNavigator.Mode.NAVIGATE_PAGE;
 	}
 
-	ArrayDataSource.prototype = Object.create(AbstractDataSource.prototype);
+	KeyboardNavigator.prototype = Object.create(AbstractNavigator.prototype);
 
 	/**
-	 * Returns the number of items in the dataset.
+	 * List of supported navigation modes.
 	 *
-	 * @method getItemCount
-	 * @return {number}
+	 * @property Mode
+	 * @type {object}
+	 * @param {string} Mode.NAVIGATE_PAGE=&#x27;navigate-page&#x27; The navigation keys navigate one page at a time
+	 * @param {string} Mode.NAVIGATE_ITEM=&#x27;navigate-item&#x27; The navigation keys navigate one item at a time
 	 */
-	ArrayDataSource.prototype.getItemCount = function() {
-		return this._data.length;
+	KeyboardNavigator.Mode = {
+		NAVIGATE_PAGE: &#x27;navigate-page&#x27;,
+		NAVIGATE_ITEM: &#x27;navigate-item&#x27;
 	};
 
 	/**
-	 * Fetches given range of items from the dataset.
+	 * Called by the init to set up the navigator.
 	 *
-	 * This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
-	 * available or rejected when an error occurs.
-	 *
-	 * By default the range is the entire dataset.
-	 *
-	 * Throws error if invalid range is requested.
-	 *
-	 * @method getItems
-	 * @param {number} [startIndex=0] Range start index to fetch
-	 * @param {number} [endIndex=length] Range end index to fetch
-	 * @return {Deferred.Promise}
+	 * @method _setup
+	 * @protected
 	 */
-	ArrayDataSource.prototype.getItems = function(startIndex, endIndex) {
-		var deferred = new Deferred();
+	KeyboardNavigator.prototype._setup = function() {
+		var mainWrap = this._carousel.getMainWrap();
 
-		startIndex = startIndex || 0;
-		endIndex = endIndex || this._data.length;
+		$(mainWrap)
+			.on(&#x27;mouseenter&#x27;, function() {
+				this._mouseEntered = true;
+			}.bind(this))
+			.on(&#x27;mouseleave&#x27;, function() {
+				this._mouseEntered = false;
+			}.bind(this));
 
-		// validate index range
-		if (startIndex &lt; 0) {
-			throw new Error(&#x27;Invalid negative start index &quot;&#x27; + startIndex + &#x27;&quot; requested&#x27;);
-		} else if (endIndex &gt; this._data.length) {
-			throw new Error(
-				&#x27;Too large end index &quot;&#x27; + endIndex + &#x27;&quot; requested, there are only &#x27; + this._data.length + &#x27; items&#x27;
-			);
+		$(window).on(&#x27;keydown&#x27;, function(e) {
+			var result = this._onKeyDown(e.keyCode);
+
+			if (result === false) {
+				e.preventDefault();
+			}
+
+			return result;
+		}.bind(this));
+	};
+
+	/**
+	 * Called on key down even for anywhere in the document.
+	 *
+	 * @method _onKeyDown
+	 * @param {number} keyCode Key press key-code.
+	 * @return {boolean} Should the key event be propagated further
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onKeyDown = function(keyCode) {
+		var keyCodes;
+
+		// don&#x27;t do anything if the mouse is not over given component
+		if (!this._mouseEntered) {
+			return;
 		}
 
-		// resolve the deferred immediately as array data source is syncronous
-		deferred.resolve(this._data.slice(startIndex, endIndex));
+		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
+		switch (this._carousel.getOrientation()) {
+			case this._carousel.Orientation.HORIZONTAL:
+				keyCodes = {
+					previous: 37, // arrow left
+					next: 39 // arrow right
+				};
+			break;
 
-		return deferred.promise();
+			case this._carousel.Orientation.VERTICAL:
+				keyCodes = {
+					previous: 38, // arrow up
+					next: 40 // arrow down
+				};
+			break;
+		}
+
+		// navigate using the key-codes defined above
+		switch (keyCode) {
+			case keyCodes.next:
+				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
+					this._carousel.navigateToNextPage();
+				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
+					this._carousel.navigateToNextItem();
+				}
+
+				return false;
+
+			case keyCodes.previous:
+				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
+					this._carousel.navigateToPreviousPage();
+				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
+					this._carousel.navigateToPreviousItem();
+				}
+
+				return false;
+		}
+
+		return true;
 	};
 
-	return ArrayDataSource;
+	return KeyboardNavigator;
 });
     </pre>
 </div>

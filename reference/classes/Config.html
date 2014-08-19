@@ -45,6 +45,8 @@
             
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
+                <li><a href="../classes/AbstractNavigator.html">AbstractNavigator</a></li>
+            
                 <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
             
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
@@ -62,6 +64,8 @@
                 <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
             
                 <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
+            
+                <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -299,7 +303,16 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_orientation">orientation</a>
+                                <a href="#property_Navigator">Navigator</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_navigators">navigators</a>
 
                                 
                                 
@@ -310,6 +323,13 @@
 
                                 
                                     <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_orientation">orientation</a>
+
                                 
                                 
                             </li>
@@ -350,17 +370,17 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_sizeMode">sizeMode</a>
+                                <a href="#property_SizeMode">SizeMode</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_SizeMode">SizeMode</a>
+                                <a href="#property_sizeMode">sizeMode</a>
 
-                                
-                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -449,7 +469,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l317"><code>src\Config.js:317</code></a>
+        <a href="../files/src_Config.js.html#l339"><code>src\Config.js:339</code></a>
         
         </p>
 
@@ -541,7 +561,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l364"><code>src\Config.js:364</code></a>
+        <a href="../files/src_Config.js.html#l386"><code>src\Config.js:386</code></a>
         
         </p>
 
@@ -645,7 +665,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l338"><code>src\Config.js:338</code></a>
+        <a href="../files/src_Config.js.html#l360"><code>src\Config.js:360</code></a>
         
         </p>
 
@@ -753,7 +773,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l267"><code>src\Config.js:267</code></a>
+        <a href="../files/src_Config.js.html#l275"><code>src\Config.js:275</code></a>
         
         </p>
 
@@ -928,7 +948,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l254"><code>src\Config.js:254</code></a>
+        <a href="../files/src_Config.js.html#l262"><code>src\Config.js:262</code></a>
         
         </p>
 
@@ -977,7 +997,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l179"><code>src\Config.js:179</code></a>
+        <a href="../files/src_Config.js.html#l187"><code>src\Config.js:187</code></a>
         
         </p>
 
@@ -1215,7 +1235,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l170"><code>src\Config.js:170</code></a>
+        <a href="../files/src_Config.js.html#l178"><code>src\Config.js:178</code></a>
         
         </p>
 
@@ -1262,7 +1282,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l220"><code>src\Config.js:220</code></a>
+        <a href="../files/src_Config.js.html#l228"><code>src\Config.js:228</code></a>
         
         </p>
 
@@ -1381,9 +1401,77 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
 </div>
 
                 
-                    <div id="property_orientation" class="property item">
-    <h3 class="name"><code>orientation</code></h3>
-    <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
+                    <div id="property_Navigator" class="property item">
+    <h3 class="name"><code>Navigator</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l325"><code>src\Config.js:325</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>List of built-in navigators that the carousel can use.</p>
+<p>Set using <a href="../classes/Config.html#property_navigators" class="crosslink">navigators</a> option.</p>
+
+    </div>
+
+    
+
+    
+
+    
+        <h4>Sub-properties:</h4>
+
+        <ul class="params-list">
+            
+            <li class="param">
+                
+                    <code class="param-name">KEYBOARD=&#x27;keyboard&#x27;</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                
+
+                <div class="param-description">
+                    <p>Keyboard navigator</p>
+
+                </div>
+
+                
+            </li>
+            
+        </ul>
+    
+</div>
+
+                
+                    <div id="property_navigators" class="property item">
+    <h3 class="name"><code>navigators</code></h3>
+    <span class="type"><a href="../classes/Config.html#property_Navigator" class="crosslink">Navigator</a></span>
 
     
 
@@ -1404,7 +1492,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l13"><code>src\Config.js:13</code></a>
+        <a href="../files/src_Config.js.html#l170"><code>src\Config.js:170</code></a>
         
         </p>
 
@@ -1414,14 +1502,10 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
     </div>
 
     <div class="description">
-        <p>Carousel orientation to use.</p>
-<p>One of <a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a>.</p>
-<p>Defaults to horizontal.</p>
+        <p>Default built-in navigators to use.</p>
 
     </div>
 
-    
-        <p><strong>Default:</strong> Config.Orientation.VERTICAL</p>
     
 
     
@@ -1455,7 +1539,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l287"><code>src\Config.js:287</code></a>
+        <a href="../files/src_Config.js.html#l295"><code>src\Config.js:295</code></a>
         
         </p>
 
@@ -1511,9 +1595,9 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
 </div>
 
                 
-                    <div id="property_renderer" class="property item">
-    <h3 class="name"><code>renderer</code></h3>
-    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a></span>
+                    <div id="property_orientation" class="property item">
+    <h3 class="name"><code>orientation</code></h3>
+    <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
 
     
 
@@ -1534,7 +1618,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l243"><code>src\Config.js:243</code></a>
+        <a href="../files/src_Config.js.html#l13"><code>src\Config.js:13</code></a>
         
         </p>
 
@@ -1544,13 +1628,14 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
     </div>
 
     <div class="description">
-        <p>Optional custom renderer to use.</p>
-<p>If none is provided then the <a href="../classes/HtmlRenderer.html" class="crosslink">HtmlRenderer</a> is used.</p>
+        <p>Carousel orientation to use.</p>
+<p>One of <a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a>.</p>
+<p>Defaults to horizontal.</p>
 
     </div>
 
     
-        <p><strong>Default:</strong> null</p>
+        <p><strong>Default:</strong> Config.Orientation.VERTICAL</p>
     
 
     
@@ -1582,7 +1667,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l229"><code>src\Config.js:229</code></a>
+        <a href="../files/src_Config.js.html#l237"><code>src\Config.js:237</code></a>
         
         </p>
 
@@ -1596,6 +1681,54 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
 <p>As a special case, a simple array can be provided as data source which is converted to use
 <a href="../classes/ArrayDataSource.html" class="crosslink">ArrayDataSource</a> implementation.</p>
 <p>If none is provided then the <a href="../classes/HtmlDataSource.html" class="crosslink">HtmlDataSource</a> is used.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_renderer" class="property item">
+    <h3 class="name"><code>renderer</code></h3>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l251"><code>src\Config.js:251</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional custom renderer to use.</p>
+<p>If none is provided then the <a href="../classes/HtmlRenderer.html" class="crosslink">HtmlRenderer</a> is used.</p>
 
     </div>
 
@@ -1755,53 +1888,6 @@ itself on every frame but rather waits for the size to normalize.</p>
 </div>
 
                 
-                    <div id="property_sizeMode" class="property item">
-    <h3 class="name"><code>sizeMode</code></h3>
-    <span class="type"><a href="../classes/Config.html#property_SizeMode" class="crosslink">SizeMode</a></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_Config.js.html#l26"><code>src\Config.js:26</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The size mode to use, defaults to matching item sizes to wrap size.</p>
-
-    </div>
-
-    
-        <p><strong>Default:</strong> Config.SizeMode.MATCH_WRAP</p>
-    
-
-    
-
-    
-</div>
-
-                
                     <div id="property_SizeMode" class="property item">
     <h3 class="name"><code>SizeMode</code></h3>
     <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
@@ -1827,7 +1913,7 @@ itself on every frame but rather waits for the size to normalize.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l301"><code>src\Config.js:301</code></a>
+        <a href="../files/src_Config.js.html#l309"><code>src\Config.js:309</code></a>
         
         </p>
 
@@ -1883,6 +1969,53 @@ MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item</p>
             </li>
             
         </ul>
+    
+</div>
+
+                
+                    <div id="property_sizeMode" class="property item">
+    <h3 class="name"><code>sizeMode</code></h3>
+    <span class="type"><a href="../classes/Config.html#property_SizeMode" class="crosslink">SizeMode</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l26"><code>src\Config.js:26</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The size mode to use, defaults to matching item sizes to wrap size.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> Config.SizeMode.MATCH_WRAP</p>
+    
+
+    
+
     
 </div>
 

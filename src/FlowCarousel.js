@@ -8,6 +8,8 @@ define([
 	'DefaultAnimator',
 	'AbstractRenderer',
 	'HtmlRenderer',
+	'AbstractNavigator',
+	'KeyboardNavigator',
 	'Deferred',
 	'Util',
 	'EventEmitter',
@@ -21,6 +23,8 @@ define([
 	DefaultAnimator,
 	AbstractRenderer,
 	HtmlRenderer,
+	AbstractNavigator,
+	KeyboardNavigator,
 	Deferred,
 	Util,
 	EventEmitter
@@ -101,6 +105,18 @@ define([
 		 * @private
 		 */
 		this._animator = null;
+
+		/**
+		 * Map of navigators used to navigate the component.
+		 *
+		 * Use the config to set built-in navigators to use or add a custom one using
+		 * {{#crossLink "FlowCarousel/addNavigator"}}{{/crossLink}}.
+		 *
+		 * @type {AbstractNavigator[]}
+		 * @private
+		 * @default {}
+		 */
+		this._navigators = {};
 
 		/**
 		 * Selector of elements to turn into a carousel.
@@ -252,6 +268,19 @@ define([
 		 * @static
 		 */
 		this.SizeMode = Config.SizeMode;
+
+		/**
+		 * List of built-in navigators that the carousel can use.
+	     *
+	     * Set using {{#crossLink "Config/navigators:property"}}{{/crossLink}} option.
+		 *
+		 * See {{#crossLink "Config/Navigator:property"}}{{/crossLink}} for possible options.
+		 *
+		 * @property Navigator
+		 * @type {object}
+		 * @static
+		 */
+		this.Navigator = Config.Navigator;
 	}
 
 	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
@@ -282,6 +311,8 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	FlowCarousel.prototype.init = function(selector, userConfig) {
+		var promise;
+
 		this._selector = selector;
 
 		if (typeof selector !== 'string') {
@@ -334,7 +365,14 @@ define([
 		}
 
 		// setup the carousel rendering and events
-		return this._setupCarousel(this._mainWrap, this._config.orientation);
+		promise = this._setupCarousel(this._mainWrap, this._config.orientation);
+
+		// wait until the main initialization is complete before initializing the navigators
+		promise.done(function() {
+			this._setupDefaultNavigators();
+		}.bind(this));
+
+		return promise;
 	};
 
 	/**
@@ -542,6 +580,28 @@ define([
 	};
 
 	/**
+	 * Adds a new navigator to use.
+	 *
+	 * @method addNavigator
+	 * @param {string} type Type of the navigator, should be unique
+	 * @param {AbstractNavigator} instance Navigator instance
+	 */
+	FlowCarousel.prototype.addNavigator = function(type, instance) {
+		if (typeof this._navigators[type] !== 'undefined') {
+			throw new Error('Navigator of type "' + type + '" already added');
+		}
+
+		if (!(instance instanceof AbstractNavigator)) {
+			throw new Error('The navigator is expected to be an instance of AbstractNavigator');
+		}
+
+		this._navigators[type] = instance;
+
+		// initiate the navigator
+		this._navigators[type].init(this);
+	};
+
+	/**
 	 * Returns the data used for rendering the component.
 	 *
 	 * Returns null if the component has not yet been initialized.
@@ -567,7 +627,8 @@ define([
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant) {
 		var itemCount = this._dataSource.getItemCount(),
-			animationPromise;
+			animationPromise,
+			fakeAnimationDeferred;
 
 		// validate index range
 		if (itemIndex < 0) {
@@ -578,7 +639,12 @@ define([
 
 		// TODO what if the carousel is already animating
 		if (this._isAnimating) {
-			throw new Error('Starting new animation while the last has not completed is not yet implemented');
+			//throw new Error('Starting new animation while the last has not completed is not yet implemented');
+			fakeAnimationDeferred = new Deferred();
+
+			fakeAnimationDeferred.resolve();
+
+			return fakeAnimationDeferred.promise();
 		}
 
 		// update the target item index
@@ -949,6 +1015,35 @@ define([
 
 		// render the items
 		return this._validateItemsToRender();
+	};
+
+	/**
+	 * Sets up the default navigators to use as defined in the {{#crossLink "Config"}}{{/crossLink}}.
+	 *
+	 * @method _setupDefaultNavigators
+	 * @private
+	 */
+	FlowCarousel.prototype._setupDefaultNavigators = function() {
+		var navigator = null,
+			type,
+			i;
+
+		for (i = 0; i < this._config.navigators.length; i++) {
+			type = this._config.navigators[i];
+
+			switch (type) {
+				case Config.Navigator.KEYBOARD:
+					navigator = new KeyboardNavigator(KeyboardNavigator.Mode.NAVIGATE_PAGE);
+				break;
+
+				default:
+					throw new Error('Navigator "' + type + '" is not supported');
+			}
+
+			if (navigator !== null) {
+				this.addNavigator(type, navigator);
+			}
+		}
 	};
 
 	/**

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>AbstractDataSource - FlowCarousel</title>
+    <title>AbstractNavigator - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -108,7 +108,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>AbstractDataSource Class</h1>
+                        <h1>AbstractNavigator Class</h1>
 <div class="box meta">
     
 
@@ -116,7 +116,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_AbstractDataSource.js.html#l5"><code>src\AbstractDataSource.js:5</code></a>
+            Defined in: <a href="../files/src_AbstractNavigator.js.html#l5"><code>src\AbstractNavigator.js:5</code></a>
         </div>
     
 
@@ -128,15 +128,16 @@
 
 
 <div class="box intro">
-    <p>Data source interface.</p>
+    <p>Abstract navigator base class.</p>
+<p>Use navigators to navigate the carousel using mouse, touch, keyboard, ui, urls etc.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_AbstractDataSource" class="method item">
-    <h3 class="name"><code>AbstractDataSource</code></h3>
+        <div id="method_AbstractNavigator" class="method item">
+    <h3 class="name"><code>AbstractNavigator</code></h3>
 
     
         <span class="paren">()</span>
@@ -167,7 +168,7 @@
             
         
         
-        <a href="../files/src_AbstractDataSource.js.html#l5"><code>src\AbstractDataSource.js:5</code></a>
+        <a href="../files/src_AbstractNavigator.js.html#l5"><code>src\AbstractNavigator.js:5</code></a>
         
         </p>
 
@@ -213,22 +214,15 @@
 
                     <ul class="index-list methods">
                         
-                            <li class="index-item method">
-                                <a href="#method_getItemCount">getItemCount</a>
+                            <li class="index-item method protected">
+                                <a href="#method__setup">_setup</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getItems">getItems</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_isAsynchronous">isAsynchronous</a>
+                                <a href="#method_init">init</a>
 
                                 
                                 
@@ -250,21 +244,19 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getItemCount" class="method item">
-    <h3 class="name"><code>getItemCount</code></h3>
+                    <div id="method__setup" class="method item protected">
+    <h3 class="name"><code>_setup</code></h3>
 
     
         <span class="paren">()</span>
     
 
     
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-        </span>
-    
 
     
 
+    
+        <span class="flag protected">protected</span>
     
 
     
@@ -286,7 +278,7 @@
             
         
         
-        <a href="../files/src_AbstractDataSource.js.html#l13"><code>src\AbstractDataSource.js:13</code></a>
+        <a href="../files/src_AbstractNavigator.js.html#l31"><code>src\AbstractNavigator.js:31</code></a>
         
         </p>
 
@@ -297,32 +289,20 @@
     </div>
 
     <div class="description">
-        <p>Returns the number of items in the dataset.</p>
+        <p>Called by the init to set up the navigator.</p>
 
     </div>
 
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
-                    
-                
-            </div>
-        </div>
-    
 
     
 </div>
 
                 
-                    <div id="method_getItems" class="method item">
-    <h3 class="name"><code>getItems</code></h3>
+                    <div id="method_init" class="method item">
+    <h3 class="name"><code>init</code></h3>
 
     
         <div class="args">
@@ -330,13 +310,7 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[startIndex=0]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[endIndex=length]</code>
+                        <code>carousel</code>
                     
                 </li>
             
@@ -345,10 +319,6 @@
     
 
     
-        <span class="returns-inline">
-            <span class="type">Deferred.Promise</span>
-        </span>
-    
 
     
 
@@ -373,7 +343,7 @@
             
         
         
-        <a href="../files/src_AbstractDataSource.js.html#l37"><code>src\AbstractDataSource.js:37</code></a>
+        <a href="../files/src_AbstractNavigator.js.html#l17"><code>src\AbstractNavigator.js:17</code></a>
         
         </p>
 
@@ -384,11 +354,8 @@
     </div>
 
     <div class="description">
-        <p>Fetches given range of items from the dataset.</p>
-<p>This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
-available or rejected when an error occurs.</p>
-<p>By default the range is the entire dataset.</p>
-<p>Throws error if invalid range is requested.</p>
+        <p>Initiated the navigator.</p>
+<p>This is called automatically by the carousel and calls _setup() in turn that the subclasses should implement.</p>
 
     </div>
 
@@ -400,32 +367,14 @@ available or rejected when an error occurs.</p>
             
                 <li class="param">
                     
-                        <code class="param-name optional">[startIndex=0]</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                        <code class="param-name">carousel</code>
+                        <span class="type"><a href="../classes/FlowCarousel.html" class="crosslink">FlowCarousel</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>Range start index to fetch</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[endIndex=length]</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Range end index to fetch</p>
+                        <p>The carousel component</p>
 
                     </div>
 
@@ -436,91 +385,6 @@ available or rejected when an error occurs.</p>
         </div>
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Deferred.Promise</span>:
-                    
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_isAsynchronous" class="method item">
-    <h3 class="name"><code>isAsynchronous</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_AbstractDataSource.js.html#l23"><code>src\AbstractDataSource.js:23</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Returns whether given data source is asynchronous or not.</p>
-<p>If the data source is asynchronous then placeholders are generated by default while the real data is loading.</p>
-<p>Defaults to false so make sure to override this in your async data sources.</p>
-
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
-                    
-                
-            </div>
-        </div>
     
 
     

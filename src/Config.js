@@ -168,6 +168,14 @@ define([
 		this.responsiveLayoutDelay = 300;
 
 		/**
+		 * Default built-in navigators to use.
+		 *
+		 * @property navigators
+		 * @type {Config/Navigator:property[]}
+		 */
+		this.navigators = [Config.Navigator.KEYBOARD];
+
+		/**
 		 * The css classes prefix to use.
 		 *
 		 * @property cssPrefix
@@ -312,6 +320,20 @@ define([
 	Config.SizeMode = {
 		MATCH_WRAP: 'match-wrap',
 		MATCH_LARGEST_ITEM: 'match-largest-item'
+	};
+
+	/**
+	 * List of built-in navigators that the carousel can use.
+	 *
+	 * Set using {{#crossLink "Config/navigators:property"}}{{/crossLink}} option.
+	 *
+	 * @property Navigator
+	 * @type {object}
+	 * @param {string} Navigator.KEYBOARD='keyboard' Keyboard navigator
+	 * @static
+	 */
+	Config.Navigator = {
+		KEYBOARD: 'keyboard'
 	};
 
 	/**

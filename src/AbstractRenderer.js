@@ -4,7 +4,7 @@ define([
 	'use strict';
 
 	/**
-	 * Renderer interface.
+	 * Abstract renderer base class.
 	 *
 	 * @class AbstractRenderer
 	 * @constructor

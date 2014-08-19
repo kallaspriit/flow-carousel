@@ -3,6 +3,7 @@ YUI.add("yuidoc-meta", function(Y) {
     "classes": [
         "AbstractAnimator",
         "AbstractDataSource",
+        "AbstractNavigator",
         "AbstractRenderer",
         "ArrayDataSource",
         "Config",
@@ -12,6 +13,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "FlowCarousel",
         "HtmlDataSource",
         "HtmlRenderer",
+        "KeyboardNavigator",
         "Util"
     ],
     "modules": [],

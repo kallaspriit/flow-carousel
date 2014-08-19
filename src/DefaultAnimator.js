@@ -14,7 +14,7 @@ define([
 	 * @param {FlowCarousel} carousel The carousel component
 	 */
 	function DefaultAnimator(carousel) {
-		AbstractAnimator.call(this);
+		AbstractAnimator.call(this, carousel);
 
 		this._carousel = carousel;
 	}

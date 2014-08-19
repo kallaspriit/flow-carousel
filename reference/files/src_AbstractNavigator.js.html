@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\ArrayDataSource.js - FlowCarousel</title>
+    <title>src\AbstractNavigator.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -108,78 +108,51 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\ArrayDataSource.js</h1>
+                        <h1 class="file-heading">File: src\AbstractNavigator.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;AbstractDataSource&#x27;,
-	&#x27;Deferred&#x27;
-], function(AbstractDataSource, Deferred) {
+], function() {
 	&#x27;use strict&#x27;;
 
 	/**
-	 * Data source interface.
+	 * Abstract navigator base class.
 	 *
-	 * @class ArrayDataSource
-	 * @extends AbstractDataSource
+	 * Use navigators to navigate the carousel using mouse, touch, keyboard, ui, urls etc.
+	 *
+	 * @class AbstractNavigator
 	 * @constructor
 	 */
-	function ArrayDataSource(data) {
-		AbstractDataSource.call(this);
-
-		this._data = data || [];
+	function AbstractNavigator() {
+		this._carousel = null;
 	}
 
-	ArrayDataSource.prototype = Object.create(AbstractDataSource.prototype);
-
 	/**
-	 * Returns the number of items in the dataset.
+	 * Initiated the navigator.
 	 *
-	 * @method getItemCount
-	 * @return {number}
+	 * This is called automatically by the carousel and calls _setup() in turn that the subclasses should implement.
+	 *
+	 * @method init
+	 * @param {FlowCarousel} carousel The carousel component
 	 */
-	ArrayDataSource.prototype.getItemCount = function() {
-		return this._data.length;
+	AbstractNavigator.prototype.init = function(carousel) {
+		this._carousel = carousel;
+
+		this._setup();
 	};
 
 	/**
-	 * Fetches given range of items from the dataset.
+	 * Called by the init to set up the navigator.
 	 *
-	 * This operation can be asynchronous and thus returns a promise that will be resolved once the data becomes
-	 * available or rejected when an error occurs.
-	 *
-	 * By default the range is the entire dataset.
-	 *
-	 * Throws error if invalid range is requested.
-	 *
-	 * @method getItems
-	 * @param {number} [startIndex=0] Range start index to fetch
-	 * @param {number} [endIndex=length] Range end index to fetch
-	 * @return {Deferred.Promise}
+	 * @method _setup
+	 * @protected
 	 */
-	ArrayDataSource.prototype.getItems = function(startIndex, endIndex) {
-		var deferred = new Deferred();
-
-		startIndex = startIndex || 0;
-		endIndex = endIndex || this._data.length;
-
-		// validate index range
-		if (startIndex &lt; 0) {
-			throw new Error(&#x27;Invalid negative start index &quot;&#x27; + startIndex + &#x27;&quot; requested&#x27;);
-		} else if (endIndex &gt; this._data.length) {
-			throw new Error(
-				&#x27;Too large end index &quot;&#x27; + endIndex + &#x27;&quot; requested, there are only &#x27; + this._data.length + &#x27; items&#x27;
-			);
-		}
-
-		// resolve the deferred immediately as array data source is syncronous
-		deferred.resolve(this._data.slice(startIndex, endIndex));
-
-		return deferred.promise();
+	AbstractNavigator.prototype._setup = function() {
+		throw new Error(&#x27;Not implemented&#x27;);
 	};
 
-	return ArrayDataSource;
+	return AbstractNavigator;
 });
     </pre>
 </div>

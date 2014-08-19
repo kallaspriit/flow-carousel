@@ -45,6 +45,8 @@
             
                 <li><a href="../classes/AbstractDataSource.html">AbstractDataSource</a></li>
             
+                <li><a href="../classes/AbstractNavigator.html">AbstractNavigator</a></li>
+            
                 <li><a href="../classes/AbstractRenderer.html">AbstractRenderer</a></li>
             
                 <li><a href="../classes/ArrayDataSource.html">ArrayDataSource</a></li>
@@ -62,6 +64,8 @@
                 <li><a href="../classes/HtmlDataSource.html">HtmlDataSource</a></li>
             
                 <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
+            
+                <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -278,6 +282,14 @@ define([
 		this.responsiveLayoutDelay = 300;
 
 		/**
+		 * Default built-in navigators to use.
+		 *
+		 * @property navigators
+		 * @type {Config/Navigator:property[]}
+		 */
+		this.navigators = [Config.Navigator.KEYBOARD];
+
+		/**
 		 * The css classes prefix to use.
 		 *
 		 * @property cssPrefix
@@ -422,6 +434,20 @@ define([
 	Config.SizeMode = {
 		MATCH_WRAP: &#x27;match-wrap&#x27;,
 		MATCH_LARGEST_ITEM: &#x27;match-largest-item&#x27;
+	};
+
+	/**
+	 * List of built-in navigators that the carousel can use.
+	 *
+	 * Set using {{#crossLink &quot;Config/navigators:property&quot;}}{{/crossLink}} option.
+	 *
+	 * @property Navigator
+	 * @type {object}
+	 * @param {string} Navigator.KEYBOARD=&#x27;keyboard&#x27; Keyboard navigator
+	 * @static
+	 */
+	Config.Navigator = {
+		KEYBOARD: &#x27;keyboard&#x27;
 	};
 
 	/**

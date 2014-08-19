@@ -819,7 +819,7 @@ define([
 			$itemsWrap,
 			$scrollerWrap,
 			layoutPromise,
-			readyDeferred;
+			animationDeferred;
 
 		// remove any existing content (HtmlDataSource should have done that already anyway
 		$element.empty();
@@ -874,19 +874,36 @@ define([
 		// remove the loading class
 		$element.removeClass(className.initiating);
 
+		// throw error if both item and page start indexes are set
+		if (this._config.startItemIndex !== null && this._config.startPageIndex !== null) {
+			throw new Error('Set either the startItemIndex or startPageIndex option but not both');
+		}
+
 		// navigate to the start index item immediately if set
-		if (this._config.startIndex !== null) {
-			readyDeferred = new Deferred();
+		if (this._config.startItemIndex !== null) {
+			animationDeferred = new Deferred();
 
 			// wait for the layout to complete and then perform the animation and resolve once that completes too
 			layoutPromise.done(function() {
-				this.navigateToItem(this._config.startIndex, !this._config.animateToStartIndex)
+				this.navigateToItem(this._config.startItemIndex, !this._config.animateToStartIndex)
 					.done(function() {
-						readyDeferred.resolve();
+						animationDeferred.resolve();
 					});
 			}.bind(this));
 
-			return readyDeferred.promise();
+			return animationDeferred.promise();
+		} else if (this._config.startPageIndex !== null) {
+			animationDeferred = new Deferred();
+
+			// wait for the layout to complete and then perform the animation and resolve once that completes too
+			layoutPromise.done(function() {
+				this.navigateToPage(this._config.startPageIndex, !this._config.animateToStartIndex)
+					.done(function() {
+						animationDeferred.resolve();
+					});
+			}.bind(this));
+
+			return animationDeferred.promise();
 		} else {
 			return layoutPromise;
 		}

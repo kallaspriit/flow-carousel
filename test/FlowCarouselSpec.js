@@ -133,12 +133,48 @@ define([
 			var startIndex = 5;
 
 			carousel.init('.carousel', {
-				startIndex: startIndex
+				startItemIndex: startIndex
 			}).done(function() {
 				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
 
 				done();
 			});
+		});
+
+		it('can be initiated at given start position with animation', function (done) {
+			var startIndex = 5;
+
+			carousel.init('.carousel', {
+				startItemIndex: startIndex,
+				animateToStartIndex: true
+			}).done(function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
+
+				done();
+			});
+		});
+
+		it('can be initiated at given start page', function (done) {
+			var startPage = 2;
+
+			carousel.init('.carousel', {
+				startPageIndex: startPage
+			}).done(function() {
+				expect(carousel.getCurrentPageIndex()).toEqual(startPage);
+
+				done();
+			});
+		});
+
+		it('setting both start item and page indexes throws error', function () {
+			var setConflictingStartIndexes = function() {
+				carousel.init('.carousel', {
+					startItemIndex: 1,
+					startPageIndex: 1
+				});
+			};
+
+			expect(setConflictingStartIndexes).toThrow();
 		});
 
 		it('init works without providing user config', function () {

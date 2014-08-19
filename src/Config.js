@@ -75,17 +75,38 @@ define([
 		 *
 		 * Set to a number value of valid range to enable.
 		 *
-		 * Default to showing the first element.
+		 * Defaults to showing the first element.
 		 *
-		 * @property startIndex
+		 * Set either this or the {{#crossLink "Config/startPageIndex:property"}}{{/crossLink}} property, setting both
+		 * throws error.
+		 *
+		 * @property startItemIndex
 		 * @type {number}
 		 * @default null
 		 */
-		this.startIndex = null;
+		this.startItemIndex = null;
 
 		/**
-		 * If {{#crossLink "Config/startIndex:property"}}{{/crossLink}} is set then should it animate to it or should
-		 * the position be set immediately.
+		 * The index of the page to scroll to at startup.
+		 *
+		 * Set to a number value of valid range to enable.
+		 *
+		 * Defaults to showing the first element.
+		 *
+		 * Set either this or the {{#crossLink "Config/startItemIndex:property"}}{{/crossLink}} property, setting both
+		 * throws error.
+		 *
+		 * @property startPageIndex
+		 * @type {number}
+		 * @default null
+		 */
+		this.startPageIndex = null;
+
+		/**
+		 * If item or page start index is set then should it animate to it or should the position be set immediately.
+		 *
+		 * Applies to both {{#crossLink "Config/startIndex:property"}}{{/crossLink}} and
+		 * {{#crossLink "Config/startPageIndex:property"}}{{/crossLink}}.
 		 *
 		 * By default the position is set without animation.
 		 *
@@ -93,7 +114,7 @@ define([
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.animateToStartIndex = false,
+		this.animateToStartIndex = false;
 
 		/**
 		 * List of default responsive layout breakpoint.

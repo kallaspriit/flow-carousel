@@ -928,7 +928,8 @@ define([
 			sizeMode = this._config.sizeMode,
 			$itemsWrap,
 			$scrollerWrap,
-			promise;
+			layoutPromise,
+			animationDeferred;
 
 		// remove any existing content (HtmlDataSource should have done that already anyway
 		$element.empty();
@@ -973,7 +974,7 @@ define([
 		}
 
 		// setup the individual elements
-		promise = this._setupLayout(wrap, orientation);
+		layoutPromise = this._setupLayout(wrap, orientation);
 
 		// if we&#x27;re using responsive layout then we need to recalculate sizes and positions if the wrap size changes
 		if (this._config.useResponsiveLayout) {
@@ -983,12 +984,39 @@ define([
 		// remove the loading class
 		$element.removeClass(className.initiating);
 
-		// navigate to the start index item immediately if set
-		if (this._config.startIndex !== null) {
-			this.navigateToItem(this._config.startIndex, true);
+		// throw error if both item and page start indexes are set
+		if (this._config.startItemIndex !== null &amp;&amp; this._config.startPageIndex !== null) {
+			throw new Error(&#x27;Set either the startItemIndex or startPageIndex option but not both&#x27;);
 		}
 
-		return promise;
+		// navigate to the start index item immediately if set
+		if (this._config.startItemIndex !== null) {
+			animationDeferred = new Deferred();
+
+			// wait for the layout to complete and then perform the animation and resolve once that completes too
+			layoutPromise.done(function() {
+				this.navigateToItem(this._config.startItemIndex, !this._config.animateToStartIndex)
+					.done(function() {
+						animationDeferred.resolve();
+					});
+			}.bind(this));
+
+			return animationDeferred.promise();
+		} else if (this._config.startPageIndex !== null) {
+			animationDeferred = new Deferred();
+
+			// wait for the layout to complete and then perform the animation and resolve once that completes too
+			layoutPromise.done(function() {
+				this.navigateToPage(this._config.startPageIndex, !this._config.animateToStartIndex)
+					.done(function() {
+						animationDeferred.resolve();
+					});
+			}.bind(this));
+
+			return animationDeferred.promise();
+		} else {
+			return layoutPromise;
+		}
 	};
 
 	/**
@@ -1199,6 +1227,7 @@ define([
 			i;
 
 		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
+		/* istanbul ignore if */
 		if ($(this._mainWrap).parent().length === 0) {
 			deferred.resolve();
 

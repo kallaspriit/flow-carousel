@@ -115,8 +115,9 @@
 define([
 	&#x27;jquery&#x27;,
 	&#x27;AbstractAnimator&#x27;,
+	&#x27;Config&#x27;,
 	&#x27;Deferred&#x27;
-], function($, AbstractAnimator, Deferred) {
+], function($, AbstractAnimator, Config, Deferred) {
 	&#x27;use strict&#x27;;
 
 	/**
@@ -150,13 +151,13 @@ define([
 			itemsPerPage = this._carousel.getItemsPerPage(),
 			itemMargin = this._carousel.getConfig().margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			translatePosition = itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem),
+			translatePosition = Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem)),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			instantAnimationClass = this._carousel.getConfig().getClassName(&#x27;instantAnimation&#x27;),
 			translateCommand;
 
 		// the translate command is different for horizontal and vertical carousels
-		if (orientation === this._carousel.Orientation.HORIZONTAL) {
+		if (orientation === Config.Orientation.HORIZONTAL) {
 			translateCommand = &#x27;translate3d(&#x27; + -translatePosition + &#x27;px,0,0)&#x27;;
 		} else {
 			translateCommand = &#x27;translate3d(0,&#x27; + -translatePosition + &#x27;px,0)&#x27;;

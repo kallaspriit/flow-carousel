@@ -32,6 +32,26 @@ define([
 		 */
 		isArray: function(arg) {
 			return Object.prototype.toString.call(arg) === '[object Array]';
+		},
+
+		/**
+		 * Returns whether given object contains given value.
+		 *
+		 * @method objectHasValue
+		 * @param {object} obj Object to check
+		 * @param {*} value Value to search for
+		 * @return {boolean}
+		 */
+		objectHasValue: function(obj, value) {
+			var prop;
+
+			for (prop in obj) {
+				if(obj.hasOwnProperty(prop) && obj[prop] === value) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	};
 });

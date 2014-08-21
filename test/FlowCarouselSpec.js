@@ -7,6 +7,8 @@ define([
 	'AbstractAnimator',
 	'DefaultAnimator',
 	'AbstractRenderer',
+	'AbstractNavigator',
+	'KeyboardNavigator',
 	'Deferred'
 ], function(
 	FlowCarousel,
@@ -17,6 +19,8 @@ define([
 	AbstractAnimator,
 	DefaultAnimator,
 	AbstractRenderer,
+	AbstractNavigator,
+	KeyboardNavigator,
 	Deferred
 ) {
 	'use strict';
@@ -279,6 +283,16 @@ define([
 			expect(initiateWithInvalidAnimator).toThrow();
 		});
 
+		it('initiating with invalid navigator throws error', function () {
+			var initiateWithInvalidNavigator = function() {
+					carousel.init('.carousel', {
+						navigators: [FlowCarousel.Config.Navigator.KEYBOARD, 'foobar']
+					});
+				};
+
+			expect(initiateWithInvalidNavigator).toThrow();
+		});
+
 		it('can be initiated with array data', function (done) {
 			var data = [1, 2, 3, 4],
 				customRenderer = new CustomRenderer();
@@ -412,8 +426,10 @@ define([
 		});
 
 		it('renders carousel vertically', function() {
+			$('.carousel').removeClass('carousel-horizontal').addClass('carousel-vertical');
+
 			carousel.init('.carousel', {
-				orientation: carousel.Orientation.VERTICAL
+				orientation: FlowCarousel.Config.Orientation.VERTICAL
 			});
 
 			expect($('.flow-carousel-wrap').length).toEqual(1);
@@ -438,6 +454,11 @@ define([
 			});
 
 			carousel.init('.carousel');
+
+			// first change
+			window.setTimeout(function() {
+				$('.carousel').css('width', '400px');
+			}, 100);
 
 			// give it some time to change
 			window.setTimeout(function() {
@@ -591,17 +612,16 @@ define([
 			expect(navigateToInvalidIndex).toThrow();
 		});
 
-		// TODO this should be removed once support for cancelling nagivation is added
-		/*it('throws error when requesting navigation while already animating', function() {
+		it('navigating before animation complete is ignored', function(done) {
 			carousel.init('.carousel');
 
-			var callNavigateBeforeEnd = function() {
-				carousel.navigateToItem(1);
-				carousel.navigateToItem(2);
-			};
+			carousel.navigateToItem(1);
+			carousel.navigateToItem(2).done(function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(1);
 
-			expect(callNavigateBeforeEnd).toThrow();
-		});*/
+				done();
+			});
+		});
 
 		// used only for code coverage
 		it('navigating to current page index resolves immediately', function(done) {
@@ -637,7 +657,7 @@ define([
 		it('method "getOrientation" return the carousel orientation', function() {
 			carousel.init('.carousel');
 
-			expect(carousel.getOrientation()).toEqual(carousel.Orientation.HORIZONTAL);
+			expect(carousel.getOrientation()).toEqual(FlowCarousel.Config.Orientation.HORIZONTAL);
 		});
 
 		it('method "getItemSize" returns single item size', function() {
@@ -733,6 +753,43 @@ define([
 			expect(unrenderedElemet).toEqual(null);
 		});
 
+		it('method "getNavigatorByType" returns navigator instance for valid type', function() {
+			carousel.init('.carousel');
+
+			var validNavigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD);
+
+			expect(validNavigator).toEqual(jasmine.any(AbstractNavigator));
+			expect(validNavigator).toEqual(jasmine.any(KeyboardNavigator));
+		});
+
+		it('method "getNavigatorByType" returns null for non-existing navigator type', function() {
+			carousel.init('.carousel');
+
+			var invalidNavigator = carousel.getNavigatorByType('foobar');
+
+			expect(invalidNavigator).toEqual(null);
+		});
+
+		it('adding a navigator of type that already exists throws error', function() {
+			carousel.init('.carousel');
+
+			var addExistingNavigator = function() {
+				carousel.addNavigator(FlowCarousel.Config.Navigator.KEYBOARD, null);
+			};
+
+			expect(addExistingNavigator).toThrow();
+		});
+
+		it('adding a navigator that is not an instance of AbstractNavigator throws error', function() {
+			carousel.init('.carousel');
+
+			var addInvalidNavigator = function() {
+				carousel.addNavigator('foobar', null);
+			};
+
+			expect(addInvalidNavigator).toThrow();
+		});
+
 		it('the current item index does not change before the end of the animation', function(done) {
 			var targetIndex = 5;
 
@@ -757,7 +814,7 @@ define([
 			});
 
 			carousel.init('.carousel', {
-				sizeMode: carousel.SizeMode.MATCH_LARGEST_ITEM,
+				sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM,
 				useResponsiveLayout: false,
 				itemsPerPage: 5
 			}).done(function() {
@@ -785,7 +842,7 @@ define([
 			$('.carousel').removeClass('carousel-horizontal').addClass('carousel-vertical');
 
 			carousel.init('.carousel', {
-				orientation: carousel.Orientation.VERTICAL
+				orientation: FlowCarousel.Config.Orientation.VERTICAL
 			});
 
 			carousel.navigateToItem(10).done(function() {

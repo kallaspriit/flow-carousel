@@ -195,21 +195,13 @@
 
 	// fetch the carousel component and run it
 	require([
-		'FlowCarousel',
-		'Config',
-		'AbstractDataSource',
-		'AbstractRenderer',
-		'Deferred'
+		'FlowCarousel'
 	], function(
-		FlowCarousel,
-		Config,
-		AbstractDataSource,
-		AbstractRenderer,
-		Deferred
+		FlowCarousel
 	) {
 		// test asynchronous data source
 		function CustomDataSource() {
-			AbstractDataSource.call(this);
+			FlowCarousel.AbstractDataSource.call(this);
 
 			var itemCount = 1000,
 				i;
@@ -221,7 +213,7 @@
 			}
 		}
 
-		CustomDataSource.prototype = Object.create(AbstractDataSource.prototype);
+		CustomDataSource.prototype = Object.create(FlowCarousel.AbstractDataSource.prototype);
 
 		CustomDataSource.prototype.getItemCount = function() {
 			return this._data.length;
@@ -232,7 +224,7 @@
 		};
 
 		CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
-			var deferred = new Deferred(),
+			var deferred = new FlowCarousel.Deferred(),
 				requestDuration = 1000 + Math.random() * 4000; // wait 1..5 seconds
 
 			// fake asyncronous request that takes some time to complete
@@ -245,13 +237,13 @@
 
 		// renderer for the asyncronous data source
 		function CustomRenderer() {
-			AbstractRenderer.call(this);
+			FlowCarousel.AbstractRenderer.call(this);
 		}
 
-		CustomRenderer.prototype = Object.create(AbstractRenderer.prototype);
+		CustomRenderer.prototype = Object.create(FlowCarousel.AbstractRenderer.prototype);
 
 		CustomRenderer.prototype.renderItem = function(config, index, data) {
-			var deferred = new Deferred();
+			var deferred = new FlowCarousel.Deferred();
 
 			deferred.resolve($('<div class="carousel-item">test #' + data + '</div>'));
 
@@ -268,7 +260,7 @@
 			verticalCarousel = new FlowCarousel(),
 			asyncCarousel = new FlowCarousel();
 
-		basicCarousel.init('#basic-carousel');
+		/*basicCarousel.init('#basic-carousel');
 
 		// set random heights for the items
 		$('#match-largest-element-carousel .carousel-item').each(function() {
@@ -276,7 +268,7 @@
 		});
 
 		matchLargestElementCarousel.init('#match-largest-element-carousel', {
-			sizeMode: matchLargestElementCarousel.SizeMode.MATCH_LARGEST_ITEM
+			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM
 		});
 
 		halfWidthCarousel.init('#half-width-carousel', {
@@ -288,17 +280,50 @@
 
 		verticalCarousel.init('#vertical-carousel', {
 			margin: 10,
-			orientation: Config.Orientation.VERTICAL,
+			orientation: FlowCarousel.Config.Orientation.VERTICAL,
 			useResponsiveLayout: false,
 			itemsPerPage: 10
-		});
+		});*/
+
+		asyncCarousel
+			.addListener(FlowCarousel.Event.INITIATING, function() {
+				console.log('async carousel initiating');
+			})
+			.addListener(FlowCarousel.Event.INITIATED, function() {
+				console.log('async carousel initiated');
+
+				// show initiating indicator
+				$('<div class="carousel-initiating"><div>Initiating...</div></div>')
+					.appendTo(asyncCarousel.getMainWrap());
+
+				// add data loading indicator
+				$('<div class="carousel-loading"><div>Loading</div></div>')
+					.appendTo(asyncCarousel.getMainWrap());
+			})
+			.addListener(FlowCarousel.Event.STARTUP_ITEMS_RENDERED, function() {
+				console.log('async carousel startup items rendered');
+
+				// hide the loading indicator
+				$(asyncCarousel.getMainWrap()).find('.carousel-initiating').remove();
+			})
+			.addListener(FlowCarousel.Event.LOADING_ITEMS, function(startIndex, endIndex) {
+				console.log('async carousel loading items', startIndex, endIndex);
+
+				$(asyncCarousel.getMainWrap()).find('.carousel-loading').addClass('carousel-loading-visible');
+			})
+			.addListener(FlowCarousel.Event.LOADED_ITEMS, function(startIndex, endIndex, items) {
+				console.log('async carousel loaded items', startIndex, endIndex, items);
+
+				$(asyncCarousel.getMainWrap()).find('.carousel-loading').removeClass('carousel-loading-visible');
+			})
+			.addListener(FlowCarousel.Event.ABORTED_ITEMS, function(startIndex, endIndex) {
+				console.log('async carousel aborted loading items', startIndex, endIndex);
+			});
 
 		asyncCarousel.init('#async-carousel', {
 			margin: 10,
 			dataSource: new CustomDataSource(),
 			renderer: new CustomRenderer()
-		}).done(function() {
-			console.log('async carousel initiated');
 		});
 
 		// setup buttons
@@ -311,35 +336,19 @@
 
 			switch (action) {
 				case 'previous-page':
-					$btn.prop('disabled', true);
-
-					carousel.navigateToPreviousPage().done(function() {
-						$btn.prop('disabled', false);
-					});
+					carousel.navigateToPreviousPage();
 				break;
 
 				case 'previous-item':
-					$btn.prop('disabled', true);
-
-					carousel.navigateToPreviousItem().done(function() {
-						$btn.prop('disabled', false);
-					});
+					carousel.navigateToPreviousItem();
 				break;
 
 				case 'next-item':
-					$btn.prop('disabled', true);
-
-					carousel.navigateToNextItem().done(function() {
-						$btn.prop('disabled', false);
-					});
+					carousel.navigateToNextItem();
 				break;
 
 				case 'next-page':
-					$btn.prop('disabled', true);
-
-					carousel.navigateToNextPage().done(function() {
-						$btn.prop('disabled', false);
-					});
+					carousel.navigateToNextPage();
 				break;
 			}
 		});

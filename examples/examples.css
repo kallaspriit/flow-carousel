@@ -3,7 +3,6 @@ BODY {
     background-color: #F8F8F8;
 }
 .carousel {
-    overflow: hidden;
     border: 10px solid #FFF;
     background-color: #EEE;
 }
@@ -46,8 +45,45 @@ BODY {
     right: 0;
     bottom: 0;
 }
+.carousel-initiating {
+    display: table;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.carousel-initiating > DIV {
+    display: table-cell;
+    vertical-align: middle;
+    height: 100%;
+    text-align: center;
+    font-size: 24px;
+    color: #FFF;
+}
+.carousel-loading {
+    position: absolute;
+    top: -30px;
+    right: -10px;
+    height: 20px;
+    line-height: 20px;
+    background-color: #FFF;
+    padding: 0 10px;
+    color: #333;
+    border-radius: 3px 3px 0 0;
+    opacity: 0;
+    transition: opacity 150ms ease;
+}
+.carousel-loading-visible {
+    opacity: 1;
+}
 
 /* special example styles */
 .carousel-item-odd {
     background-color: #5EFF40 !important;
+}
+.flow-carousel-item {
+    background-color: #666;
 }

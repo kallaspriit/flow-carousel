@@ -113,8 +113,10 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 define([
-	&#x27;AbstractNavigator&#x27;
-], function(AbstractNavigator) {
+	&#x27;AbstractNavigator&#x27;,
+	&#x27;Config&#x27;,
+	&#x27;Util&#x27;
+], function(AbstractNavigator, Config, Util) {
 	&#x27;use strict&#x27;;
 
 	/**
@@ -129,7 +131,7 @@ define([
 		AbstractNavigator.call(this);
 
 		this._mouseEntered = false;
-		this._mode = mode || KeyboardNavigator.Mode.NAVIGATE_PAGE;
+		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
 	}
 
 	KeyboardNavigator.prototype = Object.create(AbstractNavigator.prototype);
@@ -145,6 +147,38 @@ define([
 	KeyboardNavigator.Mode = {
 		NAVIGATE_PAGE: &#x27;navigate-page&#x27;,
 		NAVIGATE_ITEM: &#x27;navigate-item&#x27;
+	};
+
+	/**
+	 * Returns current keyboard navigator mode.
+	 *
+	 * The mode is either {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_PAGE:property&quot;}}{{/crossLink}} or
+	 * {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_ITEM:property&quot;}}{{/crossLink}} meaning that the arrow keys change
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method setMode
+	 * @param {KeyboardNavigator/Mode:property} mode Mode to use
+	 */
+	KeyboardNavigator.prototype.setMode = function(mode) {
+		if (!Util.objectHasValue(KeyboardNavigator.Mode, mode)) {
+			throw new Error(&#x27;Invalid mode &quot;&#x27; + mode + &#x27;&quot; provided&#x27;);
+		}
+
+		this._mode = mode;
+	};
+
+	/**
+	 * Returns current keyboard navigator mode.
+	 *
+	 * The mode is either {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_PAGE:property&quot;}}{{/crossLink}} or
+	 * {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_ITEM:property&quot;}}{{/crossLink}} meaning that the arrow keys change
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method getMode
+	 * @return {KeyboardNavigator/Mode:property}
+	 */
+	KeyboardNavigator.prototype.getMode = function() {
+		return this._mode;
 	};
 
 	/**
@@ -193,14 +227,14 @@ define([
 
 		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
 		switch (this._carousel.getOrientation()) {
-			case this._carousel.Orientation.HORIZONTAL:
+			case Config.Orientation.HORIZONTAL:
 				keyCodes = {
 					previous: 37, // arrow left
 					next: 39 // arrow right
 				};
 			break;
 
-			case this._carousel.Orientation.VERTICAL:
+			case Config.Orientation.VERTICAL:
 				keyCodes = {
 					previous: 38, // arrow up
 					next: 40 // arrow down

@@ -243,47 +243,87 @@ define([
 		this._delayedTasks = {};
 
 		/**
-		 * Enumeration of possible carousel orientations.
+		 * The deferred promise to the currently loading itemset.
 		 *
-		 * Shortcut to the list of possible orientations from Config.
-		 *
-		 * @property Orientation
-		 * @param {string} Orientation.HORIZONTAL='horizontal' Horizontal orientation
-		 * @param {string} Orientation.VERTIAL='vertical' Vertical orientation
-		 * @type {object}
+		 * @property _getItemsPromise
+		 * @type {Deferred.Promise|null}
+		 * @private
 		 */
-		this.Orientation = Config.Orientation;
+		this._getItemsPromise = null;
 
 		/**
-		 * There are two different strategies for setting the size of the wrap and the items:
-		 * > MATCH_WRAP - the size of the items is set to match the wrap size
-		 * > MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item
+		 * The deferred promise to the current animation.
 		 *
-		 * Shortcut to the list of possible size modes from Config.
+		 * Set to null if no animation is playing.
 		 *
-		 * @property SizeMode
-		 * @type {object}
-		 * @param {string} Orientation.MATCH_WRAP='match-wrap' Items size is based on wrap size
-		 * @param {string} Orientation.MATCH_LARGEST_ITEM='match-largest-item' Wrap size is based on items size
-		 * @static
+		 * @property _activeAnimationPromise
+		 * @type {Deferred.Promise|null}
+		 * @private
 		 */
-		this.SizeMode = Config.SizeMode;
+		this._activeAnimationPromise = null;
 
 		/**
-		 * List of built-in navigators that the carousel can use.
-	     *
-	     * Set using {{#crossLink "Config/navigators:property"}}{{/crossLink}} option.
+		 * Has the {{#crossLink "FlowCarousel/Event/STARTUP_ITEMS_RENDERED:property"}}{{/crossLink}} event bee emitted.
 		 *
-		 * See {{#crossLink "Config/Navigator:property"}}{{/crossLink}} for possible options.
-		 *
-		 * @property Navigator
-		 * @type {object}
-		 * @static
+		 * @property _startupItemsRenderedEmitted
+		 * @type {boolean}
+		 * @default false
+		 * @private
 		 */
-		this.Navigator = Config.Navigator;
+		this._startupItemsRenderedEmitted = false;
 	}
 
 	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
+
+	/**
+	 * Reference to the {{#crossLink "Config"}}{{/crossLink}} class.
+	 *
+	 * Useful to access the enumerations in the configuration class.
+	 *
+	 * @property Config
+	 * @type {Config}
+	 */
+	FlowCarousel.Config = Config;
+
+	/**
+	 * Reference to the {{#crossLink "AbstractDataSource"}}{{/crossLink}} class.
+	 *
+	 * @property AbstractDataSource
+	 * @type {Config}
+	 */
+	FlowCarousel.AbstractDataSource = AbstractDataSource;
+
+	/**
+	 * Reference to the {{#crossLink "AbstractRenderer"}}{{/crossLink}} class.
+	 *
+	 * @property AbstractRenderer
+	 * @type {Config}
+	 */
+	FlowCarousel.AbstractRenderer = AbstractRenderer;
+
+	/**
+	 * Reference to the {{#crossLink "AbstractAnimator"}}{{/crossLink}} class.
+	 *
+	 * @property AbstractAnimator
+	 * @type {Config}
+	 */
+	FlowCarousel.AbstractAnimator = AbstractAnimator;
+
+	/**
+	 * Reference to the {{#crossLink "AbstractNavigator"}}{{/crossLink}} class.
+	 *
+	 * @property AbstractNavigator
+	 * @type {Config}
+	 */
+	FlowCarousel.AbstractNavigator = AbstractNavigator;
+
+	/**
+	 * Reference to the {{#crossLink "Deferred"}}{{/crossLink}} class.
+	 *
+	 * @property Deferred
+	 * @type {Config}
+	 */
+	FlowCarousel.Deferred = Deferred;
 
 	/**
 	 * Possible size modes used by {{#crossLink "FlowCarousel/_getWrapSize"}}{{/crossLink}}.
@@ -292,11 +332,42 @@ define([
 	 * @type {object}
 	 * @param {string} SizeMode.INNER='inner' Inner size
 	 * @param {string} SizeMode.OUTER='outer' Outer size
+	 * @private
 	 * @static
 	 */
 	FlowCarousel.SizeMode = {
 		INNER: 'inner',
 		OUTER: 'outer'
+	};
+
+	/**
+	 * List of possible events emitted by the carousel.
+	 *
+	 * The event system uses the Wolfy87 EventEmitter implementation https://github.com/Wolfy87/EventEmitter.
+	 *
+	 * You can subscribe to events using carousel.addListener(carousel.Event.INITIATED, function() { ... }); etc
+	 *
+	 * The [startIndex, endIndex] syntax shows the parameters passed to the callback.
+	 *
+	 * @property Event
+	 * @param {string} Event.INITIATING='initiating' Emitted when starting initiation
+	 * @param {string} Event.INITIATED='initiated' Emitted after completing initiation
+	 * @param {string} Event.STARTUP_ITEMS_RENDERED='startup-items-rendered' Emitted after rendering the first data
+	 * @param {string} Event.LOADING_ITEMS='loading-items' [startIndex, endIndex] Emitted when starting to load a new
+	 * 				   set of items
+	 * @param {string} Event.LOADED_ITEMS='loaded-items' [startIndex, endIndex, items] Emitted when a new set of items
+	 * 				   was loaded and rendered
+	 * @param {string} Event.ABORTED_ITEMS='aborted-items' [startIndex, endIndex] Emitted when loading a range of items
+	 * 				   was aborted
+	 * @type {object}
+	 */
+	FlowCarousel.Event = {
+		INITIATING: 'initiating',
+		INITIATED: 'initiated',
+		STARTUP_ITEMS_RENDERED: 'startup-items-rendered',
+		LOADING_ITEMS: 'loading-items',
+		LOADED_ITEMS: 'loaded-items',
+		ABORTED_ITEMS: 'aborted-items'
 	};
 
 	/**
@@ -312,6 +383,8 @@ define([
 	 */
 	FlowCarousel.prototype.init = function(selector, userConfig) {
 		var promise;
+
+		this.emitEvent(FlowCarousel.Event.INITIATING);
 
 		this._selector = selector;
 
@@ -367,9 +440,18 @@ define([
 		// setup the carousel rendering and events
 		promise = this._setupCarousel(this._mainWrap, this._config.orientation);
 
-		// wait until the main initialization is complete before initializing the navigators
+		// setup the default navigators
+		this._setupDefaultNavigators();
+
+		// emit the initiated event once done
 		promise.done(function() {
-			this._setupDefaultNavigators();
+			this.emitEvent(FlowCarousel.Event.INITIATED);
+
+			this._validateItemsToRender().done(function() {
+				if (!this._startupItemsRenderedEmitted) {
+					this.emitEvent(FlowCarousel.Event.STARTUP_ITEMS_RENDERED);
+				}
+			}.bind(this));
 		}.bind(this));
 
 		return promise;
@@ -602,6 +684,21 @@ define([
 	};
 
 	/**
+	 * Returns navigator instance by type.
+	 *
+	 * @method getNavigatorByType
+	 * @param {string} type Type of the navigator, should be unique
+	 * @return {AbstractNavigator|null} Navigator instance or null if not found
+	 */
+	FlowCarousel.prototype.getNavigatorByType = function(type) {
+		if (typeof this._navigators[type] === 'undefined') {
+			return null;
+		}
+
+		return this._navigators[type];
+	};
+
+	/**
 	 * Returns the data used for rendering the component.
 	 *
 	 * Returns null if the component has not yet been initialized.
@@ -627,8 +724,7 @@ define([
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant) {
 		var itemCount = this._dataSource.getItemCount(),
-			animationPromise,
-			fakeAnimationDeferred;
+			animationPromise;
 
 		// validate index range
 		if (itemIndex < 0) {
@@ -639,12 +735,7 @@ define([
 
 		// TODO what if the carousel is already animating
 		if (this._isAnimating) {
-			//throw new Error('Starting new animation while the last has not completed is not yet implemented');
-			fakeAnimationDeferred = new Deferred();
-
-			fakeAnimationDeferred.resolve();
-
-			return fakeAnimationDeferred.promise();
+			return this._activeAnimationPromise;
 		}
 
 		// update the target item index
@@ -671,6 +762,7 @@ define([
 		animationPromise.done(function() {
 			this._currentItemIndex = itemIndex;
 			this._isAnimating = false;
+			this._activeAnimationPromise = null;
 
 			// remove items that have moved out of range
 			this._removeInvalidItems();
@@ -681,6 +773,9 @@ define([
 			// set the scroller wrap size to the largest currently visible item size
 			this._setScrollerSizeToLargestVisibleChildSize();
 		}.bind(this));
+
+		// store the promise so it can be returned when requesting a new animation while the last still playing
+		this._activeAnimationPromise = animationPromise;
 
 		return animationPromise;
 	};
@@ -1013,8 +1108,8 @@ define([
 			this._renderTargetIndexPlaceholders();
 		}
 
-		// render the items
-		return this._validateItemsToRender();
+		// setting up layout is syncronous for now
+		return (new Deferred()).resolve().promise();
 	};
 
 	/**
@@ -1037,7 +1132,7 @@ define([
 				break;
 
 				default:
-					throw new Error('Navigator "' + type + '" is not supported');
+					throw new Error('Navigator of type "' + type + '" is not supported');
 			}
 
 			if (navigator !== null) {
@@ -1130,7 +1225,8 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._renderItemRange = function(startIndex, endIndex) {
-		var deferred = new Deferred(),
+		var self = this,
+			deferred = new Deferred(),
 			loadingClassName = this._config.getClassName('loading');
 
 		// for asyncronous data source add the loading class to the main wrap for the duration of the async request
@@ -1138,17 +1234,48 @@ define([
 			$(this._mainWrap).addClass(loadingClassName);
 		}
 
-		this._dataSource.getItems(startIndex, endIndex)
+		// try to abort existing item loading if possible
+		if (this._getItemsPromise !== null) {
+			/* istanbul ignore if */
+			if (typeof this._getItemsPromise.abort === 'function') {
+				this._getItemsPromise.abort();
+			}
+
+			this._getItemsPromise._ignore = true;
+
+			this._getItemsPromise = null;
+		}
+
+		this.emitEvent(FlowCarousel.Event.LOADING_ITEMS, [startIndex, endIndex]);
+
+		// store the new itemset fetching deferred promise and fetch new items
+		this._getItemsPromise = this._dataSource.getItems(startIndex, endIndex)
 			.done(function(items) {
-				if (this._dataSource.isAsynchronous()) {
-					$(this._mainWrap).removeClass(loadingClassName);
+				// ignore invalid data if it couldn't be aborted
+				if (this._ignore === true) {
+					self.emitEvent(FlowCarousel.Event.ABORTED_ITEMS, [startIndex, endIndex]);
+
+					return;
 				}
 
-				this._renderItems(items, startIndex)
-					.done(function() {
-						deferred.resolve();
-					});
-			}.bind(this));
+				self._getItemsPromise = null;
+
+				if (self._dataSource.isAsynchronous()) {
+					$(self._mainWrap).removeClass(loadingClassName);
+				}
+
+				// rendering items can be asyncronous as well
+				self._renderItems(items, startIndex).done(function() {
+					// it's possible that the initial first page data loading was cancelled
+					if (!this._startupItemsRenderedEmitted) {
+						this.emitEvent(FlowCarousel.Event.STARTUP_ITEMS_RENDERED);
+					}
+
+					this.emitEvent(FlowCarousel.Event.LOADED_ITEMS, [startIndex, endIndex, items]);
+
+					deferred.resolve();
+				}.bind(self));
+			});
 
 		return deferred.promise();
 	};
@@ -1185,6 +1312,7 @@ define([
 
 		for (itemIndex = startIndex; itemIndex < endIndex; itemIndex++) {
 			// don't render a placeholder onto already existing rendered item
+			/* istanbul ignore if */
 			if (this._renderedItemIndexes.indexOf(itemIndex) !== -1) {
 				elements.push(null);
 			} else {
@@ -1312,6 +1440,7 @@ define([
 				placeholderPos = this._renderedPlaceholderIndexes.indexOf(elementIndex);
 
 				// remove placeholder if exists
+				/* istanbul ignore if */
 				if (placeholderPos !== -1 && typeof this._itemIndexToElementMap[elementIndex] !== 'undefined') {
 					placeholderElement = this._itemIndexToElementMap[elementIndex];
 
@@ -1360,7 +1489,7 @@ define([
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			effectiveSize = itemSize - gapPerItem,
-			effectiveOffset = index * itemSize + index * (itemMargin - gapPerItem),
+			effectiveOffset = Math.floor(index * itemSize + index * (itemMargin - gapPerItem)),
 			$wrapper = $('<div></div>'),
 			cssProperties = {},
 			$wrappedElement;

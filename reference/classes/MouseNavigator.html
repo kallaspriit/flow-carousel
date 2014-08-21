@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>KeyboardNavigator - FlowCarousel</title>
+    <title>MouseNavigator - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -110,7 +110,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>KeyboardNavigator Class</h1>
+                        <h1>MouseNavigator Class</h1>
 <div class="box meta">
     
 
@@ -122,7 +122,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_KeyboardNavigator.js.html#l8"><code>src\KeyboardNavigator.js:8</code></a>
+            Defined in: <a href="../files/src_MouseNavigator.js.html#l8"><code>src\MouseNavigator.js:8</code></a>
         </div>
     
 
@@ -134,15 +134,15 @@
 
 
 <div class="box intro">
-    <p>Keyboard navigator.</p>
+    <p>Mouse navigator.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_KeyboardNavigator" class="method item">
-    <h3 class="name"><code>KeyboardNavigator</code></h3>
+        <div id="method_MouseNavigator" class="method item">
+    <h3 class="name"><code>MouseNavigator</code></h3>
 
     
         <div class="args">
@@ -150,7 +150,7 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[mode=KeyboardNavigator.Mode.NAVIGATE_PAGE]</code>
+                        <code class="optional">[mode=MouseNavigator.Mode.NAVIGATE_PAGE]</code>
                     
                 </li>
             
@@ -183,7 +183,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l8"><code>src\KeyboardNavigator.js:8</code></a>
+        <a href="../files/src_MouseNavigator.js.html#l8"><code>src\MouseNavigator.js:8</code></a>
         
         </p>
 
@@ -205,8 +205,8 @@
             
                 <li class="param">
                     
-                        <code class="param-name optional">[mode=KeyboardNavigator.Mode.NAVIGATE_PAGE]</code>
-                        <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+                        <code class="param-name optional">[mode=MouseNavigator.Mode.NAVIGATE_PAGE]</code>
+                        <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -257,7 +257,21 @@
                     <ul class="index-list methods extends">
                         
                             <li class="index-item method private">
-                                <a href="#method__onKeyDown">_onKeyDown</a>
+                                <a href="#method__begin">_begin</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__end">_end</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__move">_move</a>
 
                                 
                                 
@@ -322,8 +336,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method__onKeyDown" class="method item private">
-    <h3 class="name"><code>_onKeyDown</code></h3>
+                    <div id="method__begin" class="method item private">
+    <h3 class="name"><code>_begin</code></h3>
 
     
         <div class="args">
@@ -331,7 +345,7 @@
             
                 <li class="arg">
                     
-                        <code>keyCode</code>
+                        <code>position</code>
                     
                 </li>
             
@@ -339,10 +353,6 @@
         </div>
     
 
-    
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
-        </span>
     
 
     
@@ -370,7 +380,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l102"><code>src\KeyboardNavigator.js:102</code></a>
+        <a href="../files/src_MouseNavigator.js.html#l113"><code>src\MouseNavigator.js:113</code></a>
         
         </p>
 
@@ -381,7 +391,7 @@
     </div>
 
     <div class="description">
-        <p>Called on key down even for anywhere in the document.</p>
+        <p>Begins the navigation.</p>
 
     </div>
 
@@ -393,14 +403,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">keyCode</code>
+                        <code class="param-name">position</code>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>Key press key-code.</p>
+                        <p>Mouse/finger position</p>
 
                     </div>
 
@@ -412,19 +422,153 @@
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
 
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
-                    
-                    <p>Should the key event be propagated further</p>
+    
+</div>
 
                 
-            </div>
+                    <div id="method__end" class="method item private">
+    <h3 class="name"><code>_end</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_MouseNavigator.js.html#l154"><code>src\MouseNavigator.js:154</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Called on gesture end.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method__move" class="method item private">
+    <h3 class="name"><code>_move</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>position</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
         </div>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_MouseNavigator.js.html#l126"><code>src\MouseNavigator.js:126</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Called on mouse/finger move.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">position</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Mouse/finger position</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
     
 
     
@@ -465,7 +609,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l71"><code>src\KeyboardNavigator.js:71</code></a>
+        <a href="../files/src_MouseNavigator.js.html#l74"><code>src\MouseNavigator.js:74</code></a>
         
         </p>
 
@@ -497,7 +641,7 @@
 
     
         <span class="returns-inline">
-            <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+            <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>
         </span>
     
 
@@ -524,7 +668,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l57"><code>src\KeyboardNavigator.js:57</code></a>
+        <a href="../files/src_MouseNavigator.js.html#l60"><code>src\MouseNavigator.js:60</code></a>
         
         </p>
 
@@ -535,9 +679,9 @@
     </div>
 
     <div class="description">
-        <p>Returns current keyboard navigator mode.</p>
-<p>The mode is either KeyboardNavigator/Mode/NAVIGATE_PAGE:property or
-KeyboardNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
+        <p>Returns current mouse navigator mode.</p>
+<p>The mode is either MouseNavigator/Mode/NAVIGATE_PAGE:property or
+MouseNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
 either the page or navigate one item at a time.</p>
 
     </div>
@@ -551,7 +695,7 @@ either the page or navigate one item at a time.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>:
+                        <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>:
                     
                 
             </div>
@@ -691,7 +835,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l39"><code>src\KeyboardNavigator.js:39</code></a>
+        <a href="../files/src_MouseNavigator.js.html#l42"><code>src\MouseNavigator.js:42</code></a>
         
         </p>
 
@@ -702,9 +846,9 @@ either the page or navigate one item at a time.</p>
     </div>
 
     <div class="description">
-        <p>Returns current keyboard navigator mode.</p>
-<p>The mode is either KeyboardNavigator/Mode/NAVIGATE_PAGE:property or
-KeyboardNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
+        <p>Returns current mouse navigator mode.</p>
+<p>The mode is either MouseNavigator/Mode/NAVIGATE_PAGE:property or
+MouseNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
 either the page or navigate one item at a time.</p>
 
     </div>
@@ -718,7 +862,7 @@ either the page or navigate one item at a time.</p>
                 <li class="param">
                     
                         <code class="param-name">mode</code>
-                        <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+                        <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>
                     
 
                     
@@ -772,7 +916,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l26"><code>src\KeyboardNavigator.js:26</code></a>
+        <a href="../files/src_MouseNavigator.js.html#l29"><code>src\MouseNavigator.js:29</code></a>
         
         </p>
 

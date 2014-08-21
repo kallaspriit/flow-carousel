@@ -67,6 +67,8 @@
             
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
             
+                <li><a href="../classes/MouseNavigator.html">MouseNavigator</a></li>
+            
                 <li><a href="../classes/Util.html">Util</a></li>
             
             </ul>
@@ -120,7 +122,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_DefaultAnimator.js.html#l9"><code>src\DefaultAnimator.js:9</code></a>
+            Defined in: <a href="../files/src_DefaultAnimator.js.html#l10"><code>src\DefaultAnimator.js:10</code></a>
         </div>
     
 
@@ -181,7 +183,7 @@
             
         
         
-        <a href="../files/src_DefaultAnimator.js.html#l9"><code>src\DefaultAnimator.js:9</code></a>
+        <a href="../files/src_DefaultAnimator.js.html#l10"><code>src\DefaultAnimator.js:10</code></a>
         
         </p>
 
@@ -258,6 +260,20 @@
                                 
                             </li>
                         
+                            <li class="index-item method inherited">
+                                <a href="#method_animateToPosition">animateToPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_getCurrentPosition">getCurrentPosition</a>
+
+                                
+                                
+                            </li>
+                        
                     </ul>
                 </div>
             
@@ -326,7 +342,7 @@
             
         
         
-        <a href="../files/src_DefaultAnimator.js.html#l25"><code>src\DefaultAnimator.js:25</code></a>
+        <a href="../files/src_DefaultAnimator.js.html#l45"><code>src\DefaultAnimator.js:45</code></a>
         
         </p>
 
@@ -392,6 +408,205 @@
                 
                     
                         <span class="type">Deferred.Promise</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_animateToPosition" class="method item">
+    <h3 class="name"><code>animateToPosition</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>position</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[instant=false]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Deferred.Promise</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            <p>Inherited from
+            <a href="../classes/AbstractAnimator.html#method_animateToPosition">
+                AbstractAnimator
+            </a>
+            
+            but overwritten in
+            
+        
+        
+        <a href="../files/src_DefaultAnimator.js.html#l63"><code>src\DefaultAnimator.js:63</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Animates the carousel to given absolute position.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">position</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Requested position</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[instant=false]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Should the navigation be instantaneous and not use animation</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Deferred.Promise</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getCurrentPosition" class="method item">
+    <h3 class="name"><code>getCurrentPosition</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            <p>Inherited from
+            <a href="../classes/AbstractAnimator.html#method_getCurrentPosition">
+                AbstractAnimator
+            </a>
+            
+            but overwritten in
+            
+        
+        
+        <a href="../files/src_DefaultAnimator.js.html#l26"><code>src\DefaultAnimator.js:26</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns current absolute position.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
                     
                 
             </div>

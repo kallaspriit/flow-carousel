@@ -173,7 +173,40 @@ define([
 		 * @property navigators
 		 * @type {Config/Navigator:property[]}
 		 */
-		this.navigators = [Config.Navigator.KEYBOARD];
+		this.navigators = [
+			Config.Navigator.KEYBOARD,
+			Config.Navigator.MOUSE
+		];
+
+		/**
+		 * Keyboard navigator mode to use.
+		 *
+		 * @property keyboardNavigatorMode
+		 * @type {KeyboardNavigator/Mode:property}
+		 * @default KeyboardNavigator.Mode.NAVIGATE_PAGE
+		 */
+		this.keyboardNavigatorMode = 'navigate-page';
+
+		/**
+		 * Mouse navigator mode to use.
+		 *
+		 * @property mouseNavigatorMode
+		 * @type {MouseNavigator/Mode:property}
+		 * @default MouseNavigator.Mode.NAVIGATE_PAGE
+		 */
+		this.mouseNavigatorMode = 'navigate-page';
+		//this.mouseNavigatorMode = 'navigate-item';
+
+		/**
+		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
+		 * effect of only applying the change partially. Set to zero to disable this feature.
+		 *
+		 *
+		 * @property mouseNavigatorOverEdgeDragPositionMultiplier
+		 * @type {number}
+		 * @default 0.2
+		 */
+		this.mouseNavigatorOverEdgeDragPositionMultiplier = 0.2;
 
 		/**
 		 * The css classes prefix to use.
@@ -333,7 +366,8 @@ define([
 	 * @static
 	 */
 	Config.Navigator = {
-		KEYBOARD: 'keyboard'
+		KEYBOARD: 'keyboard',
+		MOUSE: 'mouse'
 	};
 
 	/**

@@ -17,6 +17,7 @@ define([
 		AbstractNavigator.call(this);
 
 		this._mouseEntered = false;
+
 		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -74,9 +75,11 @@ define([
 	 * @protected
 	 */
 	KeyboardNavigator.prototype._setup = function() {
-		var mainWrap = this._carousel.getMainWrap();
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$window = $(window);
 
-		$(mainWrap)
+		// make sure that the mouse if over the main wrap element
+		$mainWrap
 			.on('mouseenter', function() {
 				this._mouseEntered = true;
 			}.bind(this))
@@ -84,7 +87,8 @@ define([
 				this._mouseEntered = false;
 			}.bind(this));
 
-		$(window).on('keydown', function(e) {
+		// listen for key down events
+		$window.on('keydown', function(e) {
 			var result = this._onKeyDown(e.keyCode);
 
 			if (result === false) {

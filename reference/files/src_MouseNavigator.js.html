@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\KeyboardNavigator.js - FlowCarousel</title>
+    <title>src\MouseNavigator.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -110,7 +110,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\KeyboardNavigator.js</h1>
+                        <h1 class="file-heading">File: src\MouseNavigator.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -122,22 +122,25 @@ define([
 	&#x27;use strict&#x27;;
 
 	/**
-	 * Keyboard navigator.
+	 * Mouse navigator.
 	 *
-	 * @class KeyboardNavigator
+	 * @class MouseNavigator
 	 * @extends AbstractNavigator
-	 * @param {KeyboardNavigator/Mode:property} [mode=KeyboardNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
+	 * @param {MouseNavigator/Mode:property} [mode=MouseNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
 	 * @constructor
 	 */
-	function KeyboardNavigator(mode) {
+	function MouseNavigator(mode) {
 		AbstractNavigator.call(this);
 
-		this._mouseEntered = false;
+		this._active = false;
+		this._startPointerPosition = null;
+		this._startCarouselPosition = null;
+		this._lastPosition = null;
 
-		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
+		this.setMode(mode || MouseNavigator.Mode.NAVIGATE_PAGE);
 	}
 
-	KeyboardNavigator.prototype = Object.create(AbstractNavigator.prototype);
+	MouseNavigator.prototype = Object.create(AbstractNavigator.prototype);
 
 	/**
 	 * List of supported navigation modes.
@@ -147,23 +150,23 @@ define([
 	 * @param {string} Mode.NAVIGATE_PAGE=&#x27;navigate-page&#x27; The navigation keys navigate one page at a time
 	 * @param {string} Mode.NAVIGATE_ITEM=&#x27;navigate-item&#x27; The navigation keys navigate one item at a time
 	 */
-	KeyboardNavigator.Mode = {
+	MouseNavigator.Mode = {
 		NAVIGATE_PAGE: &#x27;navigate-page&#x27;,
 		NAVIGATE_ITEM: &#x27;navigate-item&#x27;
 	};
 
 	/**
-	 * Returns current keyboard navigator mode.
+	 * Returns current mouse navigator mode.
 	 *
-	 * The mode is either {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_PAGE:property&quot;}}{{/crossLink}} or
-	 * {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_ITEM:property&quot;}}{{/crossLink}} meaning that the arrow keys change
+	 * The mode is either {{#crossLink &quot;MouseNavigator/Mode/NAVIGATE_PAGE:property&quot;}}{{/crossLink}} or
+	 * {{#crossLink &quot;MouseNavigator/Mode/NAVIGATE_ITEM:property&quot;}}{{/crossLink}} meaning that the arrow keys change
 	 * either the page or navigate one item at a time.
 	 *
 	 * @method setMode
-	 * @param {KeyboardNavigator/Mode:property} mode Mode to use
+	 * @param {MouseNavigator/Mode:property} mode Mode to use
 	 */
-	KeyboardNavigator.prototype.setMode = function(mode) {
-		if (!Util.objectHasValue(KeyboardNavigator.Mode, mode)) {
+	MouseNavigator.prototype.setMode = function(mode) {
+		if (!Util.objectHasValue(MouseNavigator.Mode, mode)) {
 			throw new Error(&#x27;Invalid mode &quot;&#x27; + mode + &#x27;&quot; provided&#x27;);
 		}
 
@@ -171,16 +174,16 @@ define([
 	};
 
 	/**
-	 * Returns current keyboard navigator mode.
+	 * Returns current mouse navigator mode.
 	 *
-	 * The mode is either {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_PAGE:property&quot;}}{{/crossLink}} or
-	 * {{#crossLink &quot;KeyboardNavigator/Mode/NAVIGATE_ITEM:property&quot;}}{{/crossLink}} meaning that the arrow keys change
+	 * The mode is either {{#crossLink &quot;MouseNavigator/Mode/NAVIGATE_PAGE:property&quot;}}{{/crossLink}} or
+	 * {{#crossLink &quot;MouseNavigator/Mode/NAVIGATE_ITEM:property&quot;}}{{/crossLink}} meaning that the arrow keys change
 	 * either the page or navigate one item at a time.
 	 *
 	 * @method getMode
-	 * @return {KeyboardNavigator/Mode:property}
+	 * @return {MouseNavigator/Mode:property}
 	 */
-	KeyboardNavigator.prototype.getMode = function() {
+	MouseNavigator.prototype.getMode = function() {
 		return this._mode;
 	};
 
@@ -190,89 +193,120 @@ define([
 	 * @method _setup
 	 * @protected
 	 */
-	KeyboardNavigator.prototype._setup = function() {
-		var $mainWrap = $(this._carousel.getMainWrap()),
-			$window = $(window);
+	MouseNavigator.prototype._setup = function() {
+		var $scroller = $(this._carousel.getScrollerWrap()),
+			$window = $(window),
+			orientation = this._carousel.getOrientation(),
+			horizontal = orientation === Config.Orientation.HORIZONTAL;
 
-		// make sure that the mouse if over the main wrap element
-		$mainWrap
-			.on(&#x27;mouseenter&#x27;, function() {
-				this._mouseEntered = true;
-			}.bind(this))
-			.on(&#x27;mouseleave&#x27;, function() {
-				this._mouseEntered = false;
-			}.bind(this));
-
-		// listen for key down events
-		$window.on(&#x27;keydown&#x27;, function(e) {
-			var result = this._onKeyDown(e.keyCode);
-
-			if (result === false) {
-				e.preventDefault();
+		// listen for mouse down, move and up/leave events
+		$scroller.on(&#x27;mousedown&#x27;, function(e) {
+			if (e.which !== 1) {
+				return;
 			}
 
-			return result;
+			this._begin(horizontal ? e.pageX : e.pageY);
+		}.bind(this));
+
+		$window.on(&#x27;mousemove&#x27;, function(e) {
+			// only move the carousel when the left mouse button is pressed
+			if (e.which === 1) {
+				this._move(horizontal ? e.pageX : e.pageY);
+			} else {
+				this._end();
+			}
+		}.bind(this));
+
+		$window.on(&#x27;mouseup&#x27;, function(e) {
+			if (e.which !== 1) {
+				return;
+			}
+
+			this._end();
 		}.bind(this));
 	};
 
 	/**
-	 * Called on key down even for anywhere in the document.
+	 * Begins the navigation.
 	 *
-	 * @method _onKeyDown
-	 * @param {number} keyCode Key press key-code.
-	 * @return {boolean} Should the key event be propagated further
+	 * @method _begin
+	 * @param {number} position Mouse/finger position
 	 * @private
 	 */
-	KeyboardNavigator.prototype._onKeyDown = function(keyCode) {
-		var keyCodes;
+	MouseNavigator.prototype._begin = function(position) {
+		this._active = true;
+		this._startPointerPosition = position;
+		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
+	};
 
-		// don&#x27;t do anything if the mouse is not over given component
-		if (!this._mouseEntered) {
+	/**
+	 * Called on mouse/finger move.
+	 *
+	 * @method _move
+	 * @param {number} position Mouse/finger position
+	 * @private
+	 */
+	MouseNavigator.prototype._move = function(position) {
+		if (!this._active) {
 			return;
 		}
 
-		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
-		switch (this._carousel.getOrientation()) {
-			case Config.Orientation.HORIZONTAL:
-				keyCodes = {
-					previous: 37, // arrow left
-					next: 39 // arrow right
-				};
-			break;
+		var deltaPointerPosition = position - this._startPointerPosition,
+			newPosition = this._startCarouselPosition + deltaPointerPosition,
+			pageSize = this._carousel.getPageSize(),
+			totalSize = this._carousel.getTotalSize(),
+			edgeMultiplier = this._carousel.getConfig().mouseNavigatorOverEdgeDragPositionMultiplier;
 
-			case Config.Orientation.VERTICAL:
-				keyCodes = {
-					previous: 38, // arrow up
-					next: 40 // arrow down
-				};
-			break;
+		if (newPosition &gt; 0 || newPosition &lt; -(totalSize - pageSize)) {
+			newPosition = this._startCarouselPosition + deltaPointerPosition * edgeMultiplier;
 		}
 
-		// navigate using the key-codes defined above
-		switch (keyCode) {
-			case keyCodes.next:
-				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
-					this._carousel.navigateToNextPage();
-				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
-					this._carousel.navigateToNextItem();
-				}
+		// use the animator to move to calculated position instantly
+		this._carousel.getAnimator().animateToPosition(newPosition, true);
 
-				return false;
-
-			case keyCodes.previous:
-				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
-					this._carousel.navigateToPreviousPage();
-				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
-					this._carousel.navigateToPreviousItem();
-				}
-
-				return false;
-		}
-
-		return true;
+		this._lastPosition = position;
 	};
 
-	return KeyboardNavigator;
+	/**
+	 * Called on gesture end.
+	 *
+	 * @method _end
+	 * @private
+	 */
+	MouseNavigator.prototype._end = function() {
+		if (!this._active) {
+			return;
+		}
+
+		var deltaPointerPosition = this._lastPosition - this._startPointerPosition,
+			direction = deltaPointerPosition &lt; 0 ? -1 : 1,
+			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
+			closestPageIndex,
+			closestItemIndex;
+
+		// navigate to closest item or page depending on selected mode
+		switch (this._mode) {
+			case MouseNavigator.Mode.NAVIGATE_PAGE:
+				closestPageIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
+
+				this._carousel.navigateToPage(closestPageIndex, false ,true);
+			break;
+
+			case MouseNavigator.Mode.NAVIGATE_ITEM:
+				closestItemIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
+
+				this._carousel.navigateToItem(closestItemIndex, false ,true);
+			break;
+		}
+
+		// reset
+		this._active = false;
+		this._startPointerPosition = null;
+		this._startCarouselPosition = null;
+		this._lastPosition = null;
+	};
+
+	return MouseNavigator;
 });
     </pre>
 </div>

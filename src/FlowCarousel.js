@@ -10,6 +10,7 @@ define([
 	'HtmlRenderer',
 	'AbstractNavigator',
 	'KeyboardNavigator',
+	'MouseNavigator',
 	'Deferred',
 	'Util',
 	'EventEmitter',
@@ -25,6 +26,7 @@ define([
 	HtmlRenderer,
 	AbstractNavigator,
 	KeyboardNavigator,
+	MouseNavigator,
 	Deferred,
 	Util,
 	EventEmitter
@@ -318,6 +320,22 @@ define([
 	FlowCarousel.AbstractNavigator = AbstractNavigator;
 
 	/**
+	 * Reference to the {{#crossLink "KeyboardNavigator"}}{{/crossLink}} class.
+	 *
+	 * @property KeyboardNavigator
+	 * @type {KeyboardNavigator}
+	 */
+	FlowCarousel.KeyboardNavigator = KeyboardNavigator;
+
+	/**
+	 * Reference to the {{#crossLink "MouseNavigator"}}{{/crossLink}} class.
+	 *
+	 * @property MouseNavigator
+	 * @type {MouseNavigator}
+	 */
+	FlowCarousel.MouseNavigator = MouseNavigator;
+
+	/**
 	 * Reference to the {{#crossLink "Deferred"}}{{/crossLink}} class.
 	 *
 	 * @property Deferred
@@ -550,6 +568,35 @@ define([
 	};
 
 	/**
+	 * Returns the size of a single page of items.
+	 *
+	 * @method getPageSize
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getPageSize = function() {
+		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation),
+			itemsPerPage = this._config.getItemsPerPage(wrapSize),
+			itemSize = this._calculateItemSize(wrapSize, itemsPerPage);
+
+		return itemsPerPage * itemSize;
+	};
+
+	/**
+	 * Returns the size of the entire scroller that would fit all the elements.
+	 *
+	 * @method getTotalSize
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getTotalSize = function() {
+		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation),
+			itemCount = this._dataSource.getItemCount(),
+			itemsPerPage = this._config.getItemsPerPage(wrapSize),
+			itemSize = this._calculateItemSize(wrapSize, itemsPerPage);
+
+		return itemCount * itemSize;
+	};
+
+	/**
 	 * Returns the number of items in the dataset.
 	 *
 	 * @method getItemCount
@@ -619,6 +666,56 @@ define([
 		var itemsPerPage = this.getItemsPerPage();
 
 		return Math.floor(this._currentItemIndex / itemsPerPage);
+	};
+
+	/**
+	 * Returns the closest full item index at given position taking into account the direction of movement.
+	 *
+	 * @method getClosestItemIndexAtPosition
+	 * @param {number} position Scroller position
+	 * @param {number} direction Move direction (-1/1)
+	 * @return {number} Closest item index
+	 */
+	FlowCarousel.prototype.getClosestItemIndexAtPosition = function(position, direction) {
+		var itemSize = this.getItemSize(),
+			itemCount = this.getItemCount(),
+			itemsPerPage = this.getItemsPerPage(),
+			itemIndex = -position / itemSize,
+			result;
+
+		if (direction < 0) {
+			result = Math.ceil(itemIndex);
+		} else {
+			result = Math.floor(itemIndex);
+		}
+
+		// limit the range
+		return Math.min(Math.max(result, 0), itemCount - itemsPerPage);
+	};
+
+	/**
+	 * Returns the closest full page index at given position taking into account the direction of movement.
+	 *
+	 * @method getClosestPageIndexAtPosition
+	 * @param {number} position Scroller position
+	 * @param {number} direction Move direction (-1/1)
+	 * @return {number} Closest page index
+	 */
+	FlowCarousel.prototype.getClosestPageIndexAtPosition = function(position, direction) {
+		var closestItemIndex = this.getClosestItemIndexAtPosition(position, direction),
+			itemsPerPage = this.getItemsPerPage(),
+			pageCount = this.getPageCount(),
+			pageIndex = closestItemIndex / itemsPerPage,
+			result;
+
+		if (direction < 0) {
+			result = Math.ceil(pageIndex);
+		} else {
+			result = Math.floor(pageIndex);
+		}
+
+		// limit the range
+		return Math.min(Math.max(result, 0), pageCount - 1);
 	};
 
 	/**
@@ -743,9 +840,10 @@ define([
 	 * @method navigateToItem
 	 * @param {number} itemIndex Item index to navigate to
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {boolean} [force=false] Force the animation even if we think we're already at given item index
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant) {
+	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant, force) {
 		instant = typeof instant === 'boolean' ? instant : false;
 
 		var itemCount = this._dataSource.getItemCount(),
@@ -769,7 +867,7 @@ define([
 		this._isAnimating = true;
 
 		// animate to the new item position index if it's different from current item index
-		if (itemIndex !== this._currentItemIndex) {
+		if (itemIndex !== this._currentItemIndex || force === true) {
 			// start animating to given item, this is an asynchronous process
 			animationPromise = this._animator.animateToItem(itemIndex, instant);
 		} else {
@@ -824,9 +922,10 @@ define([
 	 * @method navigateToPage
 	 * @param {number} pageIndex Page index to navigate to
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {boolean} [force=false] Force the animation even if we think we're already at given item index
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant) {
+	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force) {
 		instant = typeof instant === 'boolean' ? instant : false;
 
 		var itemIndex = pageIndex * this.getItemsPerPage(),
@@ -834,7 +933,7 @@ define([
 
 		this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_PAGE, [pageIndex, instant]);
 
-		promise = this.navigateToItem(itemIndex, instant);
+		promise = this.navigateToItem(itemIndex, instant, force);
 
 		promise.done(function() {
 			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_PAGE, [pageIndex, instant]);
@@ -1202,7 +1301,11 @@ define([
 
 			switch (type) {
 				case Config.Navigator.KEYBOARD:
-					navigator = new KeyboardNavigator(KeyboardNavigator.Mode.NAVIGATE_PAGE);
+					navigator = new KeyboardNavigator(this._config.keyboardNavigatorMode);
+				break;
+
+				case Config.Navigator.MOUSE:
+					navigator = new MouseNavigator(this._config.mouseNavigatorMode);
 				break;
 
 				default:

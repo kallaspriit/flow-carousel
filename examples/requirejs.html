@@ -60,7 +60,7 @@
 		<button class="btn" data-action="next-page" data-target="#basic-carousel">Next page</button>
 	</div>
 
-	<h2>Carousel wrap matches the largest item size</h2>
+	<h2>Carousel wrap matches the largest item size and navigate by item not page</h2>
 	<div id="match-largest-element-carousel" class="carousel carousel-match-largest-element">
 		<div class="carousel-item carousel-item-odd">0</div>
 		<div class="carousel-item">1</div>
@@ -225,7 +225,7 @@
 
 		CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
 			var deferred = new FlowCarousel.Deferred(),
-				requestDuration = 1000 + Math.random() * 4000; // wait 1..5 seconds
+				requestDuration = 1000; /// one second
 
 			// fake asyncronous request that takes some time to complete
 			window.setTimeout(function() {
@@ -260,7 +260,7 @@
 			verticalCarousel = new FlowCarousel(),
 			asyncCarousel = new FlowCarousel();
 
-		/*basicCarousel.init('#basic-carousel');
+		basicCarousel.init('#basic-carousel');
 
 		// set random heights for the items
 		$('#match-largest-element-carousel .carousel-item').each(function() {
@@ -268,7 +268,9 @@
 		});
 
 		matchLargestElementCarousel.init('#match-largest-element-carousel', {
-			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM
+			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM,
+			keyboardNavigatorMode: FlowCarousel.KeyboardNavigator.Mode.NAVIGATE_ITEM,
+			mouseNavigatorMode: FlowCarousel.MouseNavigator.Mode.NAVIGATE_ITEM
 		});
 
 		halfWidthCarousel.init('#half-width-carousel', {
@@ -283,7 +285,7 @@
 			orientation: FlowCarousel.Config.Orientation.VERTICAL,
 			useResponsiveLayout: false,
 			itemsPerPage: 10
-		});*/
+		});
 
 		asyncCarousel
 			.addListener(FlowCarousel.Event.INITIATING, function() {
@@ -370,6 +372,7 @@
 
 		// register globally for testing via console
 		window.c = asyncCarousel;
+		window.v = verticalCarousel;
 	});
 
 	</script>

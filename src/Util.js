@@ -52,6 +52,28 @@ define([
 			}
 
 			return false;
+		},
+
+		/**
+		 * Parses a css transform matrix.
+		 *
+		 * Input is something along the way of "matrix(1, 0, 0, 1, -1877, 0)".
+		 *
+		 * Returns objects with keys x, y.
+		 *
+		 * @method parseTransformMatrix
+		 * @param {string} matrix Matrix to parse
+		 * @return {object}
+		 */
+		parseTransformMatrix: function(matrix) {
+			var trimmed = matrix.substr(7).substr(0, matrix.length - 8),
+				noWhitespace = trimmed.replace(/ +/g, ''),
+				items = noWhitespace.split(/,/);
+
+			return {
+				x: parseInt(items[4], 10),
+				y: parseInt(items[5], 10)
+			};
 		}
 	};
 });

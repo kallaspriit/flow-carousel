@@ -14,6 +14,16 @@ define([
 	}
 
 	/**
+	 * Returns current absolute position.
+	 *
+	 * @method getCurrentPosition
+	 * @return {number}
+	 */
+	AbstractAnimator.prototype.getCurrentPosition = function() {
+		throw new Error('Not implemented');
+	};
+
+	/**
 	 * Animates the carousel to given item index position.
 	 *
 	 * @method animateToItem
@@ -23,6 +33,20 @@ define([
 	 */
 	AbstractAnimator.prototype.animateToItem = function(itemIndex, instant) {
 		void(itemIndex, instant);
+
+		throw new Error('Not implemented');
+	};
+
+	/**
+	 * Animates the carousel to given absolute position.
+	 *
+	 * @method animateToPosition
+	 * @param {number} position Requested position
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @return {Deferred.Promise}
+	 */
+	AbstractAnimator.prototype.animateToPosition = function(position, instant) {
+		void(position, instant);
 
 		throw new Error('Not implemented');
 	};

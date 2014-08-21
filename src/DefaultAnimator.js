@@ -2,8 +2,9 @@ define([
 	'jquery',
 	'AbstractAnimator',
 	'Config',
+	'Util',
 	'Deferred'
-], function($, AbstractAnimator, Config, Deferred) {
+], function($, AbstractAnimator, Config, Util, Deferred) {
 	'use strict';
 
 	/**
@@ -23,6 +24,25 @@ define([
 	DefaultAnimator.prototype = Object.create(AbstractAnimator.prototype);
 
 	/**
+	 * Returns current absolute position.
+	 *
+	 * @method getCurrentPosition
+	 * @return {number}
+	 */
+	AbstractAnimator.prototype.getCurrentPosition = function() {
+		var $scrollerWrap = $(this._carousel.getScrollerWrap()),
+			transformMatrix = $scrollerWrap.css('transform'),
+			transformOffset = Util.parseTransformMatrix(transformMatrix),
+			orientation = this._carousel.getOrientation();
+
+		if (orientation === Config.Orientation.HORIZONTAL) {
+			return transformOffset.x;
+		} else {
+			return transformOffset.y;
+		}
+	};
+
+	/**
 	 * Animates the carousel to given item index position.
 	 *
 	 * @method animateToItem
@@ -31,26 +51,41 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
-		var deferred = new Deferred(),
-			orientation = this._carousel.getOrientation(),
-			itemSize = this._carousel.getItemSize(),
+		var itemSize = this._carousel.getItemSize(),
 			itemsPerPage = this._carousel.getItemsPerPage(),
 			itemMargin = this._carousel.getConfig().margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			translatePosition = Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem)),
+			position = Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem));
+
+		return this.animateToPosition(-position, instant);
+	};
+
+	/**
+	 * Animates the carousel to given absolute position.
+	 *
+	 * @method animateToPosition
+	 * @param {number} position Requested position
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @return {Deferred.Promise}
+	 */
+	DefaultAnimator.prototype.animateToPosition = function(position, instant) {
+		var deferred = new Deferred(),
+			orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			instantAnimationClass = this._carousel.getConfig().getClassName('instantAnimation'),
 			translateCommand;
 
 		// the translate command is different for horizontal and vertical carousels
 		if (orientation === Config.Orientation.HORIZONTAL) {
-			translateCommand = 'translate3d(' + -translatePosition + 'px,0,0)';
+			translateCommand = 'translate3d(' + position + 'px,0,0)';
 		} else {
-			translateCommand = 'translate3d(0,' + -translatePosition + 'px,0)';
+			translateCommand = 'translate3d(0,' + position + 'px,0)';
 		}
 
 		if (instant === true) {
 			$scrollerWrap.addClass(instantAnimationClass);
+		} else {
+			$scrollerWrap.removeClass(instantAnimationClass);
 		}
 
 		// apply the translate

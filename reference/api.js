@@ -14,6 +14,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "HtmlDataSource",
         "HtmlRenderer",
         "KeyboardNavigator",
+        "MouseNavigator",
         "Util"
     ],
     "modules": [],

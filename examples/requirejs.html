@@ -318,6 +318,21 @@
 			})
 			.addListener(FlowCarousel.Event.ABORTED_ITEMS, function(startIndex, endIndex) {
 				console.log('async carousel aborted loading items', startIndex, endIndex);
+			})
+			.addListener(FlowCarousel.Event.NAVIGATING_TO_ITEM, function(itemIndex, instant) {
+				console.log('async carousel navigating to item', itemIndex, instant);
+			})
+			.addListener(FlowCarousel.Event.NAVIGATED_TO_ITEM, function(itemIndex, instant) {
+				console.log('async carousel navigated to item', itemIndex, instant);
+			})
+			.addListener(FlowCarousel.Event.NAVIGATING_TO_PAGE, function(pageIndex, instant) {
+				console.log('async carousel navigating to page', pageIndex, instant);
+			})
+			.addListener(FlowCarousel.Event.NAVIGATED_TO_PAGE, function(pageIndex, instant) {
+				console.log('async carousel navigated to page', pageIndex, instant);
+			})
+			.addListener(FlowCarousel.Event.LAYOUT_CHANGED, function() {
+				console.log('async carousel layout changed');
 			});
 
 		asyncCarousel.init('#async-carousel', {

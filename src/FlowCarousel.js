@@ -359,21 +359,44 @@ define([
 	 * 				   was loaded and rendered
 	 * @param {string} Event.ABORTED_ITEMS='aborted-items' [startIndex, endIndex] Emitted when loading a range of items
 	 * 				   was aborted
+	 * @param {string} Event.NAVIGATING_TO_ITEM='navigating-to-item' [itemIndex, instant] Emitted when starting to
+	 * 				   navigate to a carousel item index
+	 * @param {string} Event.NAVIGATED_TO_ITEM='navigated-to-item' [itemIndex, instant] Emitted when finished
+	 * 				   navigate to a carousel item index including animation
+	 * @param {string} Event.NAVIGATING_TO_PAGE='navigating-to-page' [pageIndex, instant] Emitted when starting to
+	 * 				   navigate to a carousel item index
+	 * @param {string} Event.NAVIGATED_TO_PAGE='navigated-to-page' [pageIndex, instant] Emitted when finished
+	 * 				   navigate to a carousel item index including animation
+	 * @param {string} Event.LAYOUT_CHANGED='layout-changed' Emitted when the layout is re-calculated
 	 * @type {object}
 	 */
 	FlowCarousel.Event = {
 		INITIATING: 'initiating',
 		INITIATED: 'initiated',
 		STARTUP_ITEMS_RENDERED: 'startup-items-rendered',
+
 		LOADING_ITEMS: 'loading-items',
 		LOADED_ITEMS: 'loaded-items',
-		ABORTED_ITEMS: 'aborted-items'
+		ABORTED_ITEMS: 'aborted-items',
+
+		NAVIGATING_TO_ITEM: 'navigating-to-item',
+		NAVIGATED_TO_ITEM: 'navigated-to-item',
+
+		NAVIGATING_TO_PAGE: 'navigating-to-page',
+		NAVIGATED_TO_PAGE: 'navigated-to-page',
+
+		LAYOUT_CHANGED: 'layout-changed'
 	};
 
 	/**
 	 * Initializes the carousel component.
 	 *
 	 * Returns a promise that will be resolved once the carousel has been initiated.
+	 *
+	 * Emits:
+	 * - FlowCarousel.Event.INITIATING at the start of the procedure
+	 * - FlowCarousel.Event.INITIATED after initiation but the initial data may not have loaded yet
+	 * - FlowCarousel.Event.STARTUP_ITEMS_RENDERED after the initial set of data has rendered
 	 *
 	 * @method init
 	 * @param {string} selector Selector of elements to turn into a carousel
@@ -447,11 +470,7 @@ define([
 		promise.done(function() {
 			this.emitEvent(FlowCarousel.Event.INITIATED);
 
-			this._validateItemsToRender().done(function() {
-				if (!this._startupItemsRenderedEmitted) {
-					this.emitEvent(FlowCarousel.Event.STARTUP_ITEMS_RENDERED);
-				}
-			}.bind(this));
+			this._validateItemsToRender();
 		}.bind(this));
 
 		return promise;
@@ -717,12 +736,18 @@ define([
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation
+	 * - FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation
+	 *
 	 * @method navigateToItem
 	 * @param {number} itemIndex Item index to navigate to
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant) {
+		instant = typeof instant === 'boolean' ? instant : false;
+
 		var itemCount = this._dataSource.getItemCount(),
 			animationPromise;
 
@@ -733,10 +758,11 @@ define([
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
-		// TODO what if the carousel is already animating
 		if (this._isAnimating) {
 			return this._activeAnimationPromise;
 		}
+
+		this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_ITEM, [itemIndex, instant]);
 
 		// update the target item index
 		this._targetItemIndex = itemIndex;
@@ -772,6 +798,8 @@ define([
 
 			// set the scroller wrap size to the largest currently visible item size
 			this._setScrollerSizeToLargestVisibleChildSize();
+
+			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_ITEM, [itemIndex, instant]);
 		}.bind(this));
 
 		// store the promise so it can be returned when requesting a new animation while the last still playing
@@ -789,14 +817,30 @@ define([
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure
+	 * - FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page
+	 *
 	 * @method navigateToPage
 	 * @param {number} pageIndex Page index to navigate to
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToPage = function(pageIndex) {
-		var itemIndex = pageIndex * this.getItemsPerPage();
+	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant) {
+		instant = typeof instant === 'boolean' ? instant : false;
 
-		return this.navigateToItem(itemIndex);
+		var itemIndex = pageIndex * this.getItemsPerPage(),
+			promise;
+
+		this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_PAGE, [pageIndex, instant]);
+
+		promise = this.navigateToItem(itemIndex, instant);
+
+		promise.done(function() {
+			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_PAGE, [pageIndex, instant]);
+		}.bind(this));
+
+		return promise;
 	};
 
 	/**
@@ -804,16 +848,21 @@ define([
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation
+	 * - FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation
+	 *
 	 * @method navigateToNextItem
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToNextItem = function() {
+	FlowCarousel.prototype.navigateToNextItem = function(instant) {
 		var currentItemIndex = this.getCurrentItemIndex(),
 			itemsPerPage = this.getItemsPerPage(),
 			itemCount = this.getItemCount(),
 			targetItemIndex = Math.min(currentItemIndex + 1, itemCount - itemsPerPage);
 
-		return this.navigateToItem(targetItemIndex);
+		return this.navigateToItem(targetItemIndex, instant);
 	};
 
 	/**
@@ -821,14 +870,19 @@ define([
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation
+	 * - FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation
+	 *
 	 * @method navigateToPreviousItem
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToPreviousItem = function() {
+	FlowCarousel.prototype.navigateToPreviousItem = function(instant) {
 		var currentItemIndex = this.getCurrentItemIndex(),
 			targetItemIndex = Math.max(currentItemIndex - 1, 0);
 
-		return this.navigateToItem(targetItemIndex);
+		return this.navigateToItem(targetItemIndex, instant);
 	};
 
 	/**
@@ -836,15 +890,20 @@ define([
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure
+	 * - FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page
+	 *
 	 * @method navigateToNextPage
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToNextPage = function() {
+	FlowCarousel.prototype.navigateToNextPage = function(instant) {
 		var currentPageIndex = this.getCurrentPageIndex(),
 			pageCount = this.getPageCount(),
 			targetPageIndex = Math.min(currentPageIndex + 1, pageCount - 1);
 
-		return this.navigateToPage(targetPageIndex);
+		return this.navigateToPage(targetPageIndex, instant);
 	};
 
 	/**
@@ -852,14 +911,19 @@ define([
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure
+	 * - FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page
+	 *
 	 * @method navigateToPreviousPage
+	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToPreviousPage = function() {
+	FlowCarousel.prototype.navigateToPreviousPage = function(instant) {
 		var currentPageIndex = this.getCurrentPageIndex(),
 			targetPageIndex = Math.max(currentPageIndex - 1, 0);
 
-		return this.navigateToPage(targetPageIndex);
+		return this.navigateToPage(targetPageIndex, instant);
 	};
 
 	/**
@@ -1084,6 +1148,9 @@ define([
 	 *
 	 * Since fetching and rendering items can be asyncronous, this method returns a promise.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.LAYOUT_CHANGED when the layout changes
+	 *
 	 * @method _setupLayout
 	 * @param {DOMelement} element Element to setup items in
 	 * @param {Config/Orientation:property} orientation Orientation to use
@@ -1098,7 +1165,8 @@ define([
 			totalSize = itemCount * itemSize,
 			sizeProp = orientation === Config.Orientation.HORIZONTAL
 				? 'width'
-				: 'height';
+				: 'height',
+			deferred = new Deferred();
 
 		// define the scroller wrap size to fit all items
 		$(this._scrollerWrap).css(sizeProp, totalSize);
@@ -1108,8 +1176,14 @@ define([
 			this._renderTargetIndexPlaceholders();
 		}
 
-		// setting up layout is syncronous for now
-		return (new Deferred()).resolve().promise();
+		deferred.done(function() {
+			this.emitEvent(FlowCarousel.Event.LAYOUT_CHANGED);
+		}.bind(this));
+
+		// setting up layout is synchronous for now
+		deferred.resolve();
+
+		return deferred.promise();
 	};
 
 	/**
@@ -1218,6 +1292,12 @@ define([
 	/**
 	 * Renders a range of carousel items.
 	 *
+	 * Emits:
+	 * - FlowCarousel.Event.LOADING_ITEMS [startIndex, endIndex] before starting to load a range of items
+	 * - FlowCarousel.Event.ABORTED_ITEMS [startIndex, endIndex] if loading or a range of items was aborted
+	 * - FlowCarousel.Event.LOADED_ITEMS [startIndex, endIndex, items] after loading and rendering a range of items
+	 * - FlowCarousel.Event.STARTUP_ITEMS_RENDERED if the rendered range of items was the first
+	 *
 	 * @method _renderItemRange
 	 * @param {number} startIndex Range start index
 	 * @param {number} endIndex Range end index
@@ -1269,6 +1349,8 @@ define([
 					// it's possible that the initial first page data loading was cancelled
 					if (!this._startupItemsRenderedEmitted) {
 						this.emitEvent(FlowCarousel.Event.STARTUP_ITEMS_RENDERED);
+
+						this._startupItemsRenderedEmitted = true;
 					}
 
 					this.emitEvent(FlowCarousel.Event.LOADED_ITEMS, [startIndex, endIndex, items]);
@@ -1594,10 +1676,10 @@ define([
 		// reset current state
 		this._reset();
 
-		// pre-navigate to the correct position
+		// pre-navigate to the correct position, this triggers the re-render as well
 		this.navigateToItem(lastItemIndex, true);
 
-		// re-do the layout and render items
+		// re-do the layout
 		return this._setupLayout(element, orientation);
 	};
 

@@ -345,6 +345,118 @@ define([
 			});
 		});
 
+		it('emits "INITIATING" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.INITIATING, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+		});
+
+		it('emits "INITIATED" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.INITIATED, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+		});
+
+		it('emits STARTUP_ITEMS_RENDERED event', function (done) {
+			var customDataSource = new CustomDataSource(),
+				customRenderer = new CustomRenderer();
+
+			carousel.addListener(FlowCarousel.Event.STARTUP_ITEMS_RENDERED, function() {
+				done();
+			});
+
+			carousel.init('.carousel', {
+				dataSource: customDataSource,
+				renderer: customRenderer
+			});
+		});
+
+		it('emits "LOADING_ITEMS" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.LOADING_ITEMS, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+		});
+
+		it('emits "LOADED_ITEMS" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.LOADED_ITEMS, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+		});
+
+		it('emits "ABORTED_ITEMS" event', function (done) {
+			var customDataSource = new CustomDataSource(),
+				customRenderer = new CustomRenderer();
+
+			carousel.addListener(FlowCarousel.Event.ABORTED_ITEMS, function() {
+				done();
+			});
+
+			carousel.init('.carousel', {
+				dataSource: customDataSource,
+				renderer: customRenderer
+			});
+
+			carousel.navigateToPage(1);
+		});
+
+		it('emits "NAVIGATING_TO_ITEM" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.NAVIGATING_TO_ITEM, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+
+			carousel.navigateToItem(1);
+		});
+
+		it('emits "NAVIGATED_TO_ITEM" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.NAVIGATED_TO_ITEM, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+
+			carousel.navigateToItem(1);
+		});
+
+		it('emits "NAVIGATING_TO_PAGE" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.NAVIGATING_TO_PAGE, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+
+			carousel.navigateToPage(1);
+		});
+
+		it('emits "NAVIGATED_TO_PAGE" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.NAVIGATED_TO_PAGE, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+
+			carousel.navigateToPage(1);
+		});
+
+		it('emits "LAYOUT_CHANGED" event', function (done) {
+			carousel.addListener(FlowCarousel.Event.LAYOUT_CHANGED, function() {
+				done();
+			});
+
+			carousel.init('.carousel');
+
+			$('.carousel').width('400px');
+		});
+
 		it('renders placeholders for async custom data source', function (done) {
 			var customDataSource = new CustomDataSource(),
 				customRenderer = new CustomRenderer();

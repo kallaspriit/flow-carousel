@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>MouseNavigator - FlowCarousel</title>
+    <title>DragNavigator - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
+                <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
+            
                 <li><a href="../classes/EventEmitter Manages event registering and emitting..html">EventEmitter Manages event registering and emitting.</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
@@ -66,8 +68,6 @@
                 <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
-            
-                <li><a href="../classes/MouseNavigator.html">MouseNavigator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -110,7 +110,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>MouseNavigator Class</h1>
+                        <h1>DragNavigator Class</h1>
 <div class="box meta">
     
 
@@ -122,7 +122,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_MouseNavigator.js.html#l8"><code>src\MouseNavigator.js:8</code></a>
+            Defined in: <a href="../files/src_DragNavigator.js.html#l8"><code>src\DragNavigator.js:8</code></a>
         </div>
     
 
@@ -134,15 +134,15 @@
 
 
 <div class="box intro">
-    <p>Mouse navigator.</p>
+    <p>Drag navigator.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_MouseNavigator" class="method item">
-    <h3 class="name"><code>MouseNavigator</code></h3>
+        <div id="method_DragNavigator" class="method item">
+    <h3 class="name"><code>DragNavigator</code></h3>
 
     
         <div class="args">
@@ -150,7 +150,7 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[mode=MouseNavigator.Mode.NAVIGATE_PAGE]</code>
+                        <code class="optional">[mode=DragNavigator.Mode.NAVIGATE_PAGE]</code>
                     
                 </li>
             
@@ -183,7 +183,7 @@
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l8"><code>src\MouseNavigator.js:8</code></a>
+        <a href="../files/src_DragNavigator.js.html#l8"><code>src\DragNavigator.js:8</code></a>
         
         </p>
 
@@ -205,8 +205,8 @@
             
                 <li class="param">
                     
-                        <code class="param-name optional">[mode=MouseNavigator.Mode.NAVIGATE_PAGE]</code>
-                        <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+                        <code class="param-name optional">[mode=DragNavigator.Mode.NAVIGATE_PAGE]</code>
+                        <span class="type"><a href="../classes/DragNavigator.html#property_Mode" class="crosslink">Mode</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -349,10 +349,20 @@
                     
                 </li>
             
+                <li class="arg">
+                    
+                        <code>oppositePosition</code>
+                    
+                </li>
+            
             </ul><span class="paren">)</span>
         </div>
     
 
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
     
 
     
@@ -380,7 +390,7 @@
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l113"><code>src\MouseNavigator.js:113</code></a>
+        <a href="../files/src_DragNavigator.js.html#l154"><code>src\DragNavigator.js:154</code></a>
         
         </p>
 
@@ -410,7 +420,23 @@
                     
 
                     <div class="param-description">
-                        <p>Mouse/finger position</p>
+                        <p>Drag position</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">oppositePosition</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Drag opposite position (y for horizontal, x for vertical)</p>
 
                     </div>
 
@@ -421,6 +447,20 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+                    
+                    <p>Should the event propagate</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -434,6 +474,10 @@
         <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
     
 
     
@@ -461,7 +505,7 @@
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l154"><code>src\MouseNavigator.js:154</code></a>
+        <a href="../files/src_DragNavigator.js.html#l220"><code>src\DragNavigator.js:220</code></a>
         
         </p>
 
@@ -478,6 +522,20 @@
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+                    
+                    <p>Should the event propagate</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -497,10 +555,20 @@
                     
                 </li>
             
+                <li class="arg">
+                    
+                        <code>oppositePosition</code>
+                    
+                </li>
+            
             </ul><span class="paren">)</span>
         </div>
     
 
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
     
 
     
@@ -528,7 +596,7 @@
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l126"><code>src\MouseNavigator.js:126</code></a>
+        <a href="../files/src_DragNavigator.js.html#l178"><code>src\DragNavigator.js:178</code></a>
         
         </p>
 
@@ -558,7 +626,23 @@
                     
 
                     <div class="param-description">
-                        <p>Mouse/finger position</p>
+                        <p>Drag position</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">oppositePosition</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Drag opposite position (y for horizontal, x for vertical)</p>
 
                     </div>
 
@@ -569,6 +653,20 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+                    
+                    <p>Should the event propagate</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -609,7 +707,7 @@
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l74"><code>src\MouseNavigator.js:74</code></a>
+        <a href="../files/src_DragNavigator.js.html#l75"><code>src\DragNavigator.js:75</code></a>
         
         </p>
 
@@ -641,7 +739,7 @@
 
     
         <span class="returns-inline">
-            <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+            <span class="type"><a href="../classes/DragNavigator.html#property_Mode" class="crosslink">Mode</a></span>
         </span>
     
 
@@ -668,7 +766,7 @@
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l60"><code>src\MouseNavigator.js:60</code></a>
+        <a href="../files/src_DragNavigator.js.html#l61"><code>src\DragNavigator.js:61</code></a>
         
         </p>
 
@@ -679,9 +777,9 @@
     </div>
 
     <div class="description">
-        <p>Returns current mouse navigator mode.</p>
-<p>The mode is either MouseNavigator/Mode/NAVIGATE_PAGE:property or
-MouseNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
+        <p>Returns current drag navigator mode.</p>
+<p>The mode is either DragNavigator/Mode/NAVIGATE_PAGE:property or
+DragNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
 either the page or navigate one item at a time.</p>
 
     </div>
@@ -695,7 +793,7 @@ either the page or navigate one item at a time.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>:
+                        <span class="type"><a href="../classes/DragNavigator.html#property_Mode" class="crosslink">Mode</a></span>:
                     
                 
             </div>
@@ -835,7 +933,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l42"><code>src\MouseNavigator.js:42</code></a>
+        <a href="../files/src_DragNavigator.js.html#l43"><code>src\DragNavigator.js:43</code></a>
         
         </p>
 
@@ -846,9 +944,9 @@ either the page or navigate one item at a time.</p>
     </div>
 
     <div class="description">
-        <p>Returns current mouse navigator mode.</p>
-<p>The mode is either MouseNavigator/Mode/NAVIGATE_PAGE:property or
-MouseNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
+        <p>Returns current drag navigator mode.</p>
+<p>The mode is either DragNavigator/Mode/NAVIGATE_PAGE:property or
+DragNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
 either the page or navigate one item at a time.</p>
 
     </div>
@@ -862,7 +960,7 @@ either the page or navigate one item at a time.</p>
                 <li class="param">
                     
                         <code class="param-name">mode</code>
-                        <span class="type"><a href="../classes/MouseNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+                        <span class="type"><a href="../classes/DragNavigator.html#property_Mode" class="crosslink">Mode</a></span>
                     
 
                     
@@ -916,7 +1014,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_MouseNavigator.js.html#l29"><code>src\MouseNavigator.js:29</code></a>
+        <a href="../files/src_DragNavigator.js.html#l30"><code>src\DragNavigator.js:30</code></a>
         
         </p>
 

@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
+                <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
+            
                 <li><a href="../classes/EventEmitter Manages event registering and emitting..html">EventEmitter Manages event registering and emitting.</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
@@ -66,8 +68,6 @@
                 <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
-            
-                <li><a href="../classes/MouseNavigator.html">MouseNavigator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -182,13 +182,21 @@ define([
 		 * @return {object}
 		 */
 		parseTransformMatrix: function(matrix) {
-			var trimmed = matrix.substr(7).substr(0, matrix.length - 8),
+			var offset = 7,
+				largeMatrix = false;
+
+			if (matrix.substring(0, 8) === &#x27;matrix3d&#x27;) {
+				offset = 9;
+				largeMatrix = true;
+			}
+
+			var trimmed = matrix.substr(offset).substr(0, matrix.length - offset - 1),
 				noWhitespace = trimmed.replace(/ +/g, &#x27;&#x27;),
 				items = noWhitespace.split(/,/);
 
 			return {
-				x: parseInt(items[4], 10),
-				y: parseInt(items[5], 10)
+				x: parseInt(largeMatrix ? items[12] : items[4], 10),
+				y: parseInt(largeMatrix ? items[13] : items[5], 10)
 			};
 		}
 	};

@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
+                <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
+            
                 <li><a href="../classes/EventEmitter Manages event registering and emitting..html">EventEmitter Manages event registering and emitting.</a></li>
             
                 <li><a href="../classes/FlowCarousel.html">FlowCarousel</a></li>
@@ -66,8 +68,6 @@
                 <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
-            
-                <li><a href="../classes/MouseNavigator.html">MouseNavigator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -248,7 +248,8 @@ define([
 			size: 320,
 			itemsPerPage: 2
 		}, {
-			size: 768,
+			//size: 768,
+			size: 560, // TODO remove
 			itemsPerPage: 3
 		}, {
 			size: 1224,
@@ -291,7 +292,7 @@ define([
 		 */
 		this.navigators = [
 			Config.Navigator.KEYBOARD,
-			Config.Navigator.MOUSE
+			Config.Navigator.DRAG
 		];
 
 		/**
@@ -304,25 +305,25 @@ define([
 		this.keyboardNavigatorMode = &#x27;navigate-page&#x27;;
 
 		/**
-		 * Mouse navigator mode to use.
+		 * Drag navigator mode to use.
 		 *
-		 * @property mouseNavigatorMode
-		 * @type {MouseNavigator/Mode:property}
-		 * @default MouseNavigator.Mode.NAVIGATE_PAGE
+		 * @property dragNavigatorMode
+		 * @type {DragNavigator/Mode:property}
+		 * @default DragNavigator.Mode.NAVIGATE_PAGE
 		 */
-		this.mouseNavigatorMode = &#x27;navigate-page&#x27;;
-		//this.mouseNavigatorMode = &#x27;navigate-item&#x27;;
+		this.dragNavigatorMode = &#x27;navigate-page&#x27;;
+		//this.dragNavigatorMode = &#x27;navigate-item&#x27;;
 
 		/**
 		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
 		 * effect of only applying the change partially. Set to zero to disable this feature.
 		 *
 		 *
-		 * @property mouseNavigatorOverEdgeDragPositionMultiplier
+		 * @property dragNavigatorOverEdgeDragPositionMultiplier
 		 * @type {number}
 		 * @default 0.2
 		 */
-		this.mouseNavigatorOverEdgeDragPositionMultiplier = 0.2;
+		this.dragNavigatorOverEdgeDragPositionMultiplier = 0.2;
 
 		/**
 		 * The css classes prefix to use.
@@ -483,7 +484,7 @@ define([
 	 */
 	Config.Navigator = {
 		KEYBOARD: &#x27;keyboard&#x27;,
-		MOUSE: &#x27;mouse&#x27;
+		DRAG: &#x27;drag&#x27;
 	};
 
 	/**

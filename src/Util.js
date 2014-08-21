@@ -66,13 +66,21 @@ define([
 		 * @return {object}
 		 */
 		parseTransformMatrix: function(matrix) {
-			var trimmed = matrix.substr(7).substr(0, matrix.length - 8),
+			var offset = 7,
+				largeMatrix = false;
+
+			if (matrix.substring(0, 8) === 'matrix3d') {
+				offset = 9;
+				largeMatrix = true;
+			}
+
+			var trimmed = matrix.substr(offset).substr(0, matrix.length - offset - 1),
 				noWhitespace = trimmed.replace(/ +/g, ''),
 				items = noWhitespace.split(/,/);
 
 			return {
-				x: parseInt(items[4], 10),
-				y: parseInt(items[5], 10)
+				x: parseInt(largeMatrix ? items[12] : items[4], 10),
+				y: parseInt(largeMatrix ? items[13] : items[5], 10)
 			};
 		}
 	};

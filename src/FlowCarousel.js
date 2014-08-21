@@ -10,7 +10,7 @@ define([
 	'HtmlRenderer',
 	'AbstractNavigator',
 	'KeyboardNavigator',
-	'MouseNavigator',
+	'DragNavigator',
 	'Deferred',
 	'Util',
 	'EventEmitter',
@@ -26,7 +26,7 @@ define([
 	HtmlRenderer,
 	AbstractNavigator,
 	KeyboardNavigator,
-	MouseNavigator,
+	DragNavigator,
 	Deferred,
 	Util,
 	EventEmitter
@@ -328,12 +328,12 @@ define([
 	FlowCarousel.KeyboardNavigator = KeyboardNavigator;
 
 	/**
-	 * Reference to the {{#crossLink "MouseNavigator"}}{{/crossLink}} class.
+	 * Reference to the {{#crossLink "DragNavigator"}}{{/crossLink}} class.
 	 *
-	 * @property MouseNavigator
-	 * @type {MouseNavigator}
+	 * @property DragNavigator
+	 * @type {DragNavigator}
 	 */
-	FlowCarousel.MouseNavigator = MouseNavigator;
+	FlowCarousel.DragNavigator = DragNavigator;
 
 	/**
 	 * Reference to the {{#crossLink "Deferred"}}{{/crossLink}} class.
@@ -669,6 +669,32 @@ define([
 	};
 
 	/**
+	 * Returns current item absolute position.
+	 *
+	 * @method getCurrentPosition
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getCurrentItemPosition = function() {
+		return this._animator.getCurrentPosition();
+	};
+
+	/**
+	 * Returns item position at given index.
+	 *
+	 * @method getItemPositionByIndex
+	 * @param {number} itemIndex Item index
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemPositionByIndex = function(itemIndex) {
+		var itemSize = this.getItemSize(),
+			itemsPerPage = this.getItemsPerPage(),
+			itemMargin = this._config.margin,
+			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage);
+
+		return Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem));
+	};
+
+	/**
 	 * Returns the closest full item index at given position taking into account the direction of movement.
 	 *
 	 * @method getClosestItemIndexAtPosition
@@ -680,7 +706,9 @@ define([
 		var itemSize = this.getItemSize(),
 			itemCount = this.getItemCount(),
 			itemsPerPage = this.getItemsPerPage(),
-			itemIndex = -position / itemSize,
+			itemMargin = this._config.margin,
+			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
+			itemIndex = -position / (itemSize + (itemMargin - gapPerItem)),
 			result;
 
 		if (direction < 0) {
@@ -845,8 +873,11 @@ define([
 	 */
 	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant, force) {
 		instant = typeof instant === 'boolean' ? instant : false;
+		force = typeof force === 'boolean' ? force : false;
 
 		var itemCount = this._dataSource.getItemCount(),
+			isSameItemIndex = itemIndex === this._currentItemIndex,
+			fakeAnimationDeferred = null,
 			animationPromise;
 
 		// validate index range
@@ -856,6 +887,7 @@ define([
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
+		// return the existing animation promise if already animating
 		if (this._isAnimating) {
 			return this._activeAnimationPromise;
 		}
@@ -867,14 +899,14 @@ define([
 		this._isAnimating = true;
 
 		// animate to the new item position index if it's different from current item index
-		if (itemIndex !== this._currentItemIndex || force === true) {
+		if (!isSameItemIndex || force === true) {
 			// start animating to given item, this is an asynchronous process
 			animationPromise = this._animator.animateToItem(itemIndex, instant);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
-			animationPromise = new Deferred();
+			fakeAnimationDeferred = new Deferred();
 
-			animationPromise.resolve();
+			animationPromise = fakeAnimationDeferred.promise();
 		}
 
 		// render placeholders that are later replaced with real loaded items
@@ -899,6 +931,11 @@ define([
 
 			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_ITEM, [itemIndex, instant]);
 		}.bind(this));
+
+		// resolve the instant fake animation
+		if (fakeAnimationDeferred !== null) {
+			fakeAnimationDeferred.resolve();
+		}
 
 		// store the promise so it can be returned when requesting a new animation while the last still playing
 		this._activeAnimationPromise = animationPromise;
@@ -1304,8 +1341,8 @@ define([
 					navigator = new KeyboardNavigator(this._config.keyboardNavigatorMode);
 				break;
 
-				case Config.Navigator.MOUSE:
-					navigator = new MouseNavigator(this._config.mouseNavigatorMode);
+				case Config.Navigator.DRAG:
+					navigator = new DragNavigator(this._config.dragNavigatorMode);
 				break;
 
 				default:

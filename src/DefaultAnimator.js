@@ -51,11 +51,7 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
-		var itemSize = this._carousel.getItemSize(),
-			itemsPerPage = this._carousel.getItemsPerPage(),
-			itemMargin = this._carousel.getConfig().margin,
-			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			position = Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem));
+		var position = this._carousel.getItemPositionByIndex(itemIndex);
 
 		return this.animateToPosition(-position, instant);
 	};
@@ -66,14 +62,16 @@ define([
 	 * @method animateToPosition
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToPosition = function(position, instant) {
-		var deferred = new Deferred(),
-			orientation = this._carousel.getOrientation(),
+	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+		var orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			instantAnimationClass = this._carousel.getConfig().getClassName('instantAnimation'),
-			translateCommand;
+			currentPosition,
+			translateCommand,
+			deferred;
 
 		// the translate command is different for horizontal and vertical carousels
 		if (orientation === Config.Orientation.HORIZONTAL) {
@@ -91,20 +89,22 @@ define([
 		// apply the translate
 		$scrollerWrap.css('transform', translateCommand);
 
-		// wait for the transition to end and then resolve the deferred
-		$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
-			if (instant === true) {
-				$scrollerWrap.removeClass(instantAnimationClass);
-			}
+		// remove the deferred overhead where not required
+		if (noDeferred) {
+			return;
+		}
 
+		deferred = new Deferred();
+		currentPosition = this.getCurrentPosition();
+
+		// if the position is same as current then resolve immediately
+		if (instant || position === currentPosition) {
 			deferred.resolve();
-		});
-
-		// the transition end event does not get automatically triggered when using 0ms transitions
-		if (instant === true) {
-			window.setTimeout(function() {
-				$scrollerWrap.trigger('transitionend');
-			}, 0);
+		} else {
+			// wait for the transition to end and then resolve the deferred
+			$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
+				deferred.resolve();
+			});
 		}
 
 		return deferred.promise();

@@ -2,6 +2,8 @@
 <html>
 <head lang="en">
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1 minimum-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="HandheldFriendly" content="True">
 	<title>FlowCarousel RequireJS example</title>
 	<link rel="stylesheet" href="../dist/flow-carousel.css">
 	<link rel="stylesheet" href="examples.css">
@@ -270,7 +272,7 @@
 		matchLargestElementCarousel.init('#match-largest-element-carousel', {
 			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM,
 			keyboardNavigatorMode: FlowCarousel.KeyboardNavigator.Mode.NAVIGATE_ITEM,
-			mouseNavigatorMode: FlowCarousel.MouseNavigator.Mode.NAVIGATE_ITEM
+			dragNavigatorMode: FlowCarousel.DragNavigator.Mode.NAVIGATE_ITEM
 		});
 
 		halfWidthCarousel.init('#half-width-carousel', {

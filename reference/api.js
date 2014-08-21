@@ -9,12 +9,12 @@ YUI.add("yuidoc-meta", function(Y) {
         "Config",
         "DefaultAnimator",
         "Deferred",
+        "DragNavigator",
         "EventEmitter Manages event registering and emitting.",
         "FlowCarousel",
         "HtmlDataSource",
         "HtmlRenderer",
         "KeyboardNavigator",
-        "MouseNavigator",
         "Util"
     ],
     "modules": [],

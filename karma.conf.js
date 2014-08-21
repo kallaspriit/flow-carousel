@@ -62,7 +62,8 @@ module.exports = function(config) {
 			'PhantomJS',
 			'Chrome',
 			'Firefox',
-			'IE'
+			'IE',
+			//'Opera'
 		],
 
 		// Loggers to use

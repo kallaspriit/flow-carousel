@@ -8,11 +8,24 @@ define([
 
 	describe('DragNavigator', function () {
 
+		// create the fixture and carousel instance
 		beforeEach(function() {
 			window.loadFixture('test.html');
 
 			// create the carousel instance and initiate it
 			carousel = new FlowCarousel();
+		});
+
+		// release it after
+		afterEach(function() {
+			// kill the carousel if it's still alive
+			if (carousel !== null && carousel.isInitiated() && !carousel.isDestroyed()) {
+				carousel.destroy();
+			}
+
+			carousel = null;
+
+			$('#fixture-wrap').html('<em>test completed</em>');
 		});
 
 		it('is loaded by default', function () {
@@ -95,10 +108,10 @@ define([
 								expect(carousel.getCurrentPageIndex()).toEqual(1);
 
 								done();
-							}, 500);
-						}, 500);
-					}, 500);
-				}, 500);
+							}, 1500);
+						}, 1500);
+					}, 10);
+				}, 10);
 			});
 		});
 
@@ -147,10 +160,10 @@ define([
 								expect(carousel.getCurrentItemIndex()).toEqual(1);
 
 								done();
-							}, 500);
-						}, 500);
-					}, 500);
-				}, 500);
+							}, 1500);
+						}, 1500);
+					}, 10);
+				}, 10);
 			});
 		});
 
@@ -200,8 +213,8 @@ define([
 
 						done();
 					}, 500);
-				}, 500);
-			}, 500);
+				}, 50);
+			}, 50);
 		});
 
 		it('dragging left from first page navigates back to first page', function (done) {
@@ -247,8 +260,8 @@ define([
 
 						done();
 					}, 500);
-				}, 500);
-			}, 500);
+				}, 50);
+			}, 50);
 		});
 
 		it('other than left mouse button does not have effect', function (done) {
@@ -294,8 +307,8 @@ define([
 
 						done();
 					}, 500);
-				}, 500);
-			}, 500);
+				}, 50);
+			}, 50);
 		});
 
 		it('invalid mouse buttons have no effect', function (done) {
@@ -340,8 +353,8 @@ define([
 
 						done();
 					}, 500);
-				}, 500);
-			}, 500);
+				}, 50);
+			}, 50);
 		});
 
 		it('navigation is ignored if the carousel is already animating', function (done) {
@@ -390,8 +403,8 @@ define([
 
 						done();
 					}, 500);
-				}, 500);
-			}, 500);
+				}, 50);
+			}, 50);
 		});
 
 		it('dragging more in the opposite direction cancels the drag', function (done) {
@@ -440,8 +453,8 @@ define([
 
 						done();
 					}, 500);
-				}, 500);
-			}, 500);
+				}, 50);
+			}, 50);
 		});
 	});
 });

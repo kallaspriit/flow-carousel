@@ -61,5 +61,17 @@ define([
 		$(element).remove();
 	};
 
+	/**
+	 * Restores the initial contents of the carousel if possible.
+	 *
+	 * @method restoreInitialContents
+	 * @param {AbstractDataSource} dataSource Data source to use
+	 * @param {DOMElement} wrap Wrap to populate
+	 */
+	AbstractRenderer.prototype.restoreInitialContents = function(dataSource, wrap) {
+		// don't do anything by default
+		void(dataSource, wrap);
+	};
+
 	return AbstractRenderer;
 });

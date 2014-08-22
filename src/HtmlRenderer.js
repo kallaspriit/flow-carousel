@@ -41,5 +41,28 @@ define([
 		return deferred.promise();
 	};
 
+	/**
+	 * Restores the initial contents of the carousel if possible.
+	 *
+	 * @method restoreInitialContents
+	 * @param {AbstractDataSource} dataSource Data source to use
+	 * @param {DOMElement} wrap Wrap to populate
+	 */
+	HtmlRenderer.prototype.restoreInitialContents = function(dataSource, wrap) {
+		// fetch all items and append them to the wrap
+		dataSource.getItems().done(function(items) {
+			$(items).each(function(index, element) {
+				var existingStyle = $(element).attr('style');
+
+				// remove the added display: block
+				if (typeof(existingStyle) === 'string') {
+					$(element).attr('style', existingStyle.replace('display: block;', ''));
+				}
+
+				$(wrap).append(element);
+			});
+		});
+	};
+
 	return HtmlRenderer;
 });

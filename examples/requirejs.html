@@ -60,6 +60,9 @@
 		-
 		<button class="btn" data-action="next-item" data-target="#basic-carousel">Next item</button>
 		<button class="btn" data-action="next-page" data-target="#basic-carousel">Next page</button>
+		-
+		<button class="btn" data-action="destroy" data-target="#basic-carousel">Destroy</button>
+		<button class="btn" data-action="create" data-target="#basic-carousel">Create</button>
 	</div>
 
 	<h2>Carousel wrap matches the largest item size and navigate by item not page</h2>
@@ -369,10 +372,21 @@
 				case 'next-page':
 					carousel.navigateToNextPage();
 				break;
+
+				case 'destroy':
+					carousel.destroy();
+				break;
+
+				case 'create':
+					carousel = new FlowCarousel();
+
+					carousel.init('#' + carouselWrap.attr('id'));
+				break;
 			}
 		});
 
 		// register globally for testing via console
+		window.b = basicCarousel;
 		window.c = asyncCarousel;
 		window.v = verticalCarousel;
 	});

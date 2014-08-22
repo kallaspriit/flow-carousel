@@ -99,6 +99,27 @@ define([
 			};
 
 			return result;
+		},
+
+		/**
+		 * Removes CSS classes from current element that have the given prefix.
+		 *
+		 * @method removeElementClassesPrefixedWith
+		 * @param {DOMElement} element Element to modify
+		 * @param {string} cssPrefix The CSS prefix
+		 */
+		removeElementClassesPrefixedWith: function(element, cssPrefix) {
+			var wrapClasses = $(element).prop('class').split(' '),
+				filteredClasses = [],
+				i;
+
+			for (i = 0; i < wrapClasses.length; i++) {
+				if (wrapClasses[i].substr(0, cssPrefix.length) !== cssPrefix) {
+					filteredClasses.push(wrapClasses[i]);
+				}
+			}
+
+			$(element).prop('class', filteredClasses.join(' '));
 		}
 	};
 });

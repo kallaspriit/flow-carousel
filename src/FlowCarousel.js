@@ -66,6 +66,16 @@ define([
 		this._initiated = false;
 
 		/**
+		 * Set to true once the component is destroyed, no methods are valid to call after this.
+		 *
+		 * @property _destroyed
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
+		this._destroyed = false;
+
+		/**
 		 * Carousel configuration.
 		 *
 		 * @property _config
@@ -419,11 +429,15 @@ define([
 	 * @method init
 	 * @param {string} selector Selector of elements to turn into a carousel
 	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
-	 * {{#crossLink "Config"}}{{/crossLink}}.
+	 * 								{{#crossLink "Config"}}{{/crossLink}}.
 	 * @return {Deferred.Promise}
 	 */
 	FlowCarousel.prototype.init = function(selector, userConfig) {
 		var promise;
+
+		if (this._initiated) {
+			throw new Error('The carousel is already initiated');
+		}
 
 		this.emitEvent(FlowCarousel.Event.INITIATING);
 
@@ -447,7 +461,10 @@ define([
 		} else if (typeof this._config.dataSource !== 'undefined' && this._config.dataSource !== null) {
 			throw new Error('Unexpected data source type "' + typeof this._config.dataSource + '" provided');
 		} else {
-			this._dataSource = new HtmlDataSource(this._mainWrap);
+			// the data-source could have been set before init
+			if (this._dataSource === null) {
+				this._dataSource = new HtmlDataSource(this._mainWrap);
+			}
 		}
 
 		// use custom renderer if provided or the HtmlRenderer if not
@@ -460,7 +477,7 @@ define([
 		} else {
 			if (this._dataSource instanceof HtmlDataSource) {
 				this._renderer = new HtmlRenderer();
-			} else {
+			} else if (this._renderer === null) {
 				throw new Error(
 					'Expecting a custom "renderer" to be defined in the config if not using the HtmlDataSource'
 				);
@@ -475,7 +492,10 @@ define([
 				throw new Error('Custom animator provided in config but it\'s not an instance of AbstractAnimator');
 			}
 		} else {
-			this._animator = new DefaultAnimator(this);
+			// the animator could have been set before init
+			if (this._animator === null) {
+				this._animator = new DefaultAnimator(this);
+			}
 		}
 
 		// setup the carousel rendering and events
@@ -488,10 +508,59 @@ define([
 		promise.done(function() {
 			this.emitEvent(FlowCarousel.Event.INITIATED);
 
+			this._initiated = true;
+
 			this._validateItemsToRender();
 		}.bind(this));
 
 		return promise;
+	};
+
+	/**
+	 * Destroys the carousel component.
+	 *
+	 * @method destroy
+	 */
+	FlowCarousel.prototype.destroy = function() {
+		if (!this._initiated) {
+			throw new Error('Unable to destroy carousel that has not been initiated');
+		}
+
+		// remove the carousel classes from the main wrap
+		Util.removeElementClassesPrefixedWith(this._mainWrap, this._config.cssPrefix);
+
+		// clear the generated contents
+		$(this._mainWrap).empty();
+
+		// ask the renderer to restore the initial contents using the current data-source
+		this._renderer.restoreInitialContents(this._dataSource, this._mainWrap);
+
+		// remove the data reference
+		$(this._mainWrap).data(this._config.dataTarget, null);
+
+		// mark the component destroyed
+		this._initiated = false;
+		this._destroyed = false;
+	};
+
+	/**
+	 * Returns whether the carousel has been initiated.
+	 *
+	 * @method isInitiated
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isInitiated = function() {
+		return this._initiated;
+	};
+
+	/**
+	 * Returns whether the carousel has been destroyed.
+	 *
+	 * @method isDestroyed
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isDestroyed = function() {
+		return this._destroyed;
 	};
 
 	/**
@@ -797,9 +866,31 @@ define([
 			this._dataSource = new ArrayDataSource(data);
 		} else {
 			throw new Error(
-				'Invalid data of type "' + data + '" provided, expected an instance of AbstractDataSource or a ' +
-				'simple array'
+				'Invalid data of type "' + typeof data + '" provided, expected an instance of AbstractDataSource or ' +
+				'a simple array'
 			);
+		}
+
+		return this;
+	};
+
+	/**
+	 * Sets the renderer to use.
+	 *
+	 * Expects an instance of AbstractRenderer.
+	 *
+	 * This method supports call chaining by returning itself.
+	 *
+	 * @method setRenderer
+	 * @param {AbstractDataSource|array} Either an instance of AbstractDataSource or a simple array
+	 * @chainable
+	 * @return {FlowCarousel}
+	 */
+	FlowCarousel.prototype.setRenderer = function(renderer) {
+		if (renderer instanceof AbstractRenderer) {
+			this._renderer = renderer;
+		} else {
+			throw new Error('Invalid renderer provided, expected an instance of AbstractRenderer');
 		}
 
 		return this;
@@ -1146,7 +1237,9 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._setupElement = function(selector) {
-		var matches = $(selector);
+		var matches = $(selector),
+			element,
+			existingCarousel;
 
 		// make sure that the selector matches only a single element and throw error otherwise
 		if (matches.length === 0) {
@@ -1157,8 +1250,19 @@ define([
 			);
 		}
 
+		element = matches[0];
+		existingCarousel = $(element).data(this._config.dataTarget);
+
+		// make sure the same element is not initiated several times
+		if (existingCarousel instanceof FlowCarousel) {
+			throw new Error(
+				'Element matching selector "' + selector + '" is already a carousel component, ' +
+				'destroy the existing one first'
+			);
+		}
+
 		// store reference to the main wrap dom element
-		this._mainWrap = matches[0];
+		this._mainWrap = element;
 
 		// register the carousel instance on the main wrap dom element data
 		$(this._mainWrap).data(this._config.dataTarget, this);
@@ -1188,9 +1292,7 @@ define([
 			},
 			sizeMode = this._config.sizeMode,
 			$itemsWrap,
-			$scrollerWrap,
-			layoutPromise,
-			animationDeferred;
+			$scrollerWrap;
 
 		// remove any existing content (HtmlDataSource should have done that already anyway
 		$element.empty();
@@ -1235,7 +1337,7 @@ define([
 		}
 
 		// setup the individual elements
-		layoutPromise = this._setupLayout(wrap, orientation);
+		this._setupLayout(wrap, orientation);
 
 		// if we're using responsive layout then we need to recalculate sizes and positions if the wrap size changes
 		if (this._config.useResponsiveLayout) {
@@ -1252,38 +1354,23 @@ define([
 
 		// navigate to the start index item immediately if set
 		if (this._config.startItemIndex !== null) {
-			animationDeferred = new Deferred();
-
-			// wait for the layout to complete and then perform the animation and resolve once that completes too
-			layoutPromise.done(function() {
-				this.navigateToItem(this._config.startItemIndex, !this._config.animateToStartIndex)
-					.done(function() {
-						animationDeferred.resolve();
-					});
-			}.bind(this));
-
-			return animationDeferred.promise();
+			// resolve once navigated to requested item
+			return this.navigateToItem(this._config.startItemIndex, !this._config.animateToStartIndex);
 		} else if (this._config.startPageIndex !== null) {
-			animationDeferred = new Deferred();
-
-			// wait for the layout to complete and then perform the animation and resolve once that completes too
-			layoutPromise.done(function() {
-				this.navigateToPage(this._config.startPageIndex, !this._config.animateToStartIndex)
-					.done(function() {
-						animationDeferred.resolve();
-					});
-			}.bind(this));
-
-			return animationDeferred.promise();
+			// resolve once navigated to requested page
+			return this.navigateToPage(this._config.startPageIndex, !this._config.animateToStartIndex);
 		} else {
-			return layoutPromise;
+			// there's nothing to wait for, create and resolve a deferred immediately
+			var instantDeferred = new Deferred();
+
+			instantDeferred.resolve();
+
+			return instantDeferred.promise();
 		}
 	};
 
 	/**
 	 * Sets up the layout and renders the initial set of items.
-	 *
-	 * Since fetching and rendering items can be asyncronous, this method returns a promise.
 	 *
 	 * Emits:
 	 * - FlowCarousel.Event.LAYOUT_CHANGED when the layout changes
@@ -1292,7 +1379,6 @@ define([
 	 * @param {DOMelement} element Element to setup items in
 	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @param {number} [startItemIdex] Optional item index to navigate to instantly
-	 * @return {Deferred.Promise}
 	 * @private
 	 */
 	FlowCarousel.prototype._setupLayout = function(element, orientation, startItemIndex) {
@@ -1303,8 +1389,7 @@ define([
 			totalSize = Math.ceil(itemCount * itemSize),
 			sizeProp = orientation === Config.Orientation.HORIZONTAL
 				? 'width'
-				: 'height',
-			deferred = new Deferred();
+				: 'height';
 
 		// define the scroller wrap size to fit all items
 		$(this._scrollerWrap).css(sizeProp, totalSize);
@@ -1322,14 +1407,7 @@ define([
 			this._renderTargetIndexPlaceholders();
 		}
 
-		deferred.done(function() {
-			this.emitEvent(FlowCarousel.Event.LAYOUT_CHANGED);
-		}.bind(this));
-
-		// setting up layout is synchronous for now
-		deferred.resolve();
-
-		return deferred.promise();
+		this.emitEvent(FlowCarousel.Event.LAYOUT_CHANGED);
 	};
 
 	/**
@@ -1821,20 +1899,16 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		var deferred = new Deferred(),
-			lastItemIndex = this._currentItemIndex;
+		var lastItemIndex = this._currentItemIndex;
 
 		// reset current state
 		this._reset();
 
-		// recalculate the layout navigating instantly to the last item and validate items to render afterwards
-		this._setupLayout(element, orientation, lastItemIndex).done(function() {
-			this._validateItemsToRender().done(function() {
-				deferred.resolve();
-			}.bind(this));
-		}.bind(this));
+		// recalculate the layout navigating instantly to the last item
+		this._setupLayout(element, orientation, lastItemIndex);
 
-		return deferred.promise();
+		// render the items that may have become visible after the layout procedure
+		return this._validateItemsToRender();
 	};
 
 	/**

@@ -157,6 +157,29 @@ define([
 		return deferred.promise();
 	};
 
+	/**
+	 * Restores the initial contents of the carousel if possible.
+	 *
+	 * @method restoreInitialContents
+	 * @param {AbstractDataSource} dataSource Data source to use
+	 * @param {DOMElement} wrap Wrap to populate
+	 */
+	HtmlRenderer.prototype.restoreInitialContents = function(dataSource, wrap) {
+		// fetch all items and append them to the wrap
+		dataSource.getItems().done(function(items) {
+			$(items).each(function(index, element) {
+				var existingStyle = $(element).attr(&#x27;style&#x27;);
+
+				// remove the added display: block
+				if (typeof(existingStyle) === &#x27;string&#x27;) {
+					$(element).attr(&#x27;style&#x27;, existingStyle.replace(&#x27;display: block;&#x27;, &#x27;&#x27;));
+				}
+
+				$(wrap).append(element);
+			});
+		});
+	};
+
 	return HtmlRenderer;
 });
     </pre>

@@ -8,11 +8,24 @@ define([
 
 	describe('KeyboardNavigator', function () {
 
+		// create the fixture and carousel instance
 		beforeEach(function() {
 			window.loadFixture('test.html');
 
 			// create the carousel instance and initiate it
 			carousel = new FlowCarousel();
+		});
+
+		// release the carousel after testing
+		afterEach(function() {
+			// kill the carousel if it's still alive
+			if (carousel !== null && carousel.isInitiated() && !carousel.isDestroyed()) {
+				carousel.destroy();
+			}
+
+			carousel = null;
+
+			$('#fixture-wrap').html('<em>test completed</em>');
 		});
 
 		it('is loaded by default', function () {

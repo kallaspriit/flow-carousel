@@ -5,6 +5,7 @@ BODY {
 .carousel {
     border: 10px solid #FFF;
     background-color: #EEE;
+    overflow: hidden;
 }
 .controls {
     margin: 10px 0 40px 0;
@@ -29,7 +30,7 @@ BODY {
     text-align: right;
 }
 .carousel .carousel-item {
-    display: none;
+    /*display: none;*/
 }
 .flow-carousel-placeholder > DIV {
     background-color: #CCC;

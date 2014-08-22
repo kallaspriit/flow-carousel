@@ -8,6 +8,22 @@ for (var file in window.__karma__.files) {
     }
 }
 
+// load test fixture
+window.loadFixture = function(filename) {
+	'use strict';
+
+	var fixtureWrap = $('#fixture-wrap');
+
+	if (fixtureWrap.length === 0) {
+		fixtureWrap = $('<div></div>', {
+			id: 'fixture-wrap',
+			style: 'width: 1200px; height: 800px; background-color: #F8F8F8;'
+		}).appendTo(document.body);
+	}
+
+	fixtureWrap.html(window.__html__['test/fixtures/' + filename]);
+};
+
 require.config({
 
 	// base url for application scripts requested without a prefix

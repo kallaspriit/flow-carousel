@@ -236,8 +236,8 @@ define([
 		 * 				   size to the largest item size
 		 * @param {string} cssClasses.horizontal='horizontal' Assigned to main wrap for horizontal orientation
 		 * @param {string} cssClasses.vertical='vertical' Assigned to main wrap for vertical orientation
-		 * @param {string} cssClasses.instantAnimation='instant-animation' Assigned to main wrap if the animation is
-		 * 				   requested to be instantaneous
+		 * @param {string} cssClasses.animateTransform='animate-transform' With this class added the transforms get
+		 * 				   animated as well
 		 * @param {string} cssClasses.initiating='initiating' Assigned to main wrap during initialization procedure
 		 * @param {string} cssClasses.loading='loading' Assigned to main wrap during loading of items
 		 * @param {string} cssClasses.rendering='rendering' Assigned to main wrap during rendering of items
@@ -253,7 +253,7 @@ define([
 			matchLargestItem: 'match-largest-item',
 			horizontal: 'horizontal',
 			vertical: 'vertical',
-			instantAnimation: 'instant-animation',
+			animateTransform: 'animate-transform',
 			initiating: 'initiating',
 			loading: 'loading',
 			rendering: 'rendering'

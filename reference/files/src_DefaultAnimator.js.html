@@ -145,7 +145,7 @@ define([
 	 * @method getCurrentPosition
 	 * @return {number}
 	 */
-	AbstractAnimator.prototype.getCurrentPosition = function() {
+	DefaultAnimator.prototype.getCurrentPosition = function() {
 		var $scrollerWrap = $(this._carousel.getScrollerWrap()),
 			transformMatrix = $scrollerWrap.css(&#x27;transform&#x27;),
 			transformOffset = Util.parseTransformMatrix(transformMatrix),
@@ -184,7 +184,7 @@ define([
 	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
 		var orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
-			instantAnimationClass = this._carousel.getConfig().getClassName(&#x27;instantAnimation&#x27;),
+			animateTransformClass = this._carousel.getConfig().getClassName(&#x27;animateTransform&#x27;),
 			currentPosition,
 			translateCommand,
 			deferred;
@@ -196,10 +196,11 @@ define([
 			translateCommand = &#x27;translate3d(0,&#x27; + position + &#x27;px,0)&#x27;;
 		}
 
+		// add a class that enables transitioning transforms if instant is not required
 		if (instant === true) {
-			$scrollerWrap.addClass(instantAnimationClass);
+			$scrollerWrap.removeClass(animateTransformClass);
 		} else {
-			$scrollerWrap.removeClass(instantAnimationClass);
+			$scrollerWrap.addClass(animateTransformClass);
 		}
 
 		// apply the translate

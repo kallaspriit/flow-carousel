@@ -6,7 +6,7 @@ define([
 
 	var abstractNavigator = new AbstractNavigator();
 
-	describe('AbstractAnimator', function () {
+	describe('AbstractNavigator', function () {
 
 		it('has method "init"', function () {
 			expect(abstractNavigator.init).toEqual(jasmine.any(Function));

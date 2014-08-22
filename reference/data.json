@@ -859,8 +859,8 @@
                     "type": "String"
                 },
                 {
-                    "name": "instantAnimation='instant-animation'",
-                    "description": "Assigned to main wrap if the animation is\n\t\t\t\t   requested to be instantaneous",
+                    "name": "animateTransform='animate-transform'",
+                    "description": "With this class added the transforms get\n\t\t\t\t   animated as well",
                     "type": "String"
                 },
                 {
@@ -1192,7 +1192,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 154,
+            "line": 169,
             "description": "Begins the navigation.",
             "itemtype": "method",
             "name": "_begin",
@@ -1218,7 +1218,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 178,
+            "line": 193,
             "description": "Called on mouse/finger move.",
             "itemtype": "method",
             "name": "_move",
@@ -1244,7 +1244,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 220,
+            "line": 246,
             "description": "Called on gesture end.",
             "itemtype": "method",
             "name": "_end",
@@ -2505,7 +2505,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 946,
+            "line": 947,
             "description": "Navigates to given page number.\n\nNotice that page numbers start from zero.\n\nThrows error if out of bounds index is requested.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure\n- FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page",
             "itemtype": "method",
             "name": "navigateToPage",
@@ -2538,7 +2538,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 982,
+            "line": 983,
             "description": "Navigates to next carousel item.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation\n- FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation",
             "itemtype": "method",
             "name": "navigateToNextItem",
@@ -2559,7 +2559,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1004,
+            "line": 1005,
             "description": "Navigates to previous carousel item.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation\n- FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation",
             "itemtype": "method",
             "name": "navigateToPreviousItem",
@@ -2580,7 +2580,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1024,
+            "line": 1025,
             "description": "Navigates to next page if available.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure\n- FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page",
             "itemtype": "method",
             "name": "navigateToNextPage",
@@ -2601,7 +2601,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1045,
+            "line": 1046,
             "description": "Navigates to previous page if available.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure\n- FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page",
             "itemtype": "method",
             "name": "navigateToPreviousPage",
@@ -2622,7 +2622,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1065,
+            "line": 1066,
             "description": "Returns the range of currently visible carousel item wrappers.",
             "itemtype": "method",
             "name": "getCurrentPageVisibleRange",
@@ -2634,7 +2634,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1083,
+            "line": 1084,
             "description": "Returns the list of currently visible carousel item wrappers.",
             "itemtype": "method",
             "name": "getCurrentPageVisibleItemElements",
@@ -2646,7 +2646,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1109,
+            "line": 1110,
             "description": "Returns the item dom element by item index.\n\nThrows error if invalid index is requested.",
             "itemtype": "method",
             "name": "getItemElementByIndex",
@@ -2667,7 +2667,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1136,
+            "line": 1137,
             "description": "Initializes the top-level wrap element.\n\nIf the selector matches multiple elements, only the first one is considered.\n\nIf the selector does not match any elements, an error is thrown.",
             "itemtype": "method",
             "name": "_setupElement",
@@ -2684,7 +2684,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1166,
+            "line": 1167,
             "description": "Initializes a single wrap element.",
             "itemtype": "method",
             "name": "_setupCarousel",
@@ -2710,7 +2710,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1282,
+            "line": 1283,
             "description": "Sets up the layout and renders the initial set of items.\n\nSince fetching and rendering items can be asyncronous, this method returns a promise.\n\nEmits:\n- FlowCarousel.Event.LAYOUT_CHANGED when the layout changes",
             "itemtype": "method",
             "name": "_setupLayout",
@@ -2724,6 +2724,12 @@
                     "name": "orientation",
                     "description": "Orientation to use",
                     "type": "Config/Orientation:property"
+                },
+                {
+                    "name": "startItemIdex",
+                    "description": "Optional item index to navigate to instantly",
+                    "type": "Number",
+                    "optional": true
                 }
             ],
             "return": {
@@ -2736,7 +2742,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1325,
+            "line": 1335,
             "description": "Sets up the default navigators to use as defined in the {{#crossLink \"Config\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "_setupDefaultNavigators",
@@ -2746,7 +2752,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1358,
+            "line": 1368,
             "description": "Validates whether all the required items have been rendered and initiates rendering them if not.",
             "itemtype": "method",
             "name": "_validateItemsToRender",
@@ -2760,7 +2766,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1371,
+            "line": 1381,
             "description": "Removes items that have gone out of the render range.",
             "itemtype": "method",
             "name": "_removeInvalidItems",
@@ -2770,7 +2776,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1432,
+            "line": 1442,
             "description": "Renders a range of carousel items.\n\nEmits:\n- FlowCarousel.Event.LOADING_ITEMS [startIndex, endIndex] before starting to load a range of items\n- FlowCarousel.Event.ABORTED_ITEMS [startIndex, endIndex] if loading or a range of items was aborted\n- FlowCarousel.Event.LOADED_ITEMS [startIndex, endIndex, items] after loading and rendering a range of items\n- FlowCarousel.Event.STARTUP_ITEMS_RENDERED if the rendered range of items was the first",
             "itemtype": "method",
             "name": "_renderItemRange",
@@ -2796,7 +2802,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1505,
+            "line": 1515,
             "description": "Renders the item placeholders for current target index.",
             "itemtype": "method",
             "name": "_renderTargetIndexPlaceholders",
@@ -2806,7 +2812,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1520,
+            "line": 1530,
             "description": "Renders the item placeholders that will later be replaced with the actual items.\n\nGives the user some \"loading\" feedback.",
             "itemtype": "method",
             "name": "_renderItemPlaceholders",
@@ -2828,7 +2834,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1551,
+            "line": 1561,
             "description": "Renders given carousel items.",
             "itemtype": "method",
             "name": "_renderItems",
@@ -2854,7 +2860,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1631,
+            "line": 1641,
             "description": "Inserts rendered dom elements into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElements",
@@ -2883,7 +2889,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1692,
+            "line": 1702,
             "description": "Inserts a rendered dom element into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElement",
@@ -2910,7 +2916,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1769,
+            "line": 1779,
             "description": "Sets the scroller wrap size to the largest visible child size.",
             "itemtype": "method",
             "name": "_setScrollerSizeToLargestVisibleChildSize",
@@ -2920,7 +2926,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1800,
+            "line": 1810,
             "description": "Re-initializes the layout.\n\nUsed to apply responsive layout when the wrap size changes.\n\nSince fetching and rendering items can be asynchronous, this method returns a promise.",
             "itemtype": "method",
             "name": "_reLayout",
@@ -2946,7 +2952,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1826,
+            "line": 1840,
             "description": "Resets the component state and removes all rendered items.",
             "itemtype": "method",
             "name": "_reset",
@@ -2956,7 +2962,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1846,
+            "line": 1860,
             "description": "Sets up main wrap size change listener to apply responsive layout.",
             "itemtype": "method",
             "name": "_setupResponsiveLayoutListener",
@@ -2978,7 +2984,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1860,
+            "line": 1874,
             "description": "Checks whether the carousel wrap size has changed and triggers re-layout if so.",
             "itemtype": "method",
             "name": "_validateResponsiveLayout",
@@ -3000,7 +3006,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1888,
+            "line": 1901,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -3022,7 +3028,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1900,
+            "line": 1913,
             "description": "Returns the size of an element.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getElementSize",
@@ -3055,7 +3061,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1930,
+            "line": 1943,
             "description": "Returns biggest element size of given elements given orientation and size mode.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getLargestElementSize",
@@ -3088,7 +3094,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1971,
+            "line": 1984,
             "description": "Returns the opposite orientation name.\n\nFor Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.",
             "itemtype": "method",
             "name": "_getOppositeOrientation",
@@ -3109,7 +3115,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1987,
+            "line": 2000,
             "description": "Performs some action delayed by given amount.\n\nIf the method is called several times with the same name, the action is executed only once after the time\nhas passed from the last call.",
             "itemtype": "method",
             "name": "performDelayed",
@@ -3118,6 +3124,11 @@
                     "name": "name",
                     "description": "Name of the action",
                     "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "Callback to call",
+                    "type": "Function"
                 },
                 {
                     "name": "delay",
@@ -3363,7 +3374,7 @@
         {
             "file": "src\\Util.js",
             "line": 57,
-            "description": "Parses a css transform matrix.\n\nInput is something along the way of \"matrix(1, 0, 0, 1, -1877, 0)\".\n\nReturns objects with keys x, y.",
+            "description": "Parses a css transform matrix.\n\nInput is something along the way of \"matrix(1, 0, 0, 1, -1877, 0)\" or a 3D matrix like\n\"matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -100, 0, 0, 1)\"\n\nReturns objects with keys x, y.",
             "itemtype": "method",
             "name": "parseTransformMatrix",
             "params": [

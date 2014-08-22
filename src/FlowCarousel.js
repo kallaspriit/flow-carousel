@@ -892,8 +892,6 @@ define([
 			return this._activeAnimationPromise;
 		}
 
-		this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_ITEM, [itemIndex, instant]);
-
 		// update the target item index
 		this._targetItemIndex = itemIndex;
 		this._isAnimating = true;
@@ -902,6 +900,9 @@ define([
 		if (!isSameItemIndex || force === true) {
 			// start animating to given item, this is an asynchronous process
 			animationPromise = this._animator.animateToItem(itemIndex, instant);
+
+			// emitting this event before starting the animation causes lag for some reason
+			this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_ITEM, [itemIndex, instant]);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
 			fakeAnimationDeferred = new Deferred();

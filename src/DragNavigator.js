@@ -115,6 +115,11 @@ define([
 				x,
 				y;
 
+			// stop if not active
+			if (!this._active) {
+				return true;
+			}
+
 			// only move the carousel when the left mouse button is pressed
 			if (e.which !== 1 && e.type !== 'touchmove') {
 				result = this._end();
@@ -138,12 +143,19 @@ define([
 		$window.on('mouseup touchend touchcancel', function(e) {
 			var result;
 
+			// quit if invalid event
 			if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
+				return true;
+			}
+
+			// stop if not active
+			if (!this._active) {
 				return true;
 			}
 
 			result = this._end();
 
+			/* istanbul ignore else */
 			if (result === false) {
 				e.preventDefault();
 
@@ -188,13 +200,20 @@ define([
 	 * @private
 	 */
 	DragNavigator.prototype._move = function(position, oppositePosition) {
+		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}
 
 		// compare motion in the carousel and the opposite direction
 		var deltaDragPosition = position - this._startDragPosition,
-			deltaDragOppositePosition = oppositePosition - this._startDragOppositePosition;
+			deltaDragOppositePosition = oppositePosition - this._startDragOppositePosition,
+			noActionThreshold = 15;
+
+		// if the drag delta is very small then do nothing not to quit or start moving too soon
+		if (Math.abs(deltaDragPosition) < noActionThreshold) {
+			return true;
+		}
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements
@@ -232,6 +251,7 @@ define([
 	 * @private
 	 */
 	DragNavigator.prototype._end = function() {
+		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}

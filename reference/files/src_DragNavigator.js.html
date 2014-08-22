@@ -213,13 +213,16 @@ define([
 
 			result = this._begin(horizontal ? x : y, horizontal ? y : x);
 
-			if (result === false) {
+			// never disable the mousedown/touchstart events
+			return true;
+
+			/*if (result === false) {
 				e.preventDefault();
 
 				return false;
 			} else {
 				return true;
-			}
+			}*/
 		}.bind(this));
 
 		$window.on(&#x27;mousemove touchmove&#x27;, function(e) {
@@ -227,6 +230,11 @@ define([
 				isTouchEvent,
 				x,
 				y;
+
+			// stop if not active
+			if (!this._active) {
+				return true;
+			}
 
 			// only move the carousel when the left mouse button is pressed
 			if (e.which !== 1 &amp;&amp; e.type !== &#x27;touchmove&#x27;) {
@@ -251,12 +259,19 @@ define([
 		$window.on(&#x27;mouseup touchend touchcancel&#x27;, function(e) {
 			var result;
 
+			// quit if invalid event
 			if (e.which !== 1 &amp;&amp; e.type !== &#x27;touchend&#x27; &amp;&amp; e.type !== &#x27;touchcancel&#x27;) {
+				return true;
+			}
+
+			// stop if not active
+			if (!this._active) {
 				return true;
 			}
 
 			result = this._end();
 
+			/* istanbul ignore else */
 			if (result === false) {
 				e.preventDefault();
 
@@ -301,12 +316,20 @@ define([
 	 * @private
 	 */
 	DragNavigator.prototype._move = function(position, oppositePosition) {
+		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}
 
+		// compare motion in the carousel and the opposite direction
 		var deltaDragPosition = position - this._startDragPosition,
-			deltaDragOppositePosition = oppositePosition - this._startDragOppositePosition;
+			deltaDragOppositePosition = oppositePosition - this._startDragOppositePosition,
+			noActionThreshold = 15;
+
+		// if the drag delta is very small then do nothing not to quit or start moving too soon
+		if (Math.abs(deltaDragPosition) &lt; noActionThreshold) {
+			return true;
+		}
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements
@@ -316,11 +339,13 @@ define([
 			return true;
 		}
 
+		// calculate the position
 		var newPosition = this._startCarouselPosition + deltaDragPosition,
 			pageSize = this._carousel.getPageSize(),
 			totalSize = this._carousel.getTotalSize(),
 			edgeMultiplier = this._carousel.getConfig().dragNavigatorOverEdgeDragPositionMultiplier;
 
+		// create smooth limit at the edges applying the drag motion partially
 		if (newPosition &gt; 0 || newPosition &lt; -(totalSize - pageSize)) {
 			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
 		}
@@ -328,6 +353,7 @@ define([
 		// use the animator to move to calculated position instantly
 		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
 
+		// we need last move position in the _end() handler
 		this._lastPosition = position;
 
 		return false;
@@ -341,6 +367,7 @@ define([
 	 * @private
 	 */
 	DragNavigator.prototype._end = function() {
+		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}

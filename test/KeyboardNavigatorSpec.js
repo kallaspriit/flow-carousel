@@ -6,20 +6,10 @@ define([
 
 	var carousel;
 
-	describe('AbstractAnimator', function () {
+	describe('KeyboardNavigator', function () {
 
 		beforeEach(function() {
-			// load test fixture
-			var fixtureWrap = $('#fixture-wrap');
-
-			if (fixtureWrap.length === 0) {
-				fixtureWrap = $('<div></div>', {
-					id: 'fixture-wrap',
-					style: 'width: 1200px; height: 800px; background-color: #F8F8F8;'
-				}).appendTo(document.body);
-			}
-
-			fixtureWrap.html(window.__html__['test/fixtures/test.html']);
+			window.loadFixture('test.html');
 
 			// create the carousel instance and initiate it
 			carousel = new FlowCarousel();

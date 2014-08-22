@@ -291,10 +291,10 @@
 
 		asyncCarousel
 			.addListener(FlowCarousel.Event.INITIATING, function() {
-				console.log('async carousel initiating');
+				//console.log('async carousel initiating');
 			})
 			.addListener(FlowCarousel.Event.INITIATED, function() {
-				console.log('async carousel initiated');
+				//console.log('async carousel initiated');
 
 				// show initiating indicator
 				$('<div class="carousel-initiating"><div>Initiating...</div></div>')
@@ -305,38 +305,38 @@
 					.appendTo(asyncCarousel.getMainWrap());
 			})
 			.addListener(FlowCarousel.Event.STARTUP_ITEMS_RENDERED, function() {
-				console.log('async carousel startup items rendered');
+				//console.log('async carousel startup items rendered');
 
 				// hide the loading indicator
 				$(asyncCarousel.getMainWrap()).find('.carousel-initiating').remove();
 			})
 			.addListener(FlowCarousel.Event.LOADING_ITEMS, function(startIndex, endIndex) {
-				console.log('async carousel loading items', startIndex, endIndex);
+				//console.log('async carousel loading items', startIndex, endIndex);
 
 				$(asyncCarousel.getMainWrap()).find('.carousel-loading').addClass('carousel-loading-visible');
 			})
 			.addListener(FlowCarousel.Event.LOADED_ITEMS, function(startIndex, endIndex, items) {
-				console.log('async carousel loaded items', startIndex, endIndex, items);
+				//console.log('async carousel loaded items', startIndex, endIndex, items);
 
 				$(asyncCarousel.getMainWrap()).find('.carousel-loading').removeClass('carousel-loading-visible');
 			})
 			.addListener(FlowCarousel.Event.ABORTED_ITEMS, function(startIndex, endIndex) {
-				console.log('async carousel aborted loading items', startIndex, endIndex);
+				//console.log('async carousel aborted loading items', startIndex, endIndex);
 			})
 			.addListener(FlowCarousel.Event.NAVIGATING_TO_ITEM, function(itemIndex, instant) {
-				console.log('async carousel navigating to item', itemIndex, instant);
+				//console.log('async carousel navigating to item', itemIndex, instant);
 			})
 			.addListener(FlowCarousel.Event.NAVIGATED_TO_ITEM, function(itemIndex, instant) {
-				console.log('async carousel navigated to item', itemIndex, instant);
+				//console.log('async carousel navigated to item', itemIndex, instant);
 			})
 			.addListener(FlowCarousel.Event.NAVIGATING_TO_PAGE, function(pageIndex, instant) {
-				console.log('async carousel navigating to page', pageIndex, instant);
+				//console.log('async carousel navigating to page', pageIndex, instant);
 			})
 			.addListener(FlowCarousel.Event.NAVIGATED_TO_PAGE, function(pageIndex, instant) {
-				console.log('async carousel navigated to page', pageIndex, instant);
+				//console.log('async carousel navigated to page', pageIndex, instant);
 			})
 			.addListener(FlowCarousel.Event.LAYOUT_CHANGED, function() {
-				console.log('async carousel layout changed');
+				//console.log('async carousel layout changed');
 			});
 
 		asyncCarousel.init('#async-carousel', {

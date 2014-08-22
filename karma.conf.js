@@ -44,7 +44,11 @@ module.exports = function(config) {
 
         // test results reporter to use
         reporters: ['progress'],
- 
+
+		// set to a real host if accessing from another machine
+		//hostname: 'localhost',
+		hostname: '192.168.1.69', // TODO restore the localhost
+
         // web server port
         port: 9876,
  
@@ -61,9 +65,10 @@ module.exports = function(config) {
         browsers: [
 			'PhantomJS',
 			'Chrome',
-			'Firefox',
 			'IE',
-			//'Opera'
+			'Firefox',
+			'Safari',
+			//'Opera' // does not currently work with the new blink-based Opera
 		],
 
 		// Loggers to use

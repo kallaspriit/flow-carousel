@@ -57,7 +57,8 @@ define([
 		/**
 		 * Parses a css transform matrix.
 		 *
-		 * Input is something along the way of "matrix(1, 0, 0, 1, -1877, 0)".
+		 * Input is something along the way of "matrix(1, 0, 0, 1, -1877, 0)" or a 3D matrix like
+		 * "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -100, 0, 0, 1)"
 		 *
 		 * Returns objects with keys x, y.
 		 *
@@ -66,22 +67,38 @@ define([
 		 * @return {object}
 		 */
 		parseTransformMatrix: function(matrix) {
-			var offset = 7,
-				largeMatrix = false;
+			var offset,
+				itemIndexes,
+				trimmed,
+				noWhitespace,
+				items,
+				result;
 
-			if (matrix.substring(0, 8) === 'matrix3d') {
+			// TODO remove the istanbul ignore once karma coverage fixes not counting these lines
+			/* istanbul ignore next */
+			if (matrix.substring(0, 8) === 'matrix3d') { // IE uses matrix3d
 				offset = 9;
-				largeMatrix = true;
+				itemIndexes = [12, 13];
+			} else if (matrix.substring(0, 6) === 'matrix') { // webkit, safari, opera
+				offset = 7;
+				itemIndexes = [4, 5];
+			} else if (matrix.substring(0, 11) === 'translate3d') { // Safari uses translate3d sometimes
+				offset = 12;
+				itemIndexes = [0, 1];
+			} else {
+				throw new Error('Unsupported matrix format "' + matrix + '"');
 			}
 
-			var trimmed = matrix.substr(offset).substr(0, matrix.length - offset - 1),
-				noWhitespace = trimmed.replace(/ +/g, ''),
-				items = noWhitespace.split(/,/);
+			trimmed = matrix.substr(offset).substr(0, matrix.length - offset - 1);
+			noWhitespace = trimmed.replace(/ +/g, '');
+			items = noWhitespace.split(/,/);
 
-			return {
-				x: parseInt(largeMatrix ? items[12] : items[4], 10),
-				y: parseInt(largeMatrix ? items[13] : items[5], 10)
+			result = {
+				x: parseInt(items[itemIndexes[0]], 10),
+				y: parseInt(items[itemIndexes[1]], 10)
 			};
+
+			return result;
 		}
 	};
 });

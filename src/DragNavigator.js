@@ -97,13 +97,16 @@ define([
 
 			result = this._begin(horizontal ? x : y, horizontal ? y : x);
 
-			if (result === false) {
+			// never disable the mousedown/touchstart events
+			return true;
+
+			/*if (result === false) {
 				e.preventDefault();
 
 				return false;
 			} else {
 				return true;
-			}
+			}*/
 		}.bind(this));
 
 		$window.on('mousemove touchmove', function(e) {
@@ -189,6 +192,7 @@ define([
 			return true;
 		}
 
+		// compare motion in the carousel and the opposite direction
 		var deltaDragPosition = position - this._startDragPosition,
 			deltaDragOppositePosition = oppositePosition - this._startDragOppositePosition;
 
@@ -200,11 +204,13 @@ define([
 			return true;
 		}
 
+		// calculate the position
 		var newPosition = this._startCarouselPosition + deltaDragPosition,
 			pageSize = this._carousel.getPageSize(),
 			totalSize = this._carousel.getTotalSize(),
 			edgeMultiplier = this._carousel.getConfig().dragNavigatorOverEdgeDragPositionMultiplier;
 
+		// create smooth limit at the edges applying the drag motion partially
 		if (newPosition > 0 || newPosition < -(totalSize - pageSize)) {
 			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
 		}
@@ -212,6 +218,7 @@ define([
 		// use the animator to move to calculated position instantly
 		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
 
+		// we need last move position in the _end() handler
 		this._lastPosition = position;
 
 		return false;

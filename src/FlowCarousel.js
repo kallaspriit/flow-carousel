@@ -1290,15 +1290,16 @@ define([
 	 * @method _setupLayout
 	 * @param {DOMelement} element Element to setup items in
 	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @param {number} [startItemIdex] Optional item index to navigate to instantly
 	 * @return {Deferred.Promise}
 	 * @private
 	 */
-	FlowCarousel.prototype._setupLayout = function(element, orientation) {
+	FlowCarousel.prototype._setupLayout = function(element, orientation, startItemIndex) {
 		var wrapSize = this._getElementSize(element, orientation),
 			itemCount = this._dataSource.getItemCount(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
-			totalSize = itemCount * itemSize,
+			totalSize = Math.ceil(itemCount * itemSize),
 			sizeProp = orientation === Config.Orientation.HORIZONTAL
 				? 'width'
 				: 'height',
@@ -1306,6 +1307,14 @@ define([
 
 		// define the scroller wrap size to fit all items
 		$(this._scrollerWrap).css(sizeProp, totalSize);
+
+		// if the start item index is set then navigate to it instantly
+		if (typeof startItemIndex === 'number') {
+			this._targetItemIndex = startItemIndex;
+			this._currentItemIndex = startItemIndex;
+
+			this._animator.animateToItem(startItemIndex, true, true);
+		}
 
 		// render placeholders that are later replaced with real loaded items
 		if (this._config.usePlaceholders && this._dataSource.isAsynchronous()) {
@@ -1811,16 +1820,20 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		var lastItemIndex = this._currentItemIndex;
+		var deferred = new Deferred(),
+			lastItemIndex = this._currentItemIndex;
 
 		// reset current state
 		this._reset();
 
-		// pre-navigate to the correct position, this triggers the re-render as well
-		this.navigateToItem(lastItemIndex, true);
+		// recalculate the layout navigating instantly to the last item and validate items to render afterwards
+		this._setupLayout(element, orientation, lastItemIndex).done(function() {
+			this._validateItemsToRender().done(function() {
+				deferred.resolve();
+			}.bind(this));
+		}.bind(this));
 
-		// re-do the layout
-		return this._setupLayout(element, orientation);
+		return deferred.promise();
 	};
 
 	/**
@@ -1878,10 +1891,9 @@ define([
 		// perform the layout routine if the wrap size has changed
 		if (currentSize !== lastSize) {
 			// perform the re-layout routine only when the wrap size has not changed for some time
-			this._performDelayed('re-layout', this._config.responsiveLayoutDelay)
-				.done(function() {
-					this._reLayout(element, orientation);
-				}.bind(this));
+			this._performDelayed('re-layout', function() {
+				this._reLayout(element, orientation);
+			}.bind(this), this._config.responsiveLayoutDelay);
 		}
 	};
 
@@ -1992,12 +2004,10 @@ define([
 	 *
 	 * @method performDelayed
 	 * @param {String} name Name of the action
+	 * @param {Function} callback Callback to call
 	 * @param {Number} [delay=1000] The delay, default to 1000 ms
 	 */
-	FlowCarousel.prototype._performDelayed = function(name, delay) {
-		var deferred = new Deferred(),
-			promise = deferred.promise();
-
+	FlowCarousel.prototype._performDelayed = function(name, callback, delay) {
 		delay = delay || 1000;
 
 		if (typeof this._delayedTasks[name] !== 'undefined' && this._delayedTasks[name] !== null) {
@@ -2009,10 +2019,8 @@ define([
 		this._delayedTasks[name] = window.setTimeout(function() {
 			this._delayedTasks[name] = null;
 
-			deferred.resolve();
+			callback.apply(callback, [name, delay]);
 		}.bind(this), delay);
-
-		return promise;
 	};
 
 	return FlowCarousel;

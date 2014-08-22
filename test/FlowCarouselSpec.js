@@ -882,6 +882,50 @@ define([
 			expect(invalidNavigator).toEqual(null);
 		});
 
+		it('method "getPageSize" returns a single page size', function() {
+			carousel.init('.carousel');
+
+			var pageSize = carousel.getPageSize();
+
+			expect(pageSize > 0).toEqual(true);
+		});
+
+		it('method "getTotalSize" returns total scroller size', function() {
+			carousel.init('.carousel');
+
+			var totalSize = carousel.getTotalSize();
+
+			expect(totalSize > 0).toEqual(true);
+		});
+
+		it('method "getCurrentItemPosition" returns current item position', function() {
+			carousel.init('.carousel');
+
+			var itemPosition = carousel.getCurrentItemPosition();
+
+			expect(itemPosition).toEqual(0);
+		});
+
+		it('method "getClosestItemIndexAtPosition" returns closest item index to a position', function() {
+			carousel.init('.carousel');
+
+			var closestItemForward = carousel.getClosestItemIndexAtPosition(-1000, 1),
+				closestItemBackward = carousel.getClosestItemIndexAtPosition(-1000, -1);
+
+			expect(closestItemForward).toEqual(2);
+			expect(closestItemBackward).toEqual(3);
+		});
+
+		it('method "getClosestPageIndexAtPosition" returns closest page index to a position', function() {
+			carousel.init('.carousel');
+
+			var closestPageForward = carousel.getClosestPageIndexAtPosition(-1000, 1),
+				closestItemBackward = carousel.getClosestPageIndexAtPosition(-1000, -1);
+
+			expect(closestPageForward).toEqual(0);
+			expect(closestItemBackward).toEqual(1);
+		});
+
 		it('adding a navigator of type that already exists throws error', function() {
 			carousel.init('.carousel');
 

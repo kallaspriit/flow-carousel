@@ -29,7 +29,7 @@ define([
 	 * @method getCurrentPosition
 	 * @return {number}
 	 */
-	AbstractAnimator.prototype.getCurrentPosition = function() {
+	DefaultAnimator.prototype.getCurrentPosition = function() {
 		var $scrollerWrap = $(this._carousel.getScrollerWrap()),
 			transformMatrix = $scrollerWrap.css('transform'),
 			transformOffset = Util.parseTransformMatrix(transformMatrix),

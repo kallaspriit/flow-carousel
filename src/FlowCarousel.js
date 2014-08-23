@@ -14,6 +14,7 @@ define([
 	'Deferred',
 	'Util',
 	'EventEmitter',
+	'Exporter'
 ], function(
 	$,
 	Config,
@@ -29,7 +30,8 @@ define([
 	DragNavigator,
 	Deferred,
 	Util,
-	EventEmitter
+	EventEmitter,
+	Exporter
 ) {
 	'use strict';
 
@@ -38,13 +40,14 @@ define([
 	 *
 	 * Responsive paginated high-performance HTML5 carousel with AngularJS support.
 	 *
-	 * Copyright Stagnation Lab
-	 * Released under the MIT license
 	 * https://github.com/kallaspriit/flow-carousel
 	 *
 	 * @class FlowCarousel
 	 * @extends EventEmitter
 	 * @constructor
+	 * @author Priit Kallas <priit@stagnationlab.com>
+	 * @copyright Stagnation Lab
+	 * @licence MIT
 	 */
 	function FlowCarousel() {
 		/**
@@ -129,16 +132,6 @@ define([
 		 * @default {}
 		 */
 		this._navigators = {};
-
-		/**
-		 * Selector of elements to turn into a carousel.
-		 *
-		 * @property _selector
-		 * @type {string}
-		 * @default null
-		 * @private
-		 */
-		this._selector = null;
 
 		/**
 		 * The interval reference for responsive layout changes.
@@ -287,6 +280,9 @@ define([
 
 	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
 
+	// The main FlowCarousel classes are referenced under the main FlowCarousel class so that only the main
+	// class is registered in the global namespace.
+
 	/**
 	 * Reference to the {{#crossLink "Config"}}{{/crossLink}} class.
 	 *
@@ -306,6 +302,22 @@ define([
 	FlowCarousel.AbstractDataSource = AbstractDataSource;
 
 	/**
+	 * Reference to the {{#crossLink "ArrayDataSource"}}{{/crossLink}} class.
+	 *
+	 * @property ArrayDataSource
+	 * @type {Config}
+	 */
+	FlowCarousel.ArrayDataSource = ArrayDataSource;
+
+	/**
+	 * Reference to the {{#crossLink "HtmlDataSource"}}{{/crossLink}} class.
+	 *
+	 * @property HtmlDataSource
+	 * @type {Config}
+	 */
+	FlowCarousel.HtmlDataSource = HtmlDataSource;
+
+	/**
 	 * Reference to the {{#crossLink "AbstractRenderer"}}{{/crossLink}} class.
 	 *
 	 * @property AbstractRenderer
@@ -314,12 +326,28 @@ define([
 	FlowCarousel.AbstractRenderer = AbstractRenderer;
 
 	/**
+	 * Reference to the {{#crossLink "HtmlRenderer"}}{{/crossLink}} class.
+	 *
+	 * @property HtmlRenderer
+	 * @type {Config}
+	 */
+	FlowCarousel.HtmlRenderer = HtmlRenderer;
+
+	/**
 	 * Reference to the {{#crossLink "AbstractAnimator"}}{{/crossLink}} class.
 	 *
 	 * @property AbstractAnimator
 	 * @type {Config}
 	 */
 	FlowCarousel.AbstractAnimator = AbstractAnimator;
+
+	/**
+	 * Reference to the {{#crossLink "DefaultAnimator"}}{{/crossLink}} class.
+	 *
+	 * @property DefaultAnimator
+	 * @type {Config}
+	 */
+	FlowCarousel.DefaultAnimator = DefaultAnimator;
 
 	/**
 	 * Reference to the {{#crossLink "AbstractNavigator"}}{{/crossLink}} class.
@@ -427,12 +455,12 @@ define([
 	 * - FlowCarousel.Event.STARTUP_ITEMS_RENDERED after the initial set of data has rendered
 	 *
 	 * @method init
-	 * @param {string} selector Selector of elements to turn into a carousel
+	 * @param {string|jQuery|DOMElement} element Element selector or jQuery reference or a dom element
 	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
 	 * 								{{#crossLink "Config"}}{{/crossLink}}.
 	 * @return {Deferred.Promise}
 	 */
-	FlowCarousel.prototype.init = function(selector, userConfig) {
+	FlowCarousel.prototype.init = function(element, userConfig) {
 		var promise;
 
 		if (this._initiated) {
@@ -441,19 +469,13 @@ define([
 
 		this.emitEvent(FlowCarousel.Event.INITIATING);
 
-		this._selector = selector;
-
-		if (typeof selector !== 'string') {
-			throw new Error('Expected a string as the selector argument, but got ' + typeof selector);
-		}
-
 		// extend the config with user-provided values if available
 		if (Util.isObject(userConfig)) {
 			this._config.extend(userConfig);
 		}
 
 		// initialize the wrap element that match given selector
-		this._setupElement(this._selector);
+		this._setupElement(element);
 
 		// use provided data source or a simple array if provided, use HtmlDataSource if nothing is provided
 		if (this._config.dataSource instanceof AbstractDataSource || Util.isArray(this._config.dataSource)) {
@@ -1233,20 +1255,20 @@ define([
 	 * If the selector does not match any elements, an error is thrown.
 	 *
 	 * @method _setupElement
-	 * @param {string} selector Wraps selector
+	 * @param {string|jQuery|DOMElement} source Wraps element or selector
 	 * @private
 	 */
-	FlowCarousel.prototype._setupElement = function(selector) {
-		var matches = $(selector),
+	FlowCarousel.prototype._setupElement = function(source) {
+		var matches = $(source),
 			element,
 			existingCarousel;
 
 		// make sure that the selector matches only a single element and throw error otherwise
 		if (matches.length === 0) {
-			throw new Error('Selector "' + selector + '" did not match any elements');
+			throw new Error('Selector "' + element + '" did not match any elements');
 		} else if (matches.length > 1) {
 			throw new Error(
-				'Selector "' + selector + '" matches more then one element, try using "' + selector + ':first"'
+				'Selector "' + element + '" matches more then one element, try using "' + element + ':first"'
 			);
 		}
 
@@ -1256,7 +1278,7 @@ define([
 		// make sure the same element is not initiated several times
 		if (existingCarousel instanceof FlowCarousel) {
 			throw new Error(
-				'Element matching selector "' + selector + '" is already a carousel component, ' +
+				'Element matching selector "' + element + '" is already a carousel component, ' +
 				'destroy the existing one first'
 			);
 		}
@@ -2097,6 +2119,9 @@ define([
 			callback.apply(callback, [name, delay]);
 		}.bind(this), delay);
 	};
+
+	// use the Exporter to export it to AMD, Angular etc
+	Exporter.export(FlowCarousel);
 
 	return FlowCarousel;
 });

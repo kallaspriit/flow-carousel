@@ -130,6 +130,7 @@ define([
 	&#x27;Deferred&#x27;,
 	&#x27;Util&#x27;,
 	&#x27;EventEmitter&#x27;,
+	&#x27;Exporter&#x27;
 ], function(
 	$,
 	Config,
@@ -145,7 +146,8 @@ define([
 	DragNavigator,
 	Deferred,
 	Util,
-	EventEmitter
+	EventEmitter,
+	Exporter
 ) {
 	&#x27;use strict&#x27;;
 
@@ -154,13 +156,14 @@ define([
 	 *
 	 * Responsive paginated high-performance HTML5 carousel with AngularJS support.
 	 *
-	 * Copyright Stagnation Lab
-	 * Released under the MIT license
 	 * https://github.com/kallaspriit/flow-carousel
 	 *
 	 * @class FlowCarousel
 	 * @extends EventEmitter
 	 * @constructor
+	 * @author Priit Kallas &lt;priit@stagnationlab.com&gt;
+	 * @copyright Stagnation Lab
+	 * @licence MIT
 	 */
 	function FlowCarousel() {
 		/**
@@ -245,16 +248,6 @@ define([
 		 * @default {}
 		 */
 		this._navigators = {};
-
-		/**
-		 * Selector of elements to turn into a carousel.
-		 *
-		 * @property _selector
-		 * @type {string}
-		 * @default null
-		 * @private
-		 */
-		this._selector = null;
 
 		/**
 		 * The interval reference for responsive layout changes.
@@ -403,6 +396,9 @@ define([
 
 	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
 
+	// The main FlowCarousel classes are referenced under the main FlowCarousel class so that only the main
+	// class is registered in the global namespace.
+
 	/**
 	 * Reference to the {{#crossLink &quot;Config&quot;}}{{/crossLink}} class.
 	 *
@@ -422,6 +418,22 @@ define([
 	FlowCarousel.AbstractDataSource = AbstractDataSource;
 
 	/**
+	 * Reference to the {{#crossLink &quot;ArrayDataSource&quot;}}{{/crossLink}} class.
+	 *
+	 * @property ArrayDataSource
+	 * @type {Config}
+	 */
+	FlowCarousel.ArrayDataSource = ArrayDataSource;
+
+	/**
+	 * Reference to the {{#crossLink &quot;HtmlDataSource&quot;}}{{/crossLink}} class.
+	 *
+	 * @property HtmlDataSource
+	 * @type {Config}
+	 */
+	FlowCarousel.HtmlDataSource = HtmlDataSource;
+
+	/**
 	 * Reference to the {{#crossLink &quot;AbstractRenderer&quot;}}{{/crossLink}} class.
 	 *
 	 * @property AbstractRenderer
@@ -430,12 +442,28 @@ define([
 	FlowCarousel.AbstractRenderer = AbstractRenderer;
 
 	/**
+	 * Reference to the {{#crossLink &quot;HtmlRenderer&quot;}}{{/crossLink}} class.
+	 *
+	 * @property HtmlRenderer
+	 * @type {Config}
+	 */
+	FlowCarousel.HtmlRenderer = HtmlRenderer;
+
+	/**
 	 * Reference to the {{#crossLink &quot;AbstractAnimator&quot;}}{{/crossLink}} class.
 	 *
 	 * @property AbstractAnimator
 	 * @type {Config}
 	 */
 	FlowCarousel.AbstractAnimator = AbstractAnimator;
+
+	/**
+	 * Reference to the {{#crossLink &quot;DefaultAnimator&quot;}}{{/crossLink}} class.
+	 *
+	 * @property DefaultAnimator
+	 * @type {Config}
+	 */
+	FlowCarousel.DefaultAnimator = DefaultAnimator;
 
 	/**
 	 * Reference to the {{#crossLink &quot;AbstractNavigator&quot;}}{{/crossLink}} class.
@@ -543,12 +571,12 @@ define([
 	 * - FlowCarousel.Event.STARTUP_ITEMS_RENDERED after the initial set of data has rendered
 	 *
 	 * @method init
-	 * @param {string} selector Selector of elements to turn into a carousel
+	 * @param {string|jQuery|DOMElement} element Element selector or jQuery reference or a dom element
 	 * @param {object} [userConfig] Optional user configuration object overriding defaults in the
 	 * 								{{#crossLink &quot;Config&quot;}}{{/crossLink}}.
 	 * @return {Deferred.Promise}
 	 */
-	FlowCarousel.prototype.init = function(selector, userConfig) {
+	FlowCarousel.prototype.init = function(element, userConfig) {
 		var promise;
 
 		if (this._initiated) {
@@ -557,19 +585,13 @@ define([
 
 		this.emitEvent(FlowCarousel.Event.INITIATING);
 
-		this._selector = selector;
-
-		if (typeof selector !== &#x27;string&#x27;) {
-			throw new Error(&#x27;Expected a string as the selector argument, but got &#x27; + typeof selector);
-		}
-
 		// extend the config with user-provided values if available
 		if (Util.isObject(userConfig)) {
 			this._config.extend(userConfig);
 		}
 
 		// initialize the wrap element that match given selector
-		this._setupElement(this._selector);
+		this._setupElement(element);
 
 		// use provided data source or a simple array if provided, use HtmlDataSource if nothing is provided
 		if (this._config.dataSource instanceof AbstractDataSource || Util.isArray(this._config.dataSource)) {
@@ -1349,20 +1371,20 @@ define([
 	 * If the selector does not match any elements, an error is thrown.
 	 *
 	 * @method _setupElement
-	 * @param {string} selector Wraps selector
+	 * @param {string|jQuery|DOMElement} source Wraps element or selector
 	 * @private
 	 */
-	FlowCarousel.prototype._setupElement = function(selector) {
-		var matches = $(selector),
+	FlowCarousel.prototype._setupElement = function(source) {
+		var matches = $(source),
 			element,
 			existingCarousel;
 
 		// make sure that the selector matches only a single element and throw error otherwise
 		if (matches.length === 0) {
-			throw new Error(&#x27;Selector &quot;&#x27; + selector + &#x27;&quot; did not match any elements&#x27;);
+			throw new Error(&#x27;Selector &quot;&#x27; + element + &#x27;&quot; did not match any elements&#x27;);
 		} else if (matches.length &gt; 1) {
 			throw new Error(
-				&#x27;Selector &quot;&#x27; + selector + &#x27;&quot; matches more then one element, try using &quot;&#x27; + selector + &#x27;:first&quot;&#x27;
+				&#x27;Selector &quot;&#x27; + element + &#x27;&quot; matches more then one element, try using &quot;&#x27; + element + &#x27;:first&quot;&#x27;
 			);
 		}
 
@@ -1372,7 +1394,7 @@ define([
 		// make sure the same element is not initiated several times
 		if (existingCarousel instanceof FlowCarousel) {
 			throw new Error(
-				&#x27;Element matching selector &quot;&#x27; + selector + &#x27;&quot; is already a carousel component, &#x27; +
+				&#x27;Element matching selector &quot;&#x27; + element + &#x27;&quot; is already a carousel component, &#x27; +
 				&#x27;destroy the existing one first&#x27;
 			);
 		}
@@ -2213,6 +2235,9 @@ define([
 			callback.apply(callback, [name, delay]);
 		}.bind(this), delay);
 	};
+
+	// use the Exporter to export it to AMD, Angular etc
+	Exporter.export(FlowCarousel);
 
 	return FlowCarousel;
 });

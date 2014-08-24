@@ -21,6 +21,14 @@ module.exports = function (grunt) {
 					'!src/EventEmitter.js', // ignore EventEmitter by Wolfy87 https://github.com/Wolfy87/EventEmitter
 				]
 			},
+			plguins: {
+				options: {
+					jshintrc: '.jshintrc',
+				},
+				src: [
+					'plugins/**/*.js'
+				]
+			},
 			tests: {
 				options: {
 					jshintrc: 'test/.jshintrc',
@@ -63,6 +71,22 @@ module.exports = function (grunt) {
 					preserveLicenseComments: false,
 					generateSourceMaps: true
 				}
+			}
+		},
+
+		// uglify is used to compress the plugins
+		uglify: {
+			options: {
+				sourceMap: true,
+				sourceMapIncludeSources: true
+			},
+			plugins: {
+				files: [{
+					expand: true,
+					//cwd: 'plugins',
+					src: 'plugins/**/*.js',
+					dest: 'dist'
+				}]
 			}
 		},
 
@@ -109,8 +133,8 @@ module.exports = function (grunt) {
 	// register default task
 	grunt.registerTask('default', ['jshint', 'test', 'build', 'reference']);
 
-	// builds distribution version of the library
-	grunt.registerTask('build', ['requirejs']);
+	// builds distribution version of the library and plugins
+	grunt.registerTask('build', ['requirejs', 'uglify']);
 
 	// executes the tests
 	grunt.registerTask('test', ['karma']);

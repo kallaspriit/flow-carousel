@@ -1364,6 +1364,20 @@ define([
 	};
 
 	/**
+	 * Validates the dataset and redraws some items if they have changes.
+	 *
+	 * You can call this when the data has changes in the background and the carousel should redraw itself.
+	 *
+	 * Returns promise that is resolved when the new items has been drawn.
+	 *
+	 * @method validate
+	 * @return {Deferred.Promise}
+	 */
+	FlowCarousel.prototype.validate = function() {
+		return this._reLayout(this._mainWrap, this._config.orientation);
+	};
+
+	/**
 	 * Initializes the top-level wrap element.
 	 *
 	 * If the selector matches multiple elements, only the first one is considered.

@@ -587,6 +587,18 @@ define([
 			}, 200);
 		});
 
+		it('calling validate triggers re-layout', function(done) {
+			spyOn(carousel, '_reLayout').and.callFake(function() {
+				expect(carousel._reLayout).toHaveBeenCalled();
+
+				done();
+			});
+
+			carousel.init('.carousel').done(function() {
+				carousel.validate();
+			});
+		});
+
 		it('changing carousel wrap size triggers responsive layout', function(done) {
 			carousel.init('.carousel').done(function() {
 				// give it some time to change

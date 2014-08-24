@@ -108,8 +108,8 @@ define([
 								expect(carousel.getCurrentPageIndex()).toEqual(1);
 
 								done();
-							}, 1500);
-						}, 1500);
+							}, 2000);
+						}, 2000);
 					}, 10);
 				}, 10);
 			});
@@ -160,8 +160,8 @@ define([
 								expect(carousel.getCurrentItemIndex()).toEqual(1);
 
 								done();
-							}, 1500);
-						}, 1500);
+							}, 2000);
+						}, 2000);
 					}, 10);
 				}, 10);
 			});

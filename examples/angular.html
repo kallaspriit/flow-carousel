@@ -57,18 +57,69 @@
 		<div class="carousel-item">29</div>
 	</div>
 
-	<h2>Dynamic renderer from a dataset</h2>
+	<h2>Dynamic renderer from a dataset of {{data.length}} items</h2>
 	<div flow-carousel config="config" data="data" item="item" class="carousel carousel-horizontal">
 		<div class="carousel-item">
-			{{$outer.name}} - {{item.index}}
+			{{$outer.name}} - {{item.index}}<br>
+			{{item.randomNumber}}
+		</div>
+	</div>
+	<div>
+		<button ng-click="update()">Change random numbers</button>
+		<button ng-click="insertFront()">Insert new item at front</button>
+	</div>
+
+	<h2>Custom deferred dataset example</h2>
+	<div flow-carousel config="config" data="customDataSource" item="item" class="carousel carousel-horizontal">
+		<div class="carousel-item">
+			{{$outer.name}} - #{{item.index}}
 		</div>
 	</div>
 
 	<script src="lib/jquery.js"></script>
 	<script src="lib/angular.js"></script>
-	<script src="../dist/FlowCarousel.js"></script>
+	<script src="../dist/FlowCarousel.min.js"></script>
 	<script src="../plugins/angular/FlowCarouselDirective.js"></script>
+	<!--script src="../dist/plugins/angular/FlowCarouselDirective.js"></script-->
 	<script>
+
+	// test asynchronous data source
+	function CustomDataSource() {
+		FlowCarousel.AbstractDataSource.call(this);
+
+		var itemCount = 1000,
+			i;
+
+		this._data = [];
+
+		for (i = 0; i < itemCount; i++) {
+			this._data.push({
+				index: i
+			});
+		}
+	}
+
+	CustomDataSource.prototype = Object.create(FlowCarousel.AbstractDataSource.prototype);
+
+	CustomDataSource.prototype.getItemCount = function() {
+		return this._data.length;
+	};
+
+	CustomDataSource.prototype.isAsynchronous = function() {
+		return true;
+	};
+
+	CustomDataSource.prototype.getItems = function(startIndex, endIndex) {
+		var deferred = new FlowCarousel.Deferred(),
+			requestDuration = 1000; /// one second
+
+		// fake asyncronous request that takes some time to complete
+		window.setTimeout(function() {
+			deferred.resolve(this._data.slice(startIndex, endIndex));
+		}.bind(this), requestDuration);
+
+		return deferred.promise();
+	};
 
 	// create an angular application
 	var angularApp = angular.module('CarouselApp', ['FlowCarousel'])
@@ -83,13 +134,31 @@
 				margin: 10
 			};
 
+			// simple array data example
 			$scope.data = [];
 
 			for (i = 0; i < datasetSize; i++) {
 				$scope.data.push({
-					index: i
+					index: i,
+					randomNumber: Math.floor(Math.random() * 100)
 				});
 			}
+
+			$scope.update = function() {
+				for (i = 0; i < $scope.data.length; i++) {
+					$scope.data[i].randomNumber = Math.floor(Math.random() * 100);
+				}
+			};
+
+			$scope.insertFront = function() {
+				$scope.data.unshift({
+					index: 0,
+					randomNumber: Math.floor(Math.random() * 100)
+				});
+			};
+
+			// custom deferred data source example
+			$scope.customDataSource = new CustomDataSource();
 		});
 
 	// fade in the page once angular is up and running

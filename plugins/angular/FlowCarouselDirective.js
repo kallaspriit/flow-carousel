@@ -16,13 +16,15 @@
 		 * @extends AbstractRenderer
 		 * @param {angular.Scope} scope The angular scope
 		 * @param {string} template Item template
+		 * @param {string} itemName The item name to assign data to in the scope
 		 * @constructor
 		 */
-		var AngularRenderer = function(scope, template) {
+		var AngularRenderer = function(scope, template, itemName) {
 			FlowCarousel.AbstractRenderer.call(this);
 
 			this._scope = scope;
 			this._template = template;
+			this._itemName = itemName;
 		};
 
 		AngularRenderer.prototype = Object.create(FlowCarousel.AbstractRenderer.prototype);
@@ -46,9 +48,8 @@
 				link,
 				element;
 
-			// TODO use parameter item name
 			// provide the scope with item data
-			scope.item = data;
+			scope[this._itemName] = data;
 
 			// reference the parent-parent scope as "$outer"
 			scope.$outer = scope.$parent.$parent;
@@ -108,8 +109,8 @@
 	 */
 	function FlowCarouselDirective() {
 		this._carousel = null;
-		this._data = null;
 		this._scope = null;
+		this._itemName = null;
 	}
 
 	/**
@@ -139,7 +140,7 @@
 	 * @param {DOMElement} $element The element to link to
 	 * @param {object} attrs Attributes
 	 */
-	FlowCarouselDirective.prototype.link = function(scope, $element/*, attrs*/) {
+	FlowCarouselDirective.prototype.link = function(scope, $element, attrs) {
 		var FlowCarousel = window.FlowCarousel,
 			config = {
 				dataSource: null
@@ -157,6 +158,9 @@
 		// store the reference to scope
 		this._scope = scope;
 
+		// store the item name to assign data under in the created item scopes
+		this._itemName = scope.item || 'item';
+
 		// extend the configuration with user config if provided
 		if (typeof scope.config === 'object') {
 			for (key in scope.config) {
@@ -166,28 +170,40 @@
 
 		// check whether basic array custom data has been provided
 		if (typeof scope.data === 'object' && typeof scope.data.length === 'number') {
-			this._data = scope.data;
-
-			config.dataSource = new FlowCarousel.ArrayDataSource(this._data);
+			config.dataSource = new FlowCarousel.ArrayDataSource(scope.data);
+		} else if (scope.data instanceof FlowCarousel.AbstractDataSource) {
+			// a custom AbstractDataSource implementation is provided
+			config.dataSource = scope.data;
 		}
 
 		// if we're using a custom data source then we need custom angular renderer as well
 		if (config.dataSource !== null) {
 			var AngularRenderer = createAngularRenderer();
 
-			config.renderer = new AngularRenderer(scope, this._template);
+			config.renderer = new AngularRenderer(scope, this._template, this._itemName);
 		}
 
 		// create carousel instance
 		this._carousel = new FlowCarousel();
 
-		// re-validate the scope after navigating to a new range of items
-		this._carousel.addListener(FlowCarousel.Event.NAVIGATED_TO_ITEM, function() {
-			this._scope.$apply();
+		// re-validate the scope after loading and rendering a new set of items
+		this._carousel.addListener(FlowCarousel.Event.LOADED_ITEMS, function() {
+			this._angularApply();
 		}.bind(this));
 
 		// initiate the carousel component
 		this._carousel.init($element, config);
+
+		// watch for number of items change
+		if (typeof attrs.data === 'string') {
+			this._scope.$watch(attrs.data + '.length', function (newItemCount, lastItemCount) {
+				if (newItemCount === lastItemCount) {
+					return;
+				}
+
+				this._carousel.validate();
+			}.bind(this));
+		}
 	};
 
 	/**
@@ -195,28 +211,49 @@
 	 *
 	 * @method _extractTemplate
 	 * @param {DOMElement} $element Carousel element
+	 * @return {string}
 	 * @private
-	 * @return
 	 */
 	FlowCarouselDirective.prototype._extractTemplate = function($element) {
 		// use the trimmed HTML content of the element as template
 		return $element.html().replace(/^\s+|\s+$/g, '');
 	};
 
+	/**
+	 * Performs safe angular scope $apply.
+	 *
+	 * @method _angularApply
+	 * @private
+	 */
+	FlowCarouselDirective.prototype._angularApply = function(fn) {
+		var phase = this._scope.$root.$$phase;
+
+		if (phase == '$apply' || phase == '$digest') {
+			if (typeof fn === 'function') {
+				fn();
+			}
+		} else {
+			this._scope.$apply(fn);
+		}
+	};
+
 	// define the FlowCarousel module, this should be included as dependency to your main application module
 	angular.module('FlowCarousel', [])
 		.directive('flowCarousel', function () {
-			var flowCarouselDirective = new FlowCarouselDirective();
 
-			window.d = flowCarouselDirective; // TODO remove this test
 
 			return {
 				restrict: 'EA', // element or an attribute
 				scope: {
 					data: '=',
-					config: '='
+					config: '=',
+					item: '@'
 				},
 				compile: function($element, attrs) {
+					var flowCarouselDirective = new FlowCarouselDirective();
+
+					window.d = flowCarouselDirective; // TODO remove this test
+
 					// run the compile method
 					flowCarouselDirective.compile($element, attrs);
 

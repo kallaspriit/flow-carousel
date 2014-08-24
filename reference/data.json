@@ -2792,6 +2792,18 @@
         {
             "file": "src\\FlowCarousel.js",
             "line": 1250,
+            "description": "Validates the dataset and redraws some items if they have changes.\n\nYou can call this when the data has changes in the background and the carousel should redraw itself.\n\nReturns promise that is resolved when the new items has been drawn.",
+            "itemtype": "method",
+            "name": "validate",
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 1264,
             "description": "Initializes the top-level wrap element.\n\nIf the selector matches multiple elements, only the first one is considered.\n\nIf the selector does not match any elements, an error is thrown.",
             "itemtype": "method",
             "name": "_setupElement",
@@ -2808,7 +2820,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1293,
+            "line": 1307,
             "description": "Initializes a single wrap element.",
             "itemtype": "method",
             "name": "_setupCarousel",
@@ -2834,7 +2846,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1394,
+            "line": 1408,
             "description": "Sets up the layout and renders the initial set of items.\n\nEmits:\n- FlowCarousel.Event.LAYOUT_CHANGED when the layout changes",
             "itemtype": "method",
             "name": "_setupLayout",
@@ -2862,7 +2874,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1435,
+            "line": 1449,
             "description": "Sets up the default navigators to use as defined in the {{#crossLink \"Config\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "_setupDefaultNavigators",
@@ -2872,7 +2884,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1468,
+            "line": 1482,
             "description": "Validates whether all the required items have been rendered and initiates rendering them if not.",
             "itemtype": "method",
             "name": "_validateItemsToRender",
@@ -2886,7 +2898,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1481,
+            "line": 1495,
             "description": "Removes items that have gone out of the render range.",
             "itemtype": "method",
             "name": "_removeInvalidItems",
@@ -2896,7 +2908,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1542,
+            "line": 1556,
             "description": "Renders a range of carousel items.\n\nEmits:\n- FlowCarousel.Event.LOADING_ITEMS [startIndex, endIndex] before starting to load a range of items\n- FlowCarousel.Event.ABORTED_ITEMS [startIndex, endIndex] if loading or a range of items was aborted\n- FlowCarousel.Event.LOADED_ITEMS [startIndex, endIndex, items] after loading and rendering a range of items\n- FlowCarousel.Event.STARTUP_ITEMS_RENDERED if the rendered range of items was the first",
             "itemtype": "method",
             "name": "_renderItemRange",
@@ -2922,7 +2934,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1615,
+            "line": 1629,
             "description": "Renders the item placeholders for current target index.",
             "itemtype": "method",
             "name": "_renderTargetIndexPlaceholders",
@@ -2932,7 +2944,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1630,
+            "line": 1644,
             "description": "Renders the item placeholders that will later be replaced with the actual items.\n\nGives the user some \"loading\" feedback.",
             "itemtype": "method",
             "name": "_renderItemPlaceholders",
@@ -2954,7 +2966,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1661,
+            "line": 1675,
             "description": "Renders given carousel items.",
             "itemtype": "method",
             "name": "_renderItems",
@@ -2980,7 +2992,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1741,
+            "line": 1755,
             "description": "Inserts rendered dom elements into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElements",
@@ -3009,7 +3021,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1802,
+            "line": 1816,
             "description": "Inserts a rendered dom element into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElement",
@@ -3036,7 +3048,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1879,
+            "line": 1893,
             "description": "Sets the scroller wrap size to the largest visible child size.",
             "itemtype": "method",
             "name": "_setScrollerSizeToLargestVisibleChildSize",
@@ -3046,7 +3058,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1910,
+            "line": 1924,
             "description": "Re-initializes the layout.\n\nUsed to apply responsive layout when the wrap size changes.\n\nSince fetching and rendering items can be asynchronous, this method returns a promise.",
             "itemtype": "method",
             "name": "_reLayout",
@@ -3072,7 +3084,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1936,
+            "line": 1950,
             "description": "Resets the component state and removes all rendered items.",
             "itemtype": "method",
             "name": "_reset",
@@ -3082,7 +3094,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1956,
+            "line": 1970,
             "description": "Sets up main wrap size change listener to apply responsive layout.",
             "itemtype": "method",
             "name": "_setupResponsiveLayoutListener",
@@ -3104,7 +3116,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1970,
+            "line": 1984,
             "description": "Checks whether the carousel wrap size has changed and triggers re-layout if so.",
             "itemtype": "method",
             "name": "_validateResponsiveLayout",
@@ -3126,7 +3138,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1997,
+            "line": 2011,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -3148,7 +3160,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2009,
+            "line": 2023,
             "description": "Returns the size of an element.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getElementSize",
@@ -3181,7 +3193,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2039,
+            "line": 2053,
             "description": "Returns biggest element size of given elements given orientation and size mode.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getLargestElementSize",
@@ -3214,7 +3226,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2080,
+            "line": 2094,
             "description": "Returns the opposite orientation name.\n\nFor Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.",
             "itemtype": "method",
             "name": "_getOppositeOrientation",
@@ -3235,7 +3247,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2096,
+            "line": 2110,
             "description": "Performs some action delayed by given amount.\n\nIf the method is called several times with the same name, the action is executed only once after the time\nhas passed from the last call.",
             "itemtype": "method",
             "name": "performDelayed",

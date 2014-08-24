@@ -1,6 +1,7 @@
 BODY {
     font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
     background-color: #F8F8F8;
+    padding: 20px 20px 60px 20px;
 }
 .carousel {
     border: 10px solid #FFF;

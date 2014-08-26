@@ -1,5 +1,5 @@
 define([
-	'jquery'
+	'Jquery'
 ], function($) {
 	'use strict';
 

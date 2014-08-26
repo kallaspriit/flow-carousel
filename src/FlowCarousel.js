@@ -1,5 +1,5 @@
 define([
-	'jquery',
+	'Jquery',
 	'Config',
 	'AbstractDataSource',
 	'ArrayDataSource',
@@ -271,11 +271,11 @@ define([
 		 *
 		 * Set to null if no animation is playing.
 		 *
-		 * @property _activeAnimationPromise
+		 * @property _activeAnimationDeferred
 		 * @type {Deferred.Promise|null}
 		 * @private
 		 */
-		this._activeAnimationPromise = null;
+		this._activeAnimationDeferred = null;
 
 		/**
 		 * Has the {{#crossLink "FlowCarousel/Event/STARTUP_ITEMS_RENDERED:property"}}{{/crossLink}} event bee emitted.
@@ -596,6 +596,8 @@ define([
 
 		this._validateItemsToRender().done(function() {
 			var instantAnimation = !this._config.animateToStartIndex;
+
+			this._setScrollerSizeToLargestVisibleChildSize();
 
 			if (this._config.startItemIndex !== null) {
 				// resolve once navigated to requested item
@@ -978,8 +980,8 @@ define([
 	 *
 	 * This can be different from the return value of getTargetItemIndex() if the carousel is animating.
 	 *
-	 * @method getCurrentItemIndex
-	 * @return {number}
+	 * @method isAnimating
+	 * @return {boolean}
 	 */
 	FlowCarousel.prototype.isAnimating = function() {
 		return this._isAnimating;
@@ -1107,18 +1109,13 @@ define([
 		instant = typeof instant === 'boolean' ? instant : false;
 		force = typeof force === 'boolean' ? force : false;
 
-		var itemCount = this._dataSource.getItemCount(),
-			isSameItemIndex = itemIndex === this._currentItemIndex,
-			fakeAnimationDeferred = null,
-			animationPromise;
+		var deferred = new Deferred(),
+			itemCount = this._dataSource.getItemCount(),
+			isSameItemIndex = itemIndex === this._currentItemIndex;
 
 		// if there are no items then resolve immediately
 		if (itemCount === 0) {
-			fakeAnimationDeferred = new Deferred();
-
-			fakeAnimationDeferred.resolve();
-
-			return fakeAnimationDeferred.promise();
+			deferred.resolve();
 		}
 
 		// validate index range
@@ -1128,27 +1125,40 @@ define([
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
-		// return the existing animation promise if already animating
-		if (this._isAnimating) {
-			return this._activeAnimationPromise;
-		}
+		// resolve existing animation deferred in an existing animation is already in progress
+		// TODO investigate allowing navigation while the previous animation is ongoing
+		/*if (this._activeAnimationDeferred !== null) {
+			console.log('resolve existing navigation deferred');
 
-		// update the target item index
-		this._targetItemIndex = itemIndex;
-		this._isAnimating = true;
+			this._activeAnimationDeferred.resolve();
+
+			return this.navigateToItem(itemIndex,instant, force);
+		}*/
+
+		// ignore navigation request when already navigating
+		if (this._isAnimating) {
+			return this._activeAnimationDeferred;
+		}
 
 		// animate to the new item position index if it's different from current item index
 		if (!isSameItemIndex || force === true) {
+			this._isAnimating = true;
+			this._targetItemIndex = itemIndex;
+
 			// start animating to given item, this is an asynchronous process
-			animationPromise = this._animator.animateToItem(itemIndex, instant);
+			this._animator.animateToItem(itemIndex, instant).done(function() {
+				deferred.resolve();
+			});
 
 			// emitting this event before starting the animation causes lag for some reason
 			this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_ITEM, [itemIndex, instant]);
+
+			//console.log('navigating to item', itemIndex, instant);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
-			fakeAnimationDeferred = new Deferred();
+			deferred.resolve();
 
-			animationPromise = fakeAnimationDeferred.promise();
+			//console.log('already at item', itemIndex, instant);
 		}
 
 		// render placeholders that are later replaced with real loaded items
@@ -1157,10 +1167,12 @@ define([
 		}
 
 		// once the animation is complete, update the current item index
-		animationPromise.done(function() {
-			this._currentItemIndex = itemIndex;
+		deferred.done(function() {
+			//console.log('navigated to', itemIndex);
+
+			this._currentItemIndex = this._targetItemIndex;
 			this._isAnimating = false;
-			this._activeAnimationPromise = null;
+			this._activeAnimationDeferred = null;
 
 			// remove items that have moved out of range
 			this._destroyInvalidItems();
@@ -1174,15 +1186,10 @@ define([
 			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_ITEM, [itemIndex, instant]);
 		}.bind(this));
 
-		// resolve the instant fake animation
-		if (fakeAnimationDeferred !== null) {
-			fakeAnimationDeferred.resolve();
-		}
-
 		// store the promise so it can be returned when requesting a new animation while the last still playing
-		this._activeAnimationPromise = animationPromise;
+		this._activeAnimationDeferred = deferred;
 
-		return animationPromise;
+		return deferred.promise();
 	};
 
 	/**
@@ -1928,7 +1935,10 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._insertRenderedElements = function(elements, startIndex, arePlaceholders) {
-		var itemIndex,
+		var useFragment = typeof document.createDocumentFragment === 'function',
+			$elementRangeFragment = useFragment ? $(document.createDocumentFragment()) : null,
+			$elementWrapElement = useFragment ? $elementRangeFragment : $(this._scrollerWrap),
+			itemIndex,
 			placeholderPos,
 			placeholderElement,
 			i;
@@ -1962,17 +1972,22 @@ define([
 					this._renderedPlaceholderIndexes.splice(placeholderPos, 1);
 				}
 
-				this._insertRenderedElement(elements[i], itemIndex);
+				this._insertRenderedElement($elementWrapElement, elements[i], itemIndex);
 
 				this._renderedItemIndexes.push(itemIndex);
 			} else {
 				// only add placeholders if they don't already exist
 				if (this._renderedPlaceholderIndexes.indexOf(itemIndex) === -1) {
-					this._insertRenderedElement(elements[i], itemIndex, true);
+					this._insertRenderedElement($elementWrapElement, elements[i], itemIndex, true);
 
 					this._renderedPlaceholderIndexes.push(itemIndex);
 				}
 			}
+		}
+
+		// the elements are first added to a fragment and then the whole fragment appended to scroller for performance
+		if (useFragment) {
+			$(this._scrollerWrap).append($elementRangeFragment);
 		}
 	};
 
@@ -1980,12 +1995,13 @@ define([
 	 * Inserts a rendered dom element into the carousel dom structure.
 	 *
 	 * @method _insertRenderedElement
+	 * @param {DOMElement} $wrap Wrap to append the element to once ready
 	 * @param {DOMElement} element Element to insert
 	 * @param {number} index Element index
 	 * @param {boolean} isPlaceholder Is the element a placeholder
 	 * @private
 	 */
-	FlowCarousel.prototype._insertRenderedElement = function(element, index, isPlaceholder) {
+	FlowCarousel.prototype._insertRenderedElement = function($wrap, element, index, isPlaceholder) {
 		// calculate the properties of the element
 		var $element = $(element),
 			orientation = this._config.orientation,
@@ -2046,7 +2062,7 @@ define([
 		//this._preprocessItemElement($itemWrapper, index);
 
 		// append the element to the scroller wrap
-		$(this._scrollerWrap).append($itemWrapper);
+		$wrap.append($itemWrapper);
 
 		/* istanbul ignore if */
 		if (typeof this._itemIndexToElementMap[index] !== 'undefined') {
@@ -2194,8 +2210,7 @@ define([
 		$scrollerWrap
 			.empty()
 			.attr('style', null)
-			.data(this._config.cssPrefix + 'last-size', null)
-			.data(this._config.cssPrefix + 'last-opposite-size', null);
+			.data(this._config.cssPrefix + 'last-size', null);
 
 		this._itemIndexToElementMap = {};
 		this._isAnimating = false;
@@ -2224,6 +2239,15 @@ define([
 		$(window).resize(function() {
 			this.validate();
 		}.bind(this));
+
+		// validate responsive layout when any of the main wrap attributes change
+		$(this._mainWrap).attrchange({
+			callback: function () {
+				console.log('attributes changed');
+
+				this._validateResponsiveLayout();
+			}.bind(this)
+		});
 	};
 
 	/**
@@ -2241,30 +2265,23 @@ define([
 
 		var $element = $(this._mainWrap),
 			lastSize = $element.data(this._config.cssPrefix + 'last-size') || null,
-			lastOppositeSize = $element.data(this._config.cssPrefix + 'last-opposite-size') || null,
-			currentSize = this._getMainWrapSize(),
-			currentOppositeSize = this._getMainWrapOppositeSize();
+			currentSize = this._getMainWrapSize(true);
 
 		$element.data(this._config.cssPrefix + 'last-size', currentSize);
-		$element.data(this._config.cssPrefix + 'last-opposite-size', currentOppositeSize);
 
-		if (lastSize === null && lastOppositeSize === null)  {
+		if (lastSize === null)  {
 			return;
 		}
 
 		// perform the layout routine if the wrap size has changed and it did not change to zero
 		if (
 			(currentSize !== lastSize && currentSize !== 0)
-			|| (currentOppositeSize !== lastOppositeSize && currentOppositeSize !== 0)
 		) {
 			// perform the re-layout routine only when the wrap size has not changed for some time
 			this._performDelayed('re-layout', function() {
 				this._reLayout();
 			}.bind(this), this._config.responsiveLayoutDelay);
 		}
-
-		// TODO this may be costly, search for better ways to listen to visible elements size change
-		//this._setScrollerSizeToLargestVisibleChildSize();
 	};
 
 	/**
@@ -2356,10 +2373,11 @@ define([
 	 * Uses cached value if available.
 	 *
 	 * @method _getMainWrapSize
+	 * @param {boolean} [ignoreCache=false] Should cache be ignored
 	 * @return {number}
 	 */
-	FlowCarousel.prototype._getMainWrapSize = function() {
-		if (this._useCache && this._cache.wrapSize !== null) {
+	FlowCarousel.prototype._getMainWrapSize = function(ignoreCache) {
+		if (this._useCache && this._cache.wrapSize !== null && ignoreCache !== true) {
 			return this._cache.wrapSize;
 		}
 
@@ -2376,10 +2394,11 @@ define([
 	 * Uses cached value if available.
 	 *
 	 * @method _getMainWrapOppositeSize
+	 * @param {boolean} [ignoreCache=false] Should cache be ignored
 	 * @return {number}
 	 */
-	FlowCarousel.prototype._getMainWrapOppositeSize = function() {
-		if (this._useCache && this._cache.wrapOppositeSize !== null) {
+	FlowCarousel.prototype._getMainWrapOppositeSize = function(ignoreCache) {
+		if (this._useCache && this._cache.wrapOppositeSize !== null && ignoreCache !== true) {
 			return this._cache.wrapOppositeSize;
 		}
 

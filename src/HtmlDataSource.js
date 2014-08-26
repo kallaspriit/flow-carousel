@@ -1,5 +1,5 @@
 define([
-	'jquery',
+	'Jquery',
 	'AbstractDataSource',
 	'Deferred'
 ], function($, AbstractDataSource, Deferred) {

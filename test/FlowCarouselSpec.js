@@ -477,7 +477,7 @@ define([
 
 					carousel.navigateToPreviousPage().done(function() {
 						expect(carousel.getCurrentPageIndex()).toEqual(0);
-						expect($('.flow-carousel-placeholder').length > 0).toEqual(true);
+						expect($('.flow-carousel-placeholder').length).toEqual(0);
 
 						done();
 					});
@@ -756,6 +756,9 @@ define([
 			carousel.init('.carousel');
 
 			carousel.navigateToItem(1);
+
+			expect(carousel.isAnimating()).toEqual(true);
+
 			carousel.navigateToItem(2).done(function() {
 				expect(carousel.getCurrentItemIndex()).toEqual(1);
 

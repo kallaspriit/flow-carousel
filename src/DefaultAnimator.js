@@ -1,5 +1,5 @@
 define([
-	'jquery',
+	'Jquery',
 	'AbstractAnimator',
 	'Config',
 	'Util',
@@ -83,6 +83,16 @@ define([
 		// make sure the position is a full integer
 		position = Math.floor(position);
 
+		// resolve existing deferred if exists
+		if (this._activeDeferred !== null) {
+			this._activeDeferred.resolve();
+			this._activeDeferred = null;
+
+			console.log('resolve existing animation');
+
+			//throw new Error('An animation is already in progress, this should not happen');
+		}
+
 		// the translate command is different for horizontal and vertical carousels
 		if (orientation === Config.Orientation.HORIZONTAL) {
 			translateCommand = 'translate3d(' + position + 'px,0,0)';
@@ -90,12 +100,16 @@ define([
 			translateCommand = 'translate3d(0,' + position + 'px,0)';
 		}
 
+
+
 		// add a class that enables transitioning transforms if instant is not required
 		if (instant === true) {
 			$scrollerWrap.removeClass(animateTransformClass);
 		} else {
 			$scrollerWrap.addClass(animateTransformClass);
 		}
+
+		console.log('start animation', position, instant);
 
 		// apply the translate
 		$scrollerWrap.css('transform', translateCommand, instant);
@@ -105,18 +119,12 @@ define([
 			return;
 		}
 
-		// resolve existing deferred if exists
-		if (this._activeDeferred !== null) {
-			//this._activeDeferred.resolve();
-			//this._activeDeferred = null;
-
-			throw new Error('An animation is already in progress, this should not happen');
-		}
-
 		currentPosition = this.getCurrentPosition();
 
 		// if the position is same as current then resolve immediately
 		if (instant || position === currentPosition) {
+			console.log('resolve instant animation');
+
 			deferred.resolve();
 		} else {
 			this._activeDeferred = new Deferred();
@@ -164,9 +172,10 @@ define([
 	 */
 	DefaultAnimator.prototype._resolveDeferred = function() {
 		if (this._activeDeferred === null) {
-
 			return;
 		}
+
+		console.log('animation complete');
 
 		this._activeDeferred.resolve();
 	};

@@ -85,7 +85,7 @@ define([
 				$mainWrap.trigger('mouseleave');
 
 				done();
-			}, 300);
+			}, 500);
 		});
 
 		it('navigates to previous page on left arrow', function (done) {
@@ -109,7 +109,7 @@ define([
 					$mainWrap.trigger('mouseleave');
 
 					done();
-				}, 300);
+				}, 500);
 			});
 		});
 
@@ -140,7 +140,7 @@ define([
 				$mainWrap.trigger('mouseleave');
 
 				done();
-			}, 300);
+			}, 500);
 		});
 
 		it('navigates to previous page on up arrow for vertical carousel', function (done) {
@@ -171,7 +171,7 @@ define([
 					$mainWrap.trigger('mouseleave');
 
 					done();
-				}, 300);
+				}, 500);
 			});
 		});
 
@@ -194,7 +194,7 @@ define([
 				//$mainWrap.trigger('mouseleave');
 
 				done();
-			}, 300);
+			}, 500);
 		});
 
 		it('non-arrow keys are not handled', function (done) {
@@ -217,7 +217,7 @@ define([
 				$mainWrap.trigger('mouseleave');
 
 				done();
-			}, 300);
+			}, 500);
 		});
 	});
 });

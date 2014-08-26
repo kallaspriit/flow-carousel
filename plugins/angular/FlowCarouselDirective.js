@@ -136,11 +136,11 @@
 	 * Throws error if FlowCarousel class is not present.
 	 *
 	 * @method link
-	 * @param {angular.Scope} scope Angular scope
+	 * @param {angular.Scope} $scope Angular scope
 	 * @param {DOMElement} $element The element to link to
-	 * @param {object} attrs Attributes
+	 * @param {object} $attrs Attributes
 	 */
-	FlowCarouselDirective.prototype.link = function(scope, $element, attrs) {
+	FlowCarouselDirective.prototype.link = function($scope, $element, $attrs) {
 		var FlowCarousel = window.FlowCarousel,
 			config = {
 				dataSource: null
@@ -156,31 +156,31 @@
 		}
 
 		// store the reference to scope
-		this._scope = scope;
+		this._scope = $scope;
 
 		// store the item name to assign data under in the created item scopes
-		this._itemName = scope.item || 'item';
+		this._itemName = $scope.item || 'item';
 
 		// extend the configuration with user config if provided
-		if (typeof scope.config === 'object') {
-			for (key in scope.config) {
-				config[key] = scope.config[key];
+		if (typeof $scope.config === 'object') {
+			for (key in $scope.config) {
+				config[key] = $scope.config[key];
 			}
 		}
 
 		// check whether basic array custom data has been provided
-		if (typeof scope.data === 'object' && typeof scope.data.length === 'number') {
-			config.dataSource = new FlowCarousel.ArrayDataSource(scope.data);
-		} else if (scope.data instanceof FlowCarousel.AbstractDataSource) {
+		if (typeof $scope.data === 'object' && typeof $scope.data.length === 'number') {
+			config.dataSource = new FlowCarousel.ArrayDataSource($scope.data);
+		} else if ($scope.data instanceof FlowCarousel.AbstractDataSource) {
 			// a custom AbstractDataSource implementation is provided
-			config.dataSource = scope.data;
+			config.dataSource = $scope.data;
 		}
 
 		// if we're using a custom data source then we need custom angular renderer as well
 		if (config.dataSource !== null) {
 			var AngularRenderer = createAngularRenderer();
 
-			config.renderer = new AngularRenderer(scope, this._template, this._itemName);
+			config.renderer = new AngularRenderer($scope, this._template, this._itemName);
 		}
 
 		// create carousel instance
@@ -195,14 +195,30 @@
 		this._carousel.init($element, config);
 
 		// watch for number of items change
-		if (typeof attrs.data === 'string') {
-			this._scope.$watch(attrs.data + '.length', function (newItemCount, lastItemCount) {
-				if (newItemCount === lastItemCount) {
-					return;
-				}
+		if (typeof $attrs.data === 'string') {
+			/*if ($attrs.data.indexOf('(') === -1) {
+				// watching a normal variable, expecting an array
+				this._scope.$watch($attrs.data + '.length', function (newItemCount, lastItemCount) {
+					if (newItemCount === lastItemCount) {
+						return;
+					}
 
-				this._carousel.validate();
-			}.bind(this));
+					this._carousel.validate();
+				}.bind(this));
+			} else {*/
+				this._scope.$watch(
+					'$parent.' + $attrs.data + '.length',
+					function (newItemCount, lastItemCount) {
+						if (newItemCount === lastItemCount) {
+							return;
+						}
+
+						console.log('change', newItemCount, lastItemCount);
+
+						this._carousel.validate();
+					}.bind(this)
+				);
+			//}
 		}
 	};
 
@@ -240,25 +256,23 @@
 	// define the FlowCarousel module, this should be included as dependency to your main application module
 	angular.module('FlowCarousel', [])
 		.directive('flowCarousel', function () {
-
-
 			return {
 				restrict: 'EA', // element or an attribute
 				scope: {
-					data: '=',
-					config: '=',
-					item: '@'
+					data: '=', // the data to render, leave empty if items are already in the DOM
+					config: '=', // optional config passed to the carousel init method
+					item: '@' // the name of the scope variable that each item data is set to
 				},
-				compile: function($element, attrs) {
+				compile: function ($element, attrs) {
 					var flowCarouselDirective = new FlowCarouselDirective();
-
-					window.d = flowCarouselDirective; // TODO remove this test
 
 					// run the compile method
 					flowCarouselDirective.compile($element, attrs);
 
 					// return the link method
-					return flowCarouselDirective.link.bind(flowCarouselDirective);
+					return function ($scope, $element, $attrs) {
+						flowCarouselDirective.link($scope, $element, $attrs);
+					};
 				}
 			};
 		})

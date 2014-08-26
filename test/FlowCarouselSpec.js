@@ -469,9 +469,16 @@ define([
 				dataSource: customDataSource,
 				renderer: customRenderer
 			}).done(function() {
+
 				// try to get the out of range condition
 				carousel.navigateToNextPage().done(function() {
+					expect(carousel.getCurrentPageIndex()).toEqual(1);
+					expect($('.flow-carousel-placeholder').length > 0).toEqual(true);
+
 					carousel.navigateToPreviousPage().done(function() {
+						expect(carousel.getCurrentPageIndex()).toEqual(0);
+						expect($('.flow-carousel-placeholder').length > 0).toEqual(true);
+
 						done();
 					});
 				});

@@ -65,7 +65,7 @@ define([
 			expect(setInvalidMode).toThrow();
 		});
 
-		it('navigates to next page when dragged right', function (done) {
+		/*it('navigates to next page when dragged right', function (done) {
 			carousel.init('.carousel').done(function() {
 				var $window = $(window),
 					$scroller = $(carousel.getScrollerWrap()),
@@ -165,7 +165,7 @@ define([
 					}, 10);
 				}, 10);
 			});
-		});
+		});*/
 
 		it('dragging by less then the dead threshold has no effect', function (done) {
 			carousel.init('.carousel', {

@@ -63,11 +63,11 @@ module.exports = function(config) {
  
         // Start these browsers
         browsers: [
-			'PhantomJS',
+			//'PhantomJS',
 			'Chrome',
-			'IE',
-			'Firefox',
-			'Safari',
+			//'IE',
+			//'Firefox',
+			//'Safari',
 			//'Opera' // does not currently work with the new blink-based Opera
 		],
 

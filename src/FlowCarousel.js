@@ -209,6 +209,16 @@ define([
 		this._currentItemIndex = 0;
 
 		/**
+		 * Index of currently-hovered item or null if not hovering any items.
+		 *
+		 * @property _hoverItemIndex
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
+		this._hoverItemIndex = null;
+
+		/**
 		 * List of item indexes that have been rendered.
 		 *
 		 * @property _renderedItemIndexes
@@ -276,6 +286,49 @@ define([
 		 * @private
 		 */
 		this._startupItemsRenderedEmitted = false;
+
+		/**
+		 * The last obesrved largest child size.
+		 *
+		 * @property _lastLargestChildSize
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
+		this._lastLargestChildSize = null;
+
+		/**
+		 * Various cached sizes and values that do not need to be always calculated.
+		 *
+		 * @property _cache
+		 * @type {object}
+		 * @param {number|null} wrapSize The cached main wrap size
+		 * @param {number|null} wrapOppositeSize The cached main wrap opposite size
+		 * @private
+		 */
+		this._cache = {
+			wrapSize: null,
+			wrapOppositeSize: null
+		};
+
+		/**
+		 * Empty clone of the cache used for resetting it.
+		 *
+		 * @property _emptyCache
+		 * @type {object}
+		 * @private
+		 */
+		this._emptyCache = Util.cloneObj(this._cache);
+
+		/**
+		 * Should caches be used when possible.
+		 *
+		 * @property _useCache
+		 * @type {boolean}
+		 * @default true
+		 * @private
+		 */
+		this._useCache = true;
 	}
 
 	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
@@ -424,6 +477,10 @@ define([
 	 * @param {string} Event.NAVIGATED_TO_PAGE='navigated-to-page' [pageIndex, instant] Emitted when finished
 	 * 				   navigate to a carousel item index including animation
 	 * @param {string} Event.LAYOUT_CHANGED='layout-changed' Emitted when the layout is re-calculated
+	 * @param {string} Event.DRAG_BEGIN='drag-begin' [startPosition, dragOppositePosition, carouselPosition] Emitted
+	 * 				   when the drag navigator begins to drag the scroller
+	 * @param {string} Event.DRAG_END='drag-end' [navigationMode, startPosition, endPosition, deltaDragPosition,
+	 * 				   closestIndex, direction, targetElement] Emitted when dragging stopped
 	 * @type {object}
 	 */
 	FlowCarousel.Event = {
@@ -441,7 +498,10 @@ define([
 		NAVIGATING_TO_PAGE: 'navigating-to-page',
 		NAVIGATED_TO_PAGE: 'navigated-to-page',
 
-		LAYOUT_CHANGED: 'layout-changed'
+		LAYOUT_CHANGED: 'layout-changed',
+
+		DRAG_BEGIN: 'drag-begin',
+		DRAG_END: 'drag-end',
 	};
 
 	/**
@@ -461,7 +521,7 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	FlowCarousel.prototype.init = function(element, userConfig) {
-		var promise;
+		var deferred = new Deferred();
 
 		if (this._initiated) {
 			throw new Error('The carousel is already initiated');
@@ -521,21 +581,39 @@ define([
 		}
 
 		// setup the carousel rendering and events
-		promise = this._setupCarousel(this._mainWrap, this._config.orientation);
+		this._setupCarousel(this._mainWrap, this._config.orientation);
 
 		// setup the default navigators
 		this._setupDefaultNavigators();
 
-		// emit the initiated event once done
-		promise.done(function() {
-			this.emitEvent(FlowCarousel.Event.INITIATED);
+		// notify the animator that carousel element is ready
+		this._animator.onCarouselElementReady();
 
-			this._initiated = true;
+		// notify the animator that carousel is initiated
+		this._initiated = true;
 
-			this._validateItemsToRender();
+		this.emitEvent(FlowCarousel.Event.INITIATED);
+
+		this._validateItemsToRender().done(function() {
+			var instantAnimation = !this._config.animateToStartIndex;
+
+			if (this._config.startItemIndex !== null) {
+				// resolve once navigated to requested item
+				this.navigateToItem(this._config.startItemIndex, instantAnimation).done(function() {
+					deferred.resolve();
+				});
+			} else if (this._config.startPageIndex !== null) {
+				// resolve once navigated to requested page
+				this.navigateToPage(this._config.startPageIndex, instantAnimation).done(function() {
+					deferred.resolve();
+				});
+			} else {
+				// there's nothing to wait for, create and resolve a deferred immediately
+				deferred.resolve();
+			}
 		}.bind(this));
 
-		return promise;
+		return deferred.promise();
 	};
 
 	/**
@@ -652,7 +730,7 @@ define([
 	 * @return {number}
 	 */
 	FlowCarousel.prototype.getItemSize = function() {
-		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation),
+		var wrapSize = this._getMainWrapSize(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize);
 
 		return this._calculateItemSize(wrapSize, itemsPerPage);
@@ -665,7 +743,7 @@ define([
 	 * @return {number}
 	 */
 	FlowCarousel.prototype.getPageSize = function() {
-		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation),
+		var wrapSize = this._getMainWrapSize(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage);
 
@@ -679,7 +757,7 @@ define([
 	 * @return {number}
 	 */
 	FlowCarousel.prototype.getTotalSize = function() {
-		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation),
+		var wrapSize = this._getMainWrapSize(),
 			itemCount = this._dataSource.getItemCount(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage);
@@ -698,6 +776,20 @@ define([
 	};
 
 	/**
+	 * Returns the number of items on the last page.
+	 *
+	 * @method getItemCountOnLastPage
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemCountOnLastPage = function() {
+		var itemCount = this.getItemCount(),
+			itemsPerPage = this.getItemsPerPage(),
+			pageCount = this.getPageCount();
+
+		return itemCount - (pageCount - 1) * itemsPerPage;
+	};
+
+	/**
 	 * Returns the number of pages the dataset contains given current wrap size.
 	 *
 	 * @method getPageCount
@@ -710,13 +802,19 @@ define([
 	/**
 	 * Returns the number of items displayed on a single page.
 	 *
+	 * Calculating the number of items per page causes a layout which is bad for performance so cached value is used
+	 * when possible.
+	 *
 	 * @method getItemsPerPage
 	 * @return {number}
 	 */
 	FlowCarousel.prototype.getItemsPerPage = function() {
-		var wrapSize = this._getElementSize(this._mainWrap, this._config.orientation);
+		var wrapSize = this._getMainWrapSize(),
+			itemsPerPage = this._config.getItemsPerPage(wrapSize);
 
-		return this._config.getItemsPerPage(wrapSize);
+		this._cache.itemsPerPage = itemsPerPage;
+
+		return itemsPerPage;
 	};
 
 	/**
@@ -741,6 +839,16 @@ define([
 	 */
 	FlowCarousel.prototype.getCurrentItemIndex = function() {
 		return this._currentItemIndex;
+	};
+
+	/**
+	 * Returns the currently-hovered item index or null if none is hovered.
+	 *
+	 * @method getHoverItemIndex
+	 * @return {number|null}
+	 */
+	FlowCarousel.prototype.getHoverItemIndex = function() {
+		return this._hoverItemIndex;
 	};
 
 	/**
@@ -783,6 +891,17 @@ define([
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage);
 
 		return Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem));
+	};
+
+	/**
+	 * Returns item index by position.
+	 *
+	 * @method getItemIndexByPosition
+	 * @param {number} position Item position
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemIndexByPosition= function(position) {
+		return this.getClosestItemIndexAtPosition(position, 1);
 	};
 
 	/**
@@ -993,6 +1112,15 @@ define([
 			fakeAnimationDeferred = null,
 			animationPromise;
 
+		// if there are no items then resolve immediately
+		if (itemCount === 0) {
+			fakeAnimationDeferred = new Deferred();
+
+			fakeAnimationDeferred.resolve();
+
+			return fakeAnimationDeferred.promise();
+		}
+
 		// validate index range
 		if (itemIndex < 0) {
 			throw new Error('Invalid negative  index "' + itemIndex + '" requested');
@@ -1035,13 +1163,13 @@ define([
 			this._activeAnimationPromise = null;
 
 			// remove items that have moved out of range
-			this._removeInvalidItems();
+			this._destroyInvalidItems();
 
 			// check whether we need to render or remove some items
-			this._validateItemsToRender();
-
-			// set the scroller wrap size to the largest currently visible item size
-			this._setScrollerSizeToLargestVisibleChildSize();
+			this._validateItemsToRender().done(function() {
+				// update scroller size to largest visible child
+				this._setScrollerSizeToLargestVisibleChildSize();
+			}.bind(this));
 
 			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_ITEM, [itemIndex, instant]);
 		}.bind(this));
@@ -1136,6 +1264,32 @@ define([
 	};
 
 	/**
+	 * Returns whether given (or current if no argument is given) page is the first one.
+	 *
+	 * @method isFirstPage
+	 * @param {number} [pageIndex=getCurrentPageIndex()] Optional page index, current by default
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isFirstPage = function(pageIndex) {
+		pageIndex = typeof pageIndex === 'number' ? pageIndex : this.getCurrentPageIndex();
+
+		return pageIndex === 0;
+	};
+
+	/**
+	 * Returns whether given (or current if no argument is given) page is the last one.
+	 *
+	 * @method isLastPage
+	 * @param {number} [pageIndex=getCurrentPageIndex()] Optional page index, current by default
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isLastPage = function(pageIndex) {
+		pageIndex = typeof pageIndex === 'number' ? pageIndex : this.getCurrentPageIndex();
+
+		return this.getPageCount() === 0 || pageIndex === this.getPageCount() - 1;
+	};
+
+	/**
 	 * Navigates to next page if available.
 	 *
 	 * Returns deferred promise that will be resolved once the animation completes.
@@ -1201,10 +1355,16 @@ define([
 	 * @return {DOMElement[]}
 	 */
 	FlowCarousel.prototype.getCurrentPageVisibleItemElements = function() {
-		var visibleRange = this.getCurrentPageVisibleRange(),
+		var itemCount = this.getItemCount(),
+			visibleRange = this.getCurrentPageVisibleRange(),
 			elements = [],
 			element,
 			i;
+
+		// return empty array if there are not items
+		if (itemCount === 0) {
+			return [];
+		}
 
 		for (i = visibleRange.start; i <= visibleRange.end; i++) {
 			element = this.getItemElementByIndex(i);
@@ -1233,6 +1393,11 @@ define([
 	FlowCarousel.prototype.getItemElementByIndex = function(itemIndex) {
 		var itemCount = this.getItemCount();
 
+		// nothing to search for
+		if (itemCount === 0) {
+			return null;
+		}
+
 		// validate index range
 		if (itemIndex < 0) {
 			throw new Error('Invalid negative  index "' + itemIndex + '" requested');
@@ -1258,7 +1423,7 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	FlowCarousel.prototype.validate = function() {
-		return this._reLayout(this._mainWrap, this._config.orientation);
+		return this._reLayout();
 	};
 
 	/**
@@ -1310,7 +1475,6 @@ define([
 	 * @method _setupCarousel
 	 * @param {DOMelement} wrap The carousel wrap to setup
 	 * @param {Config/Orientation:property} orientation Orientation to use
-	 * @return {Deferred.Promise}
 	 * @private
 	 */
 	FlowCarousel.prototype._setupCarousel = function(wrap, orientation) {
@@ -1373,12 +1537,10 @@ define([
 		}
 
 		// setup the individual elements
-		this._setupLayout(wrap, orientation);
+		this._setupLayout();
 
-		// if we're using responsive layout then we need to recalculate sizes and positions if the wrap size changes
-		if (this._config.useResponsiveLayout) {
-			this._setupResponsiveLayoutListener(wrap, orientation);
-		}
+		// listen for wrap size changes and perform re-layout when needed
+		this._setupResponsiveLayoutListener();
 
 		// remove the loading class
 		$element.removeClass(className.initiating);
@@ -1386,22 +1548,6 @@ define([
 		// throw error if both item and page start indexes are set
 		if (this._config.startItemIndex !== null && this._config.startPageIndex !== null) {
 			throw new Error('Set either the startItemIndex or startPageIndex option but not both');
-		}
-
-		// navigate to the start index item immediately if set
-		if (this._config.startItemIndex !== null) {
-			// resolve once navigated to requested item
-			return this.navigateToItem(this._config.startItemIndex, !this._config.animateToStartIndex);
-		} else if (this._config.startPageIndex !== null) {
-			// resolve once navigated to requested page
-			return this.navigateToPage(this._config.startPageIndex, !this._config.animateToStartIndex);
-		} else {
-			// there's nothing to wait for, create and resolve a deferred immediately
-			var instantDeferred = new Deferred();
-
-			instantDeferred.resolve();
-
-			return instantDeferred.promise();
 		}
 	};
 
@@ -1412,13 +1558,12 @@ define([
 	 * - FlowCarousel.Event.LAYOUT_CHANGED when the layout changes
 	 *
 	 * @method _setupLayout
-	 * @param {DOMelement} element Element to setup items in
-	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @param {number} [startItemIdex] Optional item index to navigate to instantly
 	 * @private
 	 */
-	FlowCarousel.prototype._setupLayout = function(element, orientation, startItemIndex) {
-		var wrapSize = this._getElementSize(element, orientation),
+	FlowCarousel.prototype._setupLayout = function(startItemIndex) {
+		var orientation = this._config.orientation,
+			wrapSize = this._getMainWrapSize(),
 			itemCount = this._dataSource.getItemCount(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
@@ -1426,6 +1571,17 @@ define([
 			sizeProp = orientation === Config.Orientation.HORIZONTAL
 				? 'width'
 				: 'height';
+
+		// the wrap size can become zero when hidden, stop the layout process
+		if (wrapSize === 0) {
+			//throw new Error('Main wrap size was found to be zero, this should not happen');
+
+			return;
+		}
+
+		if (itemSize === 0) {
+			throw new Error('Item size was found to be zero, this should not happen');
+		}
 
 		// define the scroller wrap size to fit all items
 		$(this._scrollerWrap).css(sizeProp, totalSize);
@@ -1495,10 +1651,10 @@ define([
 	/**
 	 * Removes items that have gone out of the render range.
 	 *
-	 * @method _removeInvalidItems
+	 * @method _destroyInvalidItems
 	 * @private
 	 */
-	FlowCarousel.prototype._removeInvalidItems = function() {
+	FlowCarousel.prototype._destroyInvalidItems = function() {
 		var renderRange = this.getRenderRange(),
 			filteredPlaceholderItemIndexes = [],
 			filteredRenderedItemIndexes = [],
@@ -1506,11 +1662,11 @@ define([
 			itemElement,
 			i;
 
-		// destroy rendered items out of the render range
+		// destroy rendered placeholders out of the render range
 		for (i = 0; i < this._renderedPlaceholderIndexes.length; i++) {
 			itemIndex = this._renderedPlaceholderIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex >= renderRange.end - 1) {
+			if (itemIndex < renderRange.start || itemIndex > renderRange.end - 1) {
 				itemElement = this.getItemElementByIndex(itemIndex);
 
 				/* istanbul ignore if */
@@ -1520,9 +1676,7 @@ define([
 					);
 				}
 
-				this._renderer.destroyItem(itemElement);
-
-				delete this._itemIndexToElementMap[itemIndex];
+				this._destroyItem(itemElement, itemIndex);
 			} else {
 				filteredPlaceholderItemIndexes.push(itemIndex);
 			}
@@ -1534,7 +1688,7 @@ define([
 		for (i = 0; i < this._renderedItemIndexes.length; i++) {
 			itemIndex = this._renderedItemIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex >= renderRange.end - 1) {
+			if (itemIndex < renderRange.start || itemIndex > renderRange.end - 1) {
 				itemElement = this.getItemElementByIndex(itemIndex);
 
 				/* istanbul ignore if */
@@ -1542,15 +1696,27 @@ define([
 					throw new Error('Item element at index #' + itemIndex + ' not found, this should not happen');
 				}
 
-				this._renderer.destroyItem(itemElement);
-
-				delete this._itemIndexToElementMap[itemIndex];
+				this._destroyItem(itemElement, itemIndex);
 			} else {
 				filteredRenderedItemIndexes.push(itemIndex);
 			}
 		}
 
 		this._renderedItemIndexes = filteredRenderedItemIndexes;
+	};
+
+	/**
+	 * Destroys an element and removes it from the index to element mapping.
+	 *
+	 * @method _destroyItem
+	 * @param {DOMElement} element Element to destroy
+	 * @param {number} index Element index
+	 * @private
+	 */
+	FlowCarousel.prototype._destroyItem = function(element, index) {
+		this._renderer.destroyItem(element);
+
+		this._removeItemIndexToElement(index);
 	};
 
 	/**
@@ -1714,7 +1880,7 @@ define([
 				if (typeof existingElement !== 'undefined') {
 					this._renderer.destroyItem(existingElement);
 
-					delete this._itemIndexToElementMap[itemIndex];
+					this._removeItemIndexToElement(itemIndex);
 
 					// remove the item from the placeholder item indexes list if exists
 					existingElementPos = this._renderedPlaceholderIndexes.indexOf(itemIndex);
@@ -1762,7 +1928,7 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._insertRenderedElements = function(elements, startIndex, arePlaceholders) {
-		var elementIndex,
+		var itemIndex,
 			placeholderPos,
 			placeholderElement,
 			i;
@@ -1779,38 +1945,35 @@ define([
 				continue;
 			}
 
-			elementIndex = startIndex + i;
+			itemIndex = startIndex + i;
 
 			// add the rendered and inserted items to the list of rendered items and the index to element mapping
 			if (!arePlaceholders) {
-				placeholderPos = this._renderedPlaceholderIndexes.indexOf(elementIndex);
+				placeholderPos = this._renderedPlaceholderIndexes.indexOf(itemIndex);
 
 				// remove placeholder if exists
 				/* istanbul ignore if */
-				if (placeholderPos !== -1 && typeof this._itemIndexToElementMap[elementIndex] !== 'undefined') {
-					placeholderElement = this._itemIndexToElementMap[elementIndex];
+				if (placeholderPos !== -1 && typeof this._itemIndexToElementMap[itemIndex] !== 'undefined') {
+					placeholderElement = this._itemIndexToElementMap[itemIndex];
 
 					this._renderer.destroyItem(placeholderElement);
 
-					delete this._itemIndexToElementMap[elementIndex];
+					this._removeItemIndexToElement(itemIndex);
 					this._renderedPlaceholderIndexes.splice(placeholderPos, 1);
 				}
 
-				this._insertRenderedElement(elements[i], elementIndex);
+				this._insertRenderedElement(elements[i], itemIndex);
 
-				this._renderedItemIndexes.push(elementIndex);
+				this._renderedItemIndexes.push(itemIndex);
 			} else {
 				// only add placeholders if they don't already exist
-				if (this._renderedPlaceholderIndexes.indexOf(elementIndex) === -1) {
-					this._insertRenderedElement(elements[i], elementIndex, true);
+				if (this._renderedPlaceholderIndexes.indexOf(itemIndex) === -1) {
+					this._insertRenderedElement(elements[i], itemIndex, true);
 
-					this._renderedPlaceholderIndexes.push(elementIndex);
+					this._renderedPlaceholderIndexes.push(itemIndex);
 				}
 			}
 		}
-
-		// set the scroller wrap size to the largest currently visible item size
-		this._setScrollerSizeToLargestVisibleChildSize();
 	};
 
 	/**
@@ -1827,18 +1990,17 @@ define([
 		var $element = $(element),
 			orientation = this._config.orientation,
 			sizeMode = this._config.sizeMode,
-			wrapSize = this._getElementSize(this._mainWrap, orientation),
-			oppositeOrientation = this._getOppositeOrientation(orientation),
-			wrapOppositeSize = this._getElementSize(this._mainWrap, oppositeOrientation),
+			wrapSize = this._getMainWrapSize(),
+			wrapOppositeSize = this._getMainWrapOppositeSize(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
+			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			itemMargin = this._config.margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage),
-			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
-			effectiveSize = itemSize - gapPerItem,
+			effectiveSize = Math.ceil(itemSize - gapPerItem),
 			effectiveOffset = Math.floor(index * itemSize + index * (itemMargin - gapPerItem)),
 			$wrapper = $('<div></div>'),
 			cssProperties = {},
-			$wrappedElement;
+			$itemWrapper;
 
 		// make sure the wrap has size if wrap size matching is used
 		/* istanbul ignore if */
@@ -1863,23 +2025,28 @@ define([
 			}
 		}
 
+		// the element may be display: none to begin with, make it visible
+		// TODO consider using a class instead
+		$element.css('display', 'block');
+
 		// wrap the item element in a carousel wrapper
-		$wrappedElement = $element.wrap($wrapper).parent();
+		$itemWrapper = $element.wrap($wrapper).parent();
 
 		// apply the css styles and add carousel item class
-		$wrappedElement.css(cssProperties);
-		$wrappedElement.addClass(this._config.getClassName('item'));
+		$itemWrapper.css(cssProperties);
+		$itemWrapper.addClass(this._config.getClassName('item'));
 
 		// add the placeholder class as well if the element is a placeholder
 		if (isPlaceholder) {
-			$wrappedElement.addClass(this._config.getClassName('placeholder'));
+			$itemWrapper.addClass(this._config.getClassName('placeholder'));
 		}
 
-		// the element may be display: none to begin with, make it visible
-		$element.css('display', 'block');
+		// apply some pre-processing to each element about to be inserted into the dom
+		// TODO add back in some form
+		//this._preprocessItemElement($itemWrapper, index);
 
 		// append the element to the scroller wrap
-		$(this._scrollerWrap).append($wrappedElement);
+		$(this._scrollerWrap).append($itemWrapper);
 
 		/* istanbul ignore if */
 		if (typeof this._itemIndexToElementMap[index] !== 'undefined') {
@@ -1887,7 +2054,62 @@ define([
 		}
 
 		// add the wrapped element to the index to element map
-		this._itemIndexToElementMap[index] = $wrappedElement[0];
+		this._mapItemIndexToElement(index, $itemWrapper[0]);
+	};
+
+	/**
+	 * Adds a mapping between item index and its wrapper element.
+	 *
+	 * @method _mapItemIndexToElement
+	 * @param {number} index Item index
+	 * @param {DOMElement} element The DOM element
+	 * @private
+	 */
+	FlowCarousel.prototype._mapItemIndexToElement = function(index, element) {
+		this._itemIndexToElementMap[index] = element;
+	};
+
+	/**
+	 * Removes mapping between item index and its wrapper element.
+	 *
+	 * @method _removeItemIndexToElement
+	 * @param {number} index Item index to remove mapping for
+	 * @private
+	 */
+	FlowCarousel.prototype._removeItemIndexToElement = function(index) {
+		delete this._itemIndexToElementMap[index];
+	};
+
+	/**
+	 * Preprocesses the item wrapper element about to be inserted into the DOM.
+	 *
+	 * @method _preprocessCarouselItemElement
+	 * @param {jQuery} $itemWrapper The item wrapper element jQuery reference
+	 * @param {number} index Item index
+	 * @private
+	 */
+	FlowCarousel.prototype._preprocessItemElement = function($itemWrapper, index) {
+		var self = this,
+			itemHoverClass = this._config.getClassName('itemHover');
+
+		// store the item index in wrapper element data
+		$itemWrapper.data(this._config.cssPrefix + 'index', index);
+
+		// listen for hover and out events to store the currently hovered item
+		$itemWrapper.hover(
+			function() {
+				var elementIndex = $(this).data(self._config.cssPrefix + 'index');
+
+				$(this).addClass(itemHoverClass);
+
+				self._hoverItemIndex = elementIndex;
+			},
+			function() {
+				$(this).removeClass(itemHoverClass);
+
+				self._hoverItemIndex = null;
+			}
+		);
 	};
 
 	/**
@@ -1914,11 +2136,18 @@ define([
 			);
 
 		/* istanbul ignore if */
-		if (largestChildSize === 0) {
+		/*if (largestChildSize === 0) {
 			throw new Error('Largest child size calculated to be zero, this should not happen');
 		}
 
-		$(this._scrollerWrap).css(sizeProp, largestChildSize + 'px');
+		$(this._scrollerWrap).css(sizeProp, largestChildSize + 'px');*/
+
+		// set the scroller to largest child size if it was possible to determine
+		if (largestChildSize > 0 && largestChildSize !== this._lastLargestChildSize) {
+			$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
+
+			this._lastLargestChildSize = largestChildSize;
+		}
 	};
 
 	/**
@@ -1929,22 +2158,28 @@ define([
 	 * Since fetching and rendering items can be asynchronous, this method returns a promise.
 	 *
 	 * @method _reLayout
-	 * @param {DOMelement} element Element to layout
-	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @return {Deferred.Promise}
 	 * @private
 	 */
-	FlowCarousel.prototype._reLayout = function(element, orientation) {
-		var lastItemIndex = this._currentItemIndex;
+	FlowCarousel.prototype._reLayout = function() {
+		var lastItemIndex = this._currentItemIndex,
+			promise;
 
 		// reset current state
 		this._reset();
 
 		// recalculate the layout navigating instantly to the last item
-		this._setupLayout(element, orientation, lastItemIndex);
+		this._setupLayout(lastItemIndex);
 
 		// render the items that may have become visible after the layout procedure
-		return this._validateItemsToRender();
+		promise = this._validateItemsToRender();
+
+		// update scroller size
+		promise.done(function() {
+			this._setScrollerSizeToLargestVisibleChildSize();
+		}.bind(this));
+
+		return promise;
 	};
 
 	/**
@@ -1954,58 +2189,82 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._reset = function() {
-		$(this._scrollerWrap)
+		var $scrollerWrap = $(this._scrollerWrap);
+
+		$scrollerWrap
 			.empty()
-			.attr('style', null);
+			.attr('style', null)
+			.data(this._config.cssPrefix + 'last-size', null)
+			.data(this._config.cssPrefix + 'last-opposite-size', null);
 
 		this._itemIndexToElementMap = {};
 		this._isAnimating = false;
 		this._targetItemIndex = 0;
 		this._currentItemIndex = 0;
+		this._lastLargestChildSize = null;
 		this._renderedItemIndexes = [];
 		this._renderedPlaceholderIndexes = [];
 		this._itemIndexToElementMap = {};
+		this._cache = Util.cloneObj(this._emptyCache);
 	};
 
 	/**
 	 * Sets up main wrap size change listener to apply responsive layout.
 	 *
 	 * @method _setupResponsiveLayoutListener
-	 * @param {DOMelement} element Element to listen changes of
-	 * @param {Config/Orientation:property} orientation Orientation to use
 	 * @private
 	 */
-	FlowCarousel.prototype._setupResponsiveLayoutListener = function(element, orientation) {
-		this._responsiveLayoutListenerInterval = window.setInterval(function() {
-			this._validateResponsiveLayout(element, orientation);
-		}.bind(this), this._config.responsiveLayoutListenerInterval);
+	FlowCarousel.prototype._setupResponsiveLayoutListener = function() {
+		// validate periodically
+		/*this._responsiveLayoutListenerInterval = window.setInterval(function() {
+			this._validateResponsiveLayout();
+		}.bind(this), this._config.responsiveLayoutListenerInterval);*/
+
+		// also validate on window resize
+		$(window).resize(function() {
+			this.validate();
+		}.bind(this));
 	};
 
 	/**
 	 * Checks whether the carousel wrap size has changed and triggers re-layout if so.
 	 *
 	 * @method _validateResponsiveLayout
-	 * @param {DOMelement} element Element to validate
-	 * @param {Config/Orientation:property} orientation Orientation to use
+	 * @param {boolean} force Force the validation even if busy
 	 * @private
 	 */
-	FlowCarousel.prototype._validateResponsiveLayout = function(element, orientation) {
-		var lastSize = $(element).data(this._config.cssPrefix + 'last-width') || null,
-			currentSize = this._getElementSize(element, orientation);
-
-		$(element).data(this._config.cssPrefix + 'last-width', currentSize);
-
-		if (lastSize === null)  {
+	FlowCarousel.prototype._validateResponsiveLayout = function(force) {
+		// don't perform the validation while animating
+		if (this._isAnimating && force !== true) {
 			return;
 		}
 
-		// perform the layout routine if the wrap size has changed
-		if (currentSize !== lastSize) {
+		var $element = $(this._mainWrap),
+			lastSize = $element.data(this._config.cssPrefix + 'last-size') || null,
+			lastOppositeSize = $element.data(this._config.cssPrefix + 'last-opposite-size') || null,
+			currentSize = this._getMainWrapSize(),
+			currentOppositeSize = this._getMainWrapOppositeSize();
+
+		$element.data(this._config.cssPrefix + 'last-size', currentSize);
+		$element.data(this._config.cssPrefix + 'last-opposite-size', currentOppositeSize);
+
+		if (lastSize === null && lastOppositeSize === null)  {
+			return;
+		}
+
+		// perform the layout routine if the wrap size has changed and it did not change to zero
+		if (
+			(currentSize !== lastSize && currentSize !== 0)
+			|| (currentOppositeSize !== lastOppositeSize && currentOppositeSize !== 0)
+		) {
 			// perform the re-layout routine only when the wrap size has not changed for some time
 			this._performDelayed('re-layout', function() {
-				this._reLayout(element, orientation);
+				this._reLayout();
 			}.bind(this), this._config.responsiveLayoutDelay);
 		}
+
+		// TODO this may be costly, search for better ways to listen to visible elements size change
+		//this._setScrollerSizeToLargestVisibleChildSize();
 	};
 
 	/**
@@ -2092,6 +2351,47 @@ define([
 	};
 
 	/**
+	 * Returns the main wrap size in the main orientation.
+	 *
+	 * Uses cached value if available.
+	 *
+	 * @method _getMainWrapSize
+	 * @return {number}
+	 */
+	FlowCarousel.prototype._getMainWrapSize = function() {
+		if (this._useCache && this._cache.wrapSize !== null) {
+			return this._cache.wrapSize;
+		}
+
+		var orientation = this._config.orientation;
+
+		this._cache.wrapSize = this._getElementSize(this._mainWrap, orientation);
+
+		return this._cache.wrapSize;
+	};
+
+	/**
+	 * Returns the main wrap size in the opposite orientation.
+	 *
+	 * Uses cached value if available.
+	 *
+	 * @method _getMainWrapOppositeSize
+	 * @return {number}
+	 */
+	FlowCarousel.prototype._getMainWrapOppositeSize = function() {
+		if (this._useCache && this._cache.wrapOppositeSize !== null) {
+			return this._cache.wrapOppositeSize;
+		}
+
+		var orientation = this._config.orientation,
+			oppositeOrientation = this._getOppositeOrientation(orientation);
+
+		this._cache.wrapOppositeSize = this._getElementSize(this._mainWrap, oppositeOrientation);
+
+		return this._cache.wrapOppositeSize;
+	};
+
+	/**
 	 * Returns the opposite orientation name.
 	 *
 	 * For Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.
@@ -2105,6 +2405,52 @@ define([
 		return orientation === Config.Orientation.HORIZONTAL
 			? Config.Orientation.VERTICAL
 			: Config.Orientation.HORIZONTAL;
+	};
+
+	/**
+	 * This is called by drag-based navigators on drag begin event.
+	 *
+	 * @method _onDragBegin
+	 * @param {number} startPosition The start dragging position in the main orientation
+	 * @param {number} dragOppositePosition The start dragging position in the opposite orientation
+	 * @param {number} carouselPosition The start carousel position
+	 * @private
+	 */
+	FlowCarousel.prototype._onDragBegin = function(startPosition, dragOppositePosition, carouselPosition) {
+		this.emitEvent(FlowCarousel.Event.DRAG_BEGIN, [startPosition, dragOppositePosition, carouselPosition]);
+	};
+
+	/**
+	 * This is called by drag-based navigators on drag end event.
+	 *
+	 * @method _onDragEnd
+	 * @param {string} navigationMode Navigation mode, usually 'navigate-page' or 'navigate-item'
+	 * @param {number} startPosition Drag start position
+	 * @param {number} endPosition Drag end position
+	 * @param {number} deltaDragPosition Relative drag amount
+	 * @param {number} closestIndex Closest matching page or item index depending on navigation mode
+	 * @param {number} direction Drag direction, either -1 or 1
+	 * @param {DOMElement} targetElement The element that the drag ended on
+	 * @private
+	 */
+	FlowCarousel.prototype._onDragEnd = function(
+		navigationMode,
+		startPosition,
+		endPosition,
+		deltaDragPosition,
+		closestIndex,
+		direction,
+		targetElement
+	) {
+		this.emitEvent(FlowCarousel.Event.DRAG_BEGIN, [
+			navigationMode,
+			startPosition,
+			endPosition,
+			closestIndex,
+			deltaDragPosition,
+			direction,
+			targetElement
+		]);
 	};
 
 	/**

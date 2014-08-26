@@ -58,7 +58,7 @@
 	</div>
 
 	<h2>Dynamic renderer from a dataset of {{data.length}} items</h2>
-	<div flow-carousel config="config" data="data" item="item" class="carousel carousel-horizontal">
+	<div flow-carousel config="config" data="getData()" item="item" class="carousel carousel-horizontal">
 		<div class="carousel-item">
 			{{$outer.name}} - {{item.index}}<br>
 			{{item.randomNumber}}
@@ -142,6 +142,10 @@
 					index: i,
 					randomNumber: Math.floor(Math.random() * 100)
 				});
+			}
+
+			$scope.getData = function() {
+				return $scope.data;
 			}
 
 			$scope.update = function() {

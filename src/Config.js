@@ -42,15 +42,6 @@ define([
 		this.margin = 0;
 
 		/**
-		 * Should responsive layout be used by default.
-		 *
-		 * @property useResponsiveLayout
-		 * @type boolean
-		 * @default true
-		 */
-		this.useResponsiveLayout = true;
-
-		/**
 		 * Should placeholders be generated while loading actual items.
 		 *
 		 * @property usePlaceholders
@@ -58,6 +49,15 @@ define([
 		 * @default true
 		 */
 		this.usePlaceholders = true;
+
+		/**
+		 * Should responsive layout be used by default.
+		 *
+		 * @property useResponsiveLayout
+		 * @type boolean
+		 * @default true
+		 */
+		this.useResponsiveLayout = true;
 
 		/**
 		 * Number of items to render side-by-side when not using responsive layout.
@@ -166,7 +166,7 @@ define([
 		 * @type {number}
 		 * @default 300
 		 */
-		this.responsiveLayoutDelay = 300;
+		this.responsiveLayoutDelay = 500;
 
 		/**
 		 * Default built-in navigators to use.
@@ -210,7 +210,19 @@ define([
 		this.dragNavigatorOverEdgeDragPositionMultiplier = 0.2;
 
 		/**
+		 * If the number of pixels the user dragged an element exceeds this threshold then the click event and link
+		 * element navigation are ignored.
+		 *
+		 * @property dragNavigatorIgnoreClickThreshold
+		 * @type {number}
+		 * @default 10
+		 */
+		this.dragNavigatorIgnoreClickThreshold = 10;
+
+		/**
 		 * The css classes prefix to use.
+		 *
+		 * The same prefix is also used when assigning custom carousel-specific data to the element.
 		 *
 		 * @property cssPrefix
 		 * @type {string}
@@ -230,6 +242,7 @@ define([
 		 * @param {string} cssClasses.items='items' Assigned to the items wrap element in the main wrap
 		 * @param {string} cssClasses.scroller='scroller' Assigned to the animated scroller wrap in the items wrap
 		 * @param {string} cssClasses.item='item' Assigned to each item wrapper containing the actual item
+		 * @param {string} cssClasses.itemHover='item-hover' Assigned to item wrapper on hover and removed on mouse out
 		 * @param {string} cssClasses.placeholder='placeholder' Assigned to each item wrapper that is a placeholder
 		 * @param {string} cssClasses.matchWrap='match-wrap' Assigned to main wrap when using the wrap size match mode
 		 * @param {string} cssClasses.matchLargestItem='match-largest-item' Assigned to main wrap when matching the wrap
@@ -249,6 +262,7 @@ define([
 			scroller: 'scroller',
 			item: 'item',
 			placeholder: 'placeholder',
+			itemHover: 'item-hover',
 			matchWrap: 'match-wrap',
 			matchLargestItem: 'match-largest-item',
 			horizontal: 'horizontal',
@@ -407,6 +421,7 @@ define([
 			return this.itemsPerPage;
 		}
 
+		// TODO could be cached
 		for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
 			breakpoint = this.responsiveBreakpoints[i];
 

@@ -51,5 +51,14 @@ define([
 		throw new Error('Not implemented');
 	};
 
+	/**
+	 * Called by the carousel once it's structure has been initiated.
+	 *
+	 * @method onCarouselElementReady
+	 */
+	AbstractAnimator.prototype.onCarouselElementReady = function() {
+		// do nothing by default
+	};
+
 	return AbstractAnimator;
 });

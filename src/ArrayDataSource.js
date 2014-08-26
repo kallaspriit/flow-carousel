@@ -20,6 +20,16 @@ define([
 	ArrayDataSource.prototype = Object.create(AbstractDataSource.prototype);
 
 	/**
+	 * Sets new data to use.
+	 *
+	 * @method setData
+	 * @param {array} data New data
+	 */
+	ArrayDataSource.prototype.setData = function(data) {
+		this._data = data;
+	};
+
+	/**
 	 * Returns the number of items in the dataset.
 	 *
 	 * @method getItemCount

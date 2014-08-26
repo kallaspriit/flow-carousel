@@ -8,19 +8,6 @@ BODY {
     background-color: #EEE;
     overflow: hidden;
 }
-.controls {
-    margin: 10px 0 40px 0;
-}
-.carousel-horizontal {
-    height: 200px;
-}
-.carousel-halfwidth {
-    width: 50%;
-}
-.carousel-vertical {
-    width: 300px;
-    height: 1000px;
-}
 .carousel .carousel-item,
 .flow-carousel-placeholder > DIV {
     background-color: #4F9BFF;
@@ -29,16 +16,36 @@ BODY {
     font-size: 40px;
     color: #FFF;
     text-align: right;
+	overflow: hidden;
 }
 .carousel .carousel-item {
-    /*display: none;*/
+    display: none;
+}
+.carousel-item-odd {
+    background-color: #5EFF40 !important;
 }
 .flow-carousel-placeholder > DIV {
     background-color: #CCC;
 }
+
+/* horizontal carousel */
+.carousel-horizontal {
+    height: 200px;
+}
 .carousel-horizontal .carousel-item,
 .carousel-horizontal .flow-carousel-placeholder > DIV {
     height: 100%;
+}
+
+/* half-width carousel */
+.carousel-halfwidth {
+    width: 50%;
+}
+
+/* vertical carousel */
+.carousel-vertical {
+    width: 300px;
+    height: 1000px;
 }
 .carousel-vertical .carousel-item {
     position: absolute;
@@ -47,6 +54,31 @@ BODY {
     right: 0;
     bottom: 0;
 }
+
+/* dynamic carousel */
+.carousel-dynamic .carousel-item {
+	height: 200px;
+}
+@media (min-width: 800px) {
+	.carousel-dynamic .carousel-item {
+		height: 400px;
+	}
+}
+.carousel-item.image-or-link {
+	padding: 0;
+}
+.carousel-item.image-or-link IMG {
+	height: 100%;
+	width: 100%;
+}
+.carousel-item.image-or-link A {
+	display: block;
+	height: 100%;
+	background-color: #00814f;
+	padding: 0 20px;
+}
+
+/* async carousel */
 .carousel-initiating {
     display: table;
     position: absolute;
@@ -82,10 +114,7 @@ BODY {
     opacity: 1;
 }
 
-/* special example styles */
-.carousel-item-odd {
-    background-color: #5EFF40 !important;
-}
-.flow-carousel-item {
-    background-color: #666;
+/* controls */
+.controls {
+    margin: 10px 0 40px 0;
 }

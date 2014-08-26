@@ -8,6 +8,8 @@ define([
 	/**
 	 * Keyboard navigator.
 	 *
+	 * TODO when trying to navigate past the first/last item then animate a bit past it and back
+	 *
 	 * @class KeyboardNavigator
 	 * @extends AbstractNavigator
 	 * @param {KeyboardNavigator/Mode:property} [mode=KeyboardNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use

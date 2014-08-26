@@ -19,6 +19,8 @@ define([
 		AbstractAnimator.call(this, carousel);
 
 		this._carousel = carousel;
+		this._activeDeferred = null;
+		this._transitionEndListenerCreated = false;
 	}
 
 	DefaultAnimator.prototype = Object.create(AbstractAnimator.prototype);
@@ -66,12 +68,20 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
-		var orientation = this._carousel.getOrientation(),
+		if (!this._transitionEndListenerCreated) {
+			throw new Error('Requested to animate before transition end listener was created');
+		}
+
+		var deferred = new Deferred(),
+			orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
 			translateCommand,
-			deferred;
+			promise;
+
+		// make sure the position is a full integer
+		position = Math.floor(position);
 
 		// the translate command is different for horizontal and vertical carousels
 		if (orientation === Config.Orientation.HORIZONTAL) {
@@ -88,27 +98,77 @@ define([
 		}
 
 		// apply the translate
-		$scrollerWrap.css('transform', translateCommand);
+		$scrollerWrap.css('transform', translateCommand, instant);
 
 		// remove the deferred overhead where not required
 		if (noDeferred) {
 			return;
 		}
 
-		deferred = new Deferred();
+		// resolve existing deferred if exists
+		if (this._activeDeferred !== null) {
+			//this._activeDeferred.resolve();
+			//this._activeDeferred = null;
+
+			throw new Error('An animation is already in progress, this should not happen');
+		}
+
 		currentPosition = this.getCurrentPosition();
 
 		// if the position is same as current then resolve immediately
 		if (instant || position === currentPosition) {
 			deferred.resolve();
 		} else {
-			// wait for the transition to end and then resolve the deferred
-			$scrollerWrap.bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
+			this._activeDeferred = new Deferred();
+
+			this._activeDeferred.done(function() {
+				this._activeDeferred = null;
+
 				deferred.resolve();
-			});
+			}.bind(this));
 		}
 
 		return deferred.promise();
+	};
+
+	/**
+	 * Called by the carousel once it's structure has been initiated.
+	 *
+	 * @method onCarouselInitiated
+	 */
+	AbstractAnimator.prototype.onCarouselElementReady = function() {
+		this._setupTransitionEndListener();
+	};
+
+	/**
+	 * Starts listening for transition end event on the scroller wrap.
+	 *
+	 * @method _setupTransitionEndListener
+	 * @private
+	 */
+	DefaultAnimator.prototype._setupTransitionEndListener = function() {
+		var $scrollerWrap = $(this._carousel.getScrollerWrap());
+
+		$scrollerWrap.on('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
+			this._resolveDeferred();
+		}.bind(this));
+
+		this._transitionEndListenerCreated = true;
+	};
+
+	/**
+	 * Resolves currently active deferred if available and sets it to null.
+	 *
+	 * @method _resolveDeferred
+	 * @private
+	 */
+	DefaultAnimator.prototype._resolveDeferred = function() {
+		if (this._activeDeferred === null) {
+
+			return;
+		}
+
+		this._activeDeferred.resolve();
 	};
 
 	return DefaultAnimator;

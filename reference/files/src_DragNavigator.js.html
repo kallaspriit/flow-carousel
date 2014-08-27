@@ -133,10 +133,13 @@ define([
 		AbstractNavigator.call(this);
 
 		this._active = false;
-		this._startDragPosition = null;
-		this._startDragOppositePosition = null;
+		this._startPosition = null;
+		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
+		this._startHoverItemIndex = null;
+		this._startTargetElement = null;
 		this._lastPosition = null;
+		this._lastOppositePosition = null;
 
 		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -209,9 +212,10 @@ define([
 			var isTouchEvent = e.type === &#x27;touchstart&#x27;,
 				x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
 				y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
+				targetElement = e.target,
 				result;
 
-			result = this._begin(horizontal ? x : y, horizontal ? y : x);
+			result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
 
 			// never disable the mousedown/touchstart events
 			return true;
@@ -257,7 +261,8 @@ define([
 		}.bind(this));
 
 		$window.on(&#x27;mouseup touchend touchcancel&#x27;, function(e) {
-			var result;
+			var result,
+				targetElement;
 
 			// quit if invalid event
 			if (e.which !== 1 &amp;&amp; e.type !== &#x27;touchend&#x27; &amp;&amp; e.type !== &#x27;touchcancel&#x27;) {
@@ -269,7 +274,9 @@ define([
 				return true;
 			}
 
-			result = this._end();
+			targetElement = e.target;
+
+			result = this._end(targetElement);
 
 			/* istanbul ignore else */
 			if (result === false) {
@@ -288,19 +295,39 @@ define([
 	 * @method _begin
 	 * @param {number} position Drag position
 	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
+	 * @param {DOMElement} targetElement The element that was under the cursor when drag started
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
-	DragNavigator.prototype._begin = function(position, oppositePosition) {
+	DragNavigator.prototype._begin = function(position, oppositePosition, targetElement) {
+		targetElement = targetElement || null;
+
 		// don&#x27;t allow dragging when already animating
 		if (this._carousel.isAnimating()) {
 			return true;
 		}
 
 		this._active = true;
-		this._startDragPosition = position;
-		this._startDragOppositePosition = oppositePosition;
+		this._startPosition = position;
+		this._startOppositePosition = oppositePosition;
+		this._lastPosition = position; // it&#x27;s possible that the move event never occurs so set it here alrady
+		this._lastOppositePosition = oppositePosition; // same for this
 		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
+		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
+
+		// disable all children click events for the duration of the dragging
+		if (targetElement !== null) {
+			this._startTargetElement = targetElement;
+
+			this._disableClickHandler(targetElement);
+		}
+
+		// notify the carousel that dragging has begun
+		this._carousel._onDragBegin(
+			this._startPosition,
+			this._startOppositePosition,
+			this._startCarouselPosition
+		);
 
 		// do not disable scrolling the page from the carousel component
 		return true;
@@ -322,9 +349,13 @@ define([
 		}
 
 		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startDragPosition,
-			deltaDragOppositePosition = oppositePosition - this._startDragOppositePosition,
+		var deltaDragPosition = position - this._startPosition,
+			deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
 			noActionThreshold = 15;
+
+		// we need last move position in the _end() handler
+		this._lastPosition = position;
+		this._lastOppositePosition = oppositePosition;
 
 		// if the drag delta is very small then do nothing not to quit or start moving too soon
 		if (Math.abs(deltaDragPosition) &lt; noActionThreshold) {
@@ -341,20 +372,20 @@ define([
 
 		// calculate the position
 		var newPosition = this._startCarouselPosition + deltaDragPosition,
-			pageSize = this._carousel.getPageSize(),
+			itemSize = this._carousel.getItemSize(),
 			totalSize = this._carousel.getTotalSize(),
-			edgeMultiplier = this._carousel.getConfig().dragNavigatorOverEdgeDragPositionMultiplier;
+			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
+			edgeMultiplier = this._carousel.getConfig().dragNavigatorOverEdgeDragPositionMultiplier,
+			minLimit = 0,
+			maxLimit = -totalSize + itemCountOnLastPage * itemSize;
 
 		// create smooth limit at the edges applying the drag motion partially
-		if (newPosition &gt; 0 || newPosition &lt; -(totalSize - pageSize)) {
+		if (newPosition &gt; minLimit || newPosition &lt; maxLimit) {
 			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
 		}
 
 		// use the animator to move to calculated position instantly
 		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
-
-		// we need last move position in the _end() handler
-		this._lastPosition = position;
 
 		return false;
 	};
@@ -363,42 +394,140 @@ define([
 	 * Called on gesture end.
 	 *
 	 * @method _end
+	 * @param {DOMElement} targetElement The element that the drag ended on
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
-	DragNavigator.prototype._end = function() {
+	DragNavigator.prototype._end = function(targetElement) {
 		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}
 
-		var deltaDragPosition = this._lastPosition - this._startDragPosition,
+		var deltaDragPosition = this._lastPosition - this._startPosition,
+			deltaDragOppositePosition = this._lastOppositePosition - this._startOppositePosition,
+			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
 			direction = deltaDragPosition &lt; 0 ? -1 : 1,
 			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
-			closestPageIndex,
-			closestItemIndex;
+			ignoreClickThreshold = this._carousel.getConfig().dragNavigatorIgnoreClickThreshold,
+			closestIndex,
+			endHoverItemIndex,
+			isSameItemAsStarted;
 
 		// navigate to closest item or page depending on selected mode
 		switch (this._mode) {
 			case DragNavigator.Mode.NAVIGATE_PAGE:
-				closestPageIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
+				closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
 
-				this._carousel.navigateToPage(closestPageIndex, false, true);
+				this._carousel.navigateToPage(closestIndex, false, true);
 			break;
 
 			case DragNavigator.Mode.NAVIGATE_ITEM:
-				closestItemIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
+				closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
 
-				this._carousel.navigateToItem(closestItemIndex, false, true);
+				this._carousel.navigateToItem(closestIndex, false, true);
 			break;
 		}
 
+		// restore the element click handler if drag stopped on the same element and was dragged very little
+		if (
+			this._startHoverItemIndex !== null
+			&amp;&amp; targetElement !== null
+			&amp;&amp; targetElement === this._startTargetElement
+		) {
+			endHoverItemIndex = this._carousel.getHoverItemIndex();
+
+			if (endHoverItemIndex !== null) {
+				isSameItemAsStarted = endHoverItemIndex === this._startHoverItemIndex;
+
+				// make sure we finished on the same element and dragged by a small amount at most
+				if (isSameItemAsStarted &amp;&amp; dragMagnitude &lt; ignoreClickThreshold) {
+					this._restoreClickHandler(targetElement);
+				}
+			}
+
+			this._dragStartHoverItemIndex = null;
+		}
+
+		// notify the carousel that dragging has begun
+		this._carousel._onDragEnd(
+			this._mode,
+			this._startPosition,
+			this._lastPosition,
+			deltaDragPosition,
+			closestIndex,
+			direction,
+			targetElement
+		);
+
 		// reset
 		this._active = false;
-		this._startDragPosition = null;
-		this._startDragOppositePosition = null;
+		this._startPosition = null;
+		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
 		this._lastPosition = null;
+
+		return false;
+	};
+
+	/**
+	 * Disables click handler for given element.
+	 *
+	 * @method _disableClickHandler
+	 * @param {DOMElement} element Element to disable click events on
+	 * @private
+	 */
+	DragNavigator.prototype._disableClickHandler = function(element) {
+		var $element = $(element),
+			itemWrapperClass = this._carousel.getConfig().getClassName(&#x27;item&#x27;),
+			$itemWrapper = $element.closest(&#x27;.&#x27; + itemWrapperClass),
+			$subElements = $itemWrapper.find(&#x27;A&#x27;),
+			disabledDataName = this._carousel.getConfig().cssPrefix + &#x27;click-disabled&#x27;,
+			isAlreadyDisabled = $itemWrapper.data(disabledDataName);
+
+		if (isAlreadyDisabled !== true) {
+			$subElements.on(&#x27;click&#x27;, this._ignoreEvent);
+
+			$itemWrapper.data(disabledDataName, true);
+		}
+	};
+
+	/**
+	 * Restores click handler for given element.
+	 *
+	 * @method _restoreClickHandler
+	 * @param {DOMElement} element Element to disable click events on
+	 * @private
+	 */
+	DragNavigator.prototype._restoreClickHandler = function(element) {
+		var $element = $(element),
+			itemWrapperClass = this._carousel.getConfig().getClassName(&#x27;item&#x27;),
+			disabledDataName = this._carousel.getConfig().cssPrefix + &#x27;click-disabled&#x27;,
+			$itemWrapper = $element.closest(&#x27;.&#x27; + itemWrapperClass),
+			$subElements = $itemWrapper.find(&#x27;A&#x27;),
+			isDisabled = $itemWrapper.data(disabledDataName);
+
+		if (isDisabled === true) {
+			$subElements.off(&#x27;click&#x27;, this._ignoreEvent);
+
+			$itemWrapper.data(disabledDataName, false);
+		}
+	};
+
+	/**
+	 * Ignores given jQuery event.
+	 *
+	 * TODO don&#x27;t know how to unit-test this yet
+	 *
+	 * @method _ignoreEvent
+	 * @param {jQuery.Event} e jQuery event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	/* istanbul ignore next */
+	DragNavigator.prototype._ignoreEvent = function(e) {
+		e.preventDefault();
+		e.stopPropagation();
 
 		return false;
 	};

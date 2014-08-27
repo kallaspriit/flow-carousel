@@ -65,53 +65,55 @@ define([
 			expect(setInvalidMode).toThrow();
 		});
 
-		/*it('navigates to next page when dragged right', function (done) {
+		it('navigates to next page when dragged right', function (done) {
 			carousel.init('.carousel').done(function() {
 				var $window = $(window),
 					$scroller = $(carousel.getScrollerWrap()),
+					$targetWrap = $scroller.find('.flow-carousel-item'),
+					targetElement = $targetWrap.find('DIV')[0],
+					mouseEnter = jQuery.Event('mouseenter'),
+					mouseLeave = jQuery.Event('mouseleave'),
 					mouseDown = jQuery.Event('mousedown'),
 					mouseMove = jQuery.Event('mousemove'),
 					mouseUp = jQuery.Event('mouseup'),
 					startPos = 100, // initial position
 					moveBy = -100; // move right
 
+				// trigger mouse enter on the item wrap to generate the hover event and get correct start index
+				$targetWrap.trigger(mouseEnter);
+
 				// set mouse down properties
 				mouseDown.which = 1; // left mouse button
 				mouseDown.pageX = startPos;
 				mouseDown.pageY = 0;
+				mouseDown.target = targetElement;
 
 				// set mouse move properties
 				mouseMove.which = 1; // left mouse button
 				mouseMove.pageX = startPos + moveBy;
 				mouseMove.pageY = 0;
+				mouseMove.target = targetElement;
 
 				// set mouse up properties
 				mouseUp.which = 1; // left mouse button
+				mouseUp.target = targetElement;
 
 				expect(carousel.getCurrentPageIndex()).toEqual(0);
+				expect(carousel.isAnimating()).toEqual(false);
 
-				// trigger the events
-				window.setTimeout(function () {
-					$scroller.trigger(mouseDown);
+				$scroller.trigger(mouseDown);
+				$window.trigger(mouseMove);
+				$window.trigger(mouseUp);
+				$targetWrap.trigger(mouseLeave);
 
-					// give it some time to change
-					window.setTimeout(function () {
-						$window.trigger(mouseMove);
+				window.waitsForAndRuns(function() {
+					// wait for the animation to complete
+					return carousel.isAnimating() === false;
+				}, function() {
+					expect(carousel.getCurrentPageIndex()).toEqual(1);
 
-						window.setTimeout(function () {
-							expect(carousel.isAnimating()).toEqual(false);
-
-							$window.trigger(mouseUp);
-
-							// give it some time to change
-							window.setTimeout(function () {
-								expect(carousel.getCurrentPageIndex()).toEqual(1);
-
-								done();
-							}, 2000);
-						}, 2000);
-					}, 10);
-				}, 10);
+					done();
+				});
 			});
 		});
 
@@ -121,6 +123,7 @@ define([
 			}).done(function() {
 				var $window = $(window),
 					$scroller = $(carousel.getScrollerWrap()),
+					targetElement = $scroller.find('.flow-carousel-item > DIV')[0],
 					mouseDown = jQuery.Event('mousedown'),
 					mouseMove = jQuery.Event('mousemove'),
 					mouseUp = jQuery.Event('mouseup'),
@@ -131,41 +134,34 @@ define([
 				mouseDown.which = 1; // left mouse button
 				mouseDown.pageX = startPos;
 				mouseDown.pageY = 0;
+				mouseDown.target = targetElement;
 
 				// set mouse move properties
 				mouseMove.which = 1; // left mouse button
 				mouseMove.pageX = startPos + moveBy;
 				mouseMove.pageY = 0;
+				mouseMove.target = targetElement;
 
 				// set mouse up properties
 				mouseUp.which = 1; // left mouse button
+				mouseUp.target = targetElement;
 
 				expect(carousel.getCurrentItemIndex()).toEqual(0);
 
-				// trigger the events
-				window.setTimeout(function () {
-					$scroller.trigger(mouseDown);
+				$scroller.trigger(mouseDown);
+				$window.trigger(mouseMove);
+				$window.trigger(mouseUp);
 
-					// give it some time to change
-					window.setTimeout(function () {
-						$window.trigger(mouseMove);
+				window.waitsForAndRuns(function() {
+					// wait for the animation to complete
+					return carousel.isAnimating() === false;
+				}, function() {
+					expect(carousel.getCurrentItemIndex()).toEqual(1);
 
-						window.setTimeout(function () {
-							expect(carousel.isAnimating()).toEqual(false);
-
-							$window.trigger(mouseUp);
-
-							// give it some time to change
-							window.setTimeout(function () {
-								expect(carousel.getCurrentItemIndex()).toEqual(1);
-
-								done();
-							}, 2000);
-						}, 2000);
-					}, 10);
-				}, 10);
+					done();
+				});
 			});
-		});*/
+		});
 
 		it('dragging by less then the dead threshold has no effect', function (done) {
 			carousel.init('.carousel', {
@@ -174,6 +170,7 @@ define([
 
 			var $window = $(window),
 				$scroller = $(carousel.getScrollerWrap()),
+				targetElement = $scroller.find('.flow-carousel-item > DIV')[0],
 				mouseDown = jQuery.Event('mousedown'),
 				mouseMove = jQuery.Event('mousemove'),
 				mouseUp = jQuery.Event('mouseup'),
@@ -184,37 +181,82 @@ define([
 			mouseDown.which = 1; // left mouse button
 			mouseDown.pageX = startPos;
 			mouseDown.pageY = 0;
+			mouseDown.target = targetElement;
 
 			// set mouse move properties
 			mouseMove.which = 1; // left mouse button
 			mouseMove.pageX = startPos + moveBy;
 			mouseMove.pageY = 0;
+			mouseMove.target = targetElement;
 
 			// set mouse up properties
 			mouseUp.which = 1; // left mouse button
+			mouseUp.target = targetElement;
 
 			expect(carousel.getCurrentItemIndex()).toEqual(0);
 
 			// trigger the events
 			$scroller.trigger(mouseDown);
+			$window.trigger(mouseMove);
+			$window.trigger(mouseUp);
 
-			// give it some time to change
-			window.setTimeout(function() {
+			window.waitsForAndRuns(function() {
+				// wait for the animation to complete
+				return carousel.isAnimating() === false;
+			}, function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(0);
+
+				done();
+			});
+		});
+
+		it('performs the click action when clicked and dragged very little', function (done) {
+			carousel.init('.carousel').done(function() {
+				var $window = $(window),
+					$scroller = $(carousel.getScrollerWrap()),
+					$targetWrap = $scroller.find('.flow-carousel-item'),
+					targetElement = $targetWrap.find('DIV')[0],
+					mouseEnter = jQuery.Event('mouseenter'),
+					mouseDown = jQuery.Event('mousedown'),
+					mouseMove = jQuery.Event('mousemove'),
+					mouseUp = jQuery.Event('mouseup'),
+					startPos = 100, // initial position
+					moveBy = -5; // move right very little
+
+				// trigger mouse enter on the item wrap to generate the hover event and get correct start index
+				$targetWrap.trigger(mouseEnter);
+
+				// set mouse down properties
+				mouseDown.which = 1; // left mouse button
+				mouseDown.pageX = startPos;
+				mouseDown.pageY = 0;
+				mouseDown.target = targetElement;
+
+				// set mouse move properties
+				mouseMove.which = 1; // left mouse button
+				mouseMove.pageX = startPos + moveBy;
+				mouseMove.pageY = 0;
+				mouseMove.target = targetElement;
+
+				// set mouse up properties
+				mouseUp.which = 1; // left mouse button
+				mouseUp.target = targetElement;
+
+				expect(carousel.getCurrentPageIndex()).toEqual(0);
+
+				$scroller.trigger(mouseDown);
 				$window.trigger(mouseMove);
+				$window.trigger(mouseUp);
 
-				window.setTimeout(function () {
-					expect(carousel.isAnimating()).toEqual(false);
+				window.waitsForAndRuns(function() {
+					// wait for the animation to complete
+					return carousel.isAnimating() === false;
+				}, function() {
+					expect(carousel.getCurrentItemIndex()).toEqual(0);
 
-					$window.trigger(mouseUp);
-
-					// give it some time to change
-					window.setTimeout(function () {
-						expect(carousel.getCurrentItemIndex()).toEqual(0);
-
-						done();
-					}, 500);
-				}, 50);
-			}, 50);
+					done();
+				});
+			});
 		});
 
 		it('dragging left from first page navigates back to first page', function (done) {
@@ -246,22 +288,18 @@ define([
 
 			// trigger the events
 			$scroller.trigger(mouseDown);
+			$window.trigger(mouseMove);
+			$window.trigger(mouseUp);
 
-			// give it some time to change
-			window.setTimeout(function() {
-				$window.trigger(mouseMove);
+			window.waitsForAndRuns(function() {
+				// wait for the animation to complete
+				return carousel.isAnimating() === false;
+			}, function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(0);
+				expect(carousel.getAnimator().getCurrentPosition()).toEqual(0);
 
-				window.setTimeout(function () {
-					$window.trigger(mouseUp);
-
-					// give it some time to change
-					window.setTimeout(function () {
-						expect(carousel.getCurrentPageIndex()).toEqual(0);
-
-						done();
-					}, 500);
-				}, 50);
-			}, 50);
+				done();
+			});
 		});
 
 		it('other than left mouse button does not have effect', function (done) {
@@ -293,22 +331,17 @@ define([
 
 			// trigger the events
 			$scroller.trigger(mouseDown);
+			$window.trigger(mouseMove);
+			$window.trigger(mouseUp);
 
-			// give it some time to change
-			window.setTimeout(function() {
-				$window.trigger(mouseMove);
+			window.waitsForAndRuns(function() {
+				// wait for the animation to complete
+				return carousel.isAnimating() === false;
+			}, function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(0);
 
-				window.setTimeout(function () {
-					$window.trigger(mouseUp);
-
-					// give it some time to change
-					window.setTimeout(function () {
-						expect(carousel.getCurrentPageIndex()).toEqual(0);
-
-						done();
-					}, 500);
-				}, 50);
-			}, 50);
+				done();
+			});
 		});
 
 		it('invalid mouse buttons have no effect', function (done) {
@@ -341,20 +374,18 @@ define([
 			$scroller.trigger(mouseDown);
 
 			// give it some time to change
-			window.setTimeout(function() {
-				$window.trigger(mouseMove);
+			$scroller.trigger(mouseDown);
+			$window.trigger(mouseMove);
+			$window.trigger(mouseUp);
 
-				window.setTimeout(function () {
-					$window.trigger(mouseUp);
+			window.waitsForAndRuns(function() {
+				// wait for the animation to complete
+				return carousel.isAnimating() === false;
+			}, function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(0);
 
-					// give it some time to change
-					window.setTimeout(function () {
-						expect(carousel.getCurrentPageIndex()).toEqual(0);
-
-						done();
-					}, 500);
-				}, 50);
-			}, 50);
+				done();
+			});
 		});
 
 		it('navigation is ignored if the carousel is already animating', function (done) {
@@ -391,20 +422,18 @@ define([
 			$scroller.trigger(mouseDown);
 
 			// give it some time to change
-			window.setTimeout(function() {
-				$window.trigger(mouseMove);
+			$scroller.trigger(mouseDown);
+			$window.trigger(mouseMove);
+			$window.trigger(mouseUp);
 
-				window.setTimeout(function () {
-					$window.trigger(mouseUp);
+			window.waitsForAndRuns(function() {
+				// wait for the animation to complete
+				return carousel.isAnimating() === false;
+			}, function() {
+				expect(carousel.getCurrentPageIndex()).toEqual(2);
 
-					// give it some time to change
-					window.setTimeout(function () {
-						expect(carousel.getCurrentPageIndex()).toEqual(2);
-
-						done();
-					}, 500);
-				}, 50);
-			}, 50);
+				done();
+			});
 		});
 
 		it('dragging more in the opposite direction cancels the drag', function (done) {
@@ -441,20 +470,18 @@ define([
 			$scroller.trigger(mouseDown);
 
 			// give it some time to change
-			window.setTimeout(function() {
-				$window.trigger(mouseMove);
+			$scroller.trigger(mouseDown);
+			$window.trigger(mouseMove);
+			$window.trigger(mouseUp);
 
-				window.setTimeout(function () {
-					$window.trigger(mouseUp);
+			window.waitsForAndRuns(function() {
+				// wait for the animation to complete
+				return carousel.isAnimating() === false;
+			}, function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(0);
 
-					// give it some time to change
-					window.setTimeout(function () {
-						expect(carousel.getCurrentPageIndex()).toEqual(0);
-
-						done();
-					}, 500);
-				}, 50);
-			}, 50);
+				done();
+			});
 		});
 	});
 });

@@ -57,20 +57,20 @@ define([
 	ArrayDataSource.prototype.getItems = function(startIndex, endIndex) {
 		var deferred = new Deferred();
 
-		startIndex = startIndex || 0;
-		endIndex = endIndex || this._data.length;
+		startIndex = typeof startIndex === 'number' ? startIndex : 0;
+		endIndex = typeof endIndex === 'number' ? endIndex : this._data.length - 1;
 
 		// validate index range
 		if (startIndex < 0) {
 			throw new Error('Invalid negative start index "' + startIndex + '" requested');
-		} else if (endIndex > this._data.length) {
+		} else if (endIndex > this._data.length - 1) {
 			throw new Error(
 				'Too large end index "' + endIndex + '" requested, there are only ' + this._data.length + ' items'
 			);
 		}
 
 		// resolve the deferred immediately as array data source is syncronous
-		deferred.resolve(this._data.slice(startIndex, endIndex));
+		deferred.resolve(this._data.slice(startIndex, endIndex + 1));
 
 		return deferred.promise();
 	};

@@ -135,6 +135,8 @@ define([
 		AbstractAnimator.call(this, carousel);
 
 		this._carousel = carousel;
+		this._activeDeferred = null;
+		this._transitionEndListenerCreated = false;
 	}
 
 	DefaultAnimator.prototype = Object.create(AbstractAnimator.prototype);
@@ -182,12 +184,27 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
-		var orientation = this._carousel.getOrientation(),
+		/* istanbul ignore if */
+		if (!this._transitionEndListenerCreated &amp;&amp; instant !== true) {
+			throw new Error(&#x27;Requested non-instant animation before transition end listener was created&#x27;);
+		}
+
+		var deferred = new Deferred(),
+			orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			animateTransformClass = this._carousel.getConfig().getClassName(&#x27;animateTransform&#x27;),
 			currentPosition,
-			translateCommand,
-			deferred;
+			translateCommand;
+
+		// make sure the position is a full integer
+		position = Math.floor(position);
+
+		// resolve existing deferred if exists
+		/* istanbul ignore if */
+		if (this._activeDeferred !== null) {
+			this._activeDeferred.resolve();
+			this._activeDeferred = null;
+		}
 
 		// the translate command is different for horizontal and vertical carousels
 		if (orientation === Config.Orientation.HORIZONTAL) {
@@ -197,34 +214,75 @@ define([
 		}
 
 		// add a class that enables transitioning transforms if instant is not required
-		if (instant === true) {
+		if (instant === true &amp;&amp; $scrollerWrap.hasClass(animateTransformClass)) {
 			$scrollerWrap.removeClass(animateTransformClass);
-		} else {
+		} else if (instant === false &amp;&amp; !$scrollerWrap.hasClass(animateTransformClass)) {
 			$scrollerWrap.addClass(animateTransformClass);
 		}
 
 		// apply the translate
-		$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
+		$scrollerWrap.css(&#x27;transform&#x27;, translateCommand, instant);
 
 		// remove the deferred overhead where not required
 		if (noDeferred) {
 			return;
 		}
 
-		deferred = new Deferred();
 		currentPosition = this.getCurrentPosition();
 
 		// if the position is same as current then resolve immediately
 		if (instant || position === currentPosition) {
 			deferred.resolve();
 		} else {
-			// wait for the transition to end and then resolve the deferred
-			$scrollerWrap.bind(&#x27;transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd&#x27;, function () {
+			this._activeDeferred = new Deferred();
+
+			this._activeDeferred.done(function() {
+				this._activeDeferred = null;
+
 				deferred.resolve();
-			});
+			}.bind(this));
 		}
 
 		return deferred.promise();
+	};
+
+	/**
+	 * Called by the carousel once it&#x27;s structure has been initiated.
+	 *
+	 * @method onCarouselInitiated
+	 */
+	AbstractAnimator.prototype.onCarouselElementReady = function() {
+		this._setupTransitionEndListener();
+	};
+
+	/**
+	 * Starts listening for transition end event on the scroller wrap.
+	 *
+	 * @method _setupTransitionEndListener
+	 * @private
+	 */
+	DefaultAnimator.prototype._setupTransitionEndListener = function() {
+		var $scrollerWrap = $(this._carousel.getScrollerWrap());
+
+		$scrollerWrap.on(&#x27;transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd&#x27;, function () {
+			this._resolveDeferred();
+		}.bind(this));
+
+		this._transitionEndListenerCreated = true;
+	};
+
+	/**
+	 * Resolves currently active deferred if available and sets it to null.
+	 *
+	 * @method _resolveDeferred
+	 * @private
+	 */
+	DefaultAnimator.prototype._resolveDeferred = function() {
+		if (this._activeDeferred === null) {
+			return;
+		}
+
+		this._activeDeferred.resolve();
 	};
 
 	return DefaultAnimator;

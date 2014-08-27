@@ -196,7 +196,6 @@ define([
 		 * @default DragNavigator.Mode.NAVIGATE_PAGE
 		 */
 		this.dragNavigatorMode = 'navigate-page';
-		//this.dragNavigatorMode = 'navigate-item';
 
 		/**
 		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
@@ -335,7 +334,7 @@ define([
 		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount) {
 			return {
 				start: Math.max(currentItemIndex - itemsPerPage, 0),
-				end: Math.min(currentItemIndex + itemsPerPage * 2, itemCount)
+				end: Math.min(currentItemIndex + itemsPerPage * 2 - 1, itemCount - 1)
 			};
 		};
 	}

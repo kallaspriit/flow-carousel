@@ -203,7 +203,7 @@
 						return;
 					}
 
-					this._carousel.validate();
+					this._carousel.redraw();
 				}.bind(this));
 			} else {*/
 				this._scope.$watch(
@@ -215,7 +215,7 @@
 
 						console.log('change', newItemCount, lastItemCount);
 
-						this._carousel.validate();
+						this._carousel.redraw();
 					}.bind(this)
 				);
 			//}

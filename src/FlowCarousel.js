@@ -1,5 +1,5 @@
 define([
-	'Jquery',
+	'jquery',
 	'Config',
 	'AbstractDataSource',
 	'ArrayDataSource',
@@ -462,12 +462,15 @@ define([
 	 * @param {string} Event.INITIATING='initiating' Emitted when starting initiation
 	 * @param {string} Event.INITIATED='initiated' Emitted after completing initiation
 	 * @param {string} Event.STARTUP_ITEMS_RENDERED='startup-items-rendered' Emitted after rendering the first data
-	 * @param {string} Event.LOADING_ITEMS='loading-items' [startIndex, endIndex] Emitted when starting to load a new
-	 * 				   set of items
+	 * @param {string} Event.LOADING_ITEMS='loading-items' [startIndex, endIndex, items] Emitted when starting to load a
+	 * 				   new set of items
 	 * @param {string} Event.LOADED_ITEMS='loaded-items' [startIndex, endIndex, items] Emitted when a new set of items
-	 * 				   was loaded and rendered
+	 * 				   was loaded
 	 * @param {string} Event.ABORTED_ITEMS='aborted-items' [startIndex, endIndex] Emitted when loading a range of items
 	 * 				   was aborted
+	 * @param {string} Event.RENDERED_ITEMS='rendered-items' [startIndex, endIndex, elements] Emitted when a new set of
+	 * 				   items was rendered
+	 * @param {string} Event.DESTROYED_ITEMS='destroyed-items' [itemIndexes] Emitted when a set of items was destroyed
 	 * @param {string} Event.NAVIGATING_TO_ITEM='navigating-to-item' [itemIndex, instant] Emitted when starting to
 	 * 				   navigate to a carousel item index
 	 * @param {string} Event.NAVIGATED_TO_ITEM='navigated-to-item' [itemIndex, instant] Emitted when finished
@@ -490,7 +493,11 @@ define([
 
 		LOADING_ITEMS: 'loading-items',
 		LOADED_ITEMS: 'loaded-items',
+
 		ABORTED_ITEMS: 'aborted-items',
+
+		RENDERED_ITEMS: 'rendered-items',
+		DESTROYED_ITEMS: 'destroyed-items',
 
 		NAVIGATING_TO_ITEM: 'navigating-to-item',
 		NAVIGATED_TO_ITEM: 'navigated-to-item',
@@ -527,7 +534,7 @@ define([
 			throw new Error('The carousel is already initiated');
 		}
 
-		this.emitEvent(FlowCarousel.Event.INITIATING);
+		this.emit(FlowCarousel.Event.INITIATING);
 
 		// extend the config with user-provided values if available
 		if (Util.isObject(userConfig)) {
@@ -586,33 +593,20 @@ define([
 		// setup the default navigators
 		this._setupDefaultNavigators();
 
-		// notify the animator that carousel element is ready
-		this._animator.onCarouselElementReady();
-
 		// notify the animator that carousel is initiated
 		this._initiated = true;
 
-		this.emitEvent(FlowCarousel.Event.INITIATED);
+		this.emit(FlowCarousel.Event.INITIATED);
 
 		this._validateItemsToRender().done(function() {
-			var instantAnimation = !this._config.animateToStartIndex;
+			this.validateSize();
 
-			this._setScrollerSizeToLargestVisibleChildSize();
+			deferred.resolve();
+		}.bind(this));
 
-			if (this._config.startItemIndex !== null) {
-				// resolve once navigated to requested item
-				this.navigateToItem(this._config.startItemIndex, instantAnimation).done(function() {
-					deferred.resolve();
-				});
-			} else if (this._config.startPageIndex !== null) {
-				// resolve once navigated to requested page
-				this.navigateToPage(this._config.startPageIndex, instantAnimation).done(function() {
-					deferred.resolve();
-				});
-			} else {
-				// there's nothing to wait for, create and resolve a deferred immediately
-				deferred.resolve();
-			}
+		// listen for wrap size changes and perform re-layout when needed once the carousel is initiated
+		deferred.done(function() {
+			this._setupResponsiveLayoutListener();
 		}.bind(this));
 
 		return deferred.promise();
@@ -896,25 +890,16 @@ define([
 	};
 
 	/**
-	 * Returns item index by position.
-	 *
-	 * @method getItemIndexByPosition
-	 * @param {number} position Item position
-	 * @return {number}
-	 */
-	FlowCarousel.prototype.getItemIndexByPosition= function(position) {
-		return this.getClosestItemIndexAtPosition(position, 1);
-	};
-
-	/**
 	 * Returns the closest full item index at given position taking into account the direction of movement.
 	 *
 	 * @method getClosestItemIndexAtPosition
 	 * @param {number} position Scroller position
-	 * @param {number} direction Move direction (-1/1)
+	 * @param {number} [direction=1] Move direction (-1/1)
 	 * @return {number} Closest item index
 	 */
 	FlowCarousel.prototype.getClosestItemIndexAtPosition = function(position, direction) {
+		direction = direction || 1;
+
 		var itemSize = this.getItemSize(),
 			itemCount = this.getItemCount(),
 			itemsPerPage = this.getItemsPerPage(),
@@ -938,10 +923,12 @@ define([
 	 *
 	 * @method getClosestPageIndexAtPosition
 	 * @param {number} position Scroller position
-	 * @param {number} direction Move direction (-1/1)
+	 * @param {number} [direction=1] Move direction (-1/1)
 	 * @return {number} Closest page index
 	 */
 	FlowCarousel.prototype.getClosestPageIndexAtPosition = function(position, direction) {
+		direction = direction || 1;
+
 		var closestItemIndex = this.getClosestItemIndexAtPosition(position, direction),
 			itemsPerPage = this.getItemsPerPage(),
 			pageCount = this.getPageCount(),
@@ -973,6 +960,42 @@ define([
 			itemCount = this._dataSource.getItemCount();
 
 		return this._config.getRenderRange(itemIndex, itemsPerPage, itemCount);
+	};
+
+	/**
+	 * Returns the range of items that have already been rendered for current item index and config.
+	 *
+	 * @method getRenderedRange
+	 * @return {object|null} Render range with start and end keys or null if no elements have been renderer
+	 * @private
+	 */
+	FlowCarousel.prototype.getRenderedRange = function() {
+		var range = {
+				start: null,
+				end: null
+			},
+			itemIndex,
+			i;
+
+		for (i = 0; i < this._renderedItemIndexes.length; i++) {
+			itemIndex = this._renderedItemIndexes[i];
+
+			itemIndex = parseInt(itemIndex, 10);
+
+			if (range.start === null || itemIndex < range.start) {
+				range.start = itemIndex;
+			}
+
+			if (range.end === null || itemIndex > range.end) {
+				range.end = itemIndex;
+			}
+		}
+
+		if (range.start === null || range.end === null) {
+			return null;
+		}
+
+		return range;
 	};
 
 	/**
@@ -1113,9 +1136,11 @@ define([
 			itemCount = this._dataSource.getItemCount(),
 			isSameItemIndex = itemIndex === this._currentItemIndex;
 
-		// if there are no items then resolve immediately
+		// if there are no items then resolve immediately and give up
 		if (itemCount === 0) {
 			deferred.resolve();
+
+			return deferred.promise();
 		}
 
 		// validate index range
@@ -1125,11 +1150,8 @@ define([
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
-		// resolve existing animation deferred in an existing animation is already in progress
 		// TODO investigate allowing navigation while the previous animation is ongoing
 		/*if (this._activeAnimationDeferred !== null) {
-			console.log('resolve existing navigation deferred');
-
 			this._activeAnimationDeferred.resolve();
 
 			return this.navigateToItem(itemIndex,instant, force);
@@ -1151,14 +1173,12 @@ define([
 			});
 
 			// emitting this event before starting the animation causes lag for some reason
-			this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_ITEM, [itemIndex, instant]);
-
-			//console.log('navigating to item', itemIndex, instant);
+			this.emit(FlowCarousel.Event.NAVIGATING_TO_ITEM, itemIndex, instant);
 		} else {
 			// if the currently active index is requested then just ignore the call and resolve immediately
 			deferred.resolve();
 
-			//console.log('already at item', itemIndex, instant);
+			return deferred;
 		}
 
 		// render placeholders that are later replaced with real loaded items
@@ -1168,8 +1188,6 @@ define([
 
 		// once the animation is complete, update the current item index
 		deferred.done(function() {
-			//console.log('navigated to', itemIndex);
-
 			this._currentItemIndex = this._targetItemIndex;
 			this._isAnimating = false;
 			this._activeAnimationDeferred = null;
@@ -1180,10 +1198,10 @@ define([
 			// check whether we need to render or remove some items
 			this._validateItemsToRender().done(function() {
 				// update scroller size to largest visible child
-				this._setScrollerSizeToLargestVisibleChildSize();
+				this.validateSize();
 			}.bind(this));
 
-			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_ITEM, [itemIndex, instant]);
+			this.emit(FlowCarousel.Event.NAVIGATED_TO_ITEM, itemIndex, instant);
 		}.bind(this));
 
 		// store the promise so it can be returned when requesting a new animation while the last still playing
@@ -1214,18 +1232,28 @@ define([
 	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force) {
 		instant = typeof instant === 'boolean' ? instant : false;
 
-		var itemIndex = pageIndex * this.getItemsPerPage(),
-			promise;
+		var currentPageIndex = this.getCurrentPageIndex(),
+			itemIndex = pageIndex * this.getItemsPerPage(),
+			deferred = new Deferred();
 
-		this.emitEvent(FlowCarousel.Event.NAVIGATING_TO_PAGE, [pageIndex, instant]);
+		// already at target page index, don't do anything
+		if (pageIndex === currentPageIndex && force !== true) {
+			deferred.resolve();
 
-		promise = this.navigateToItem(itemIndex, instant, force);
+			return deferred.promise();
+		}
 
-		promise.done(function() {
-			this.emitEvent(FlowCarousel.Event.NAVIGATED_TO_PAGE, [pageIndex, instant]);
+		this.emit(FlowCarousel.Event.NAVIGATING_TO_PAGE, pageIndex, instant);
+
+		this.navigateToItem(itemIndex, instant, force).done(function() {
+			deferred.resolve();
+		});
+
+		deferred.done(function() {
+			this.emit(FlowCarousel.Event.NAVIGATED_TO_PAGE, pageIndex, instant);
 		}.bind(this));
 
-		return promise;
+		return deferred.promise();
 	};
 
 	/**
@@ -1368,7 +1396,7 @@ define([
 			element,
 			i;
 
-		// return empty array if there are not items
+		// return empty array if there are no items
 		if (itemCount === 0) {
 			return [];
 		}
@@ -1420,16 +1448,16 @@ define([
 	};
 
 	/**
-	 * Validates the dataset and redraws some items if they have changes.
+	 * Validates the dataset and redraws the carousel.
 	 *
 	 * You can call this when the data has changes in the background and the carousel should redraw itself.
 	 *
 	 * Returns promise that is resolved when the new items has been drawn.
 	 *
-	 * @method validate
+	 * @method redraw
 	 * @return {Deferred.Promise}
 	 */
-	FlowCarousel.prototype.validate = function() {
+	FlowCarousel.prototype.redraw = function() {
 		return this._reLayout();
 	};
 
@@ -1498,6 +1526,7 @@ define([
 				vertical: this._config.getClassName('vertical')
 			},
 			sizeMode = this._config.sizeMode,
+			startItemIndex = 0,
 			$itemsWrap,
 			$scrollerWrap;
 
@@ -1543,11 +1572,17 @@ define([
 			throw new Error('Unexpected orientation "' + orientation + '" provided');
 		}
 
-		// setup the individual elements
-		this._setupLayout();
+		if (this._config.startItemIndex !== null) {
+			startItemIndex = this._config.startItemIndex;
+		} else if (this._config.startPageIndex !== null) {
+			startItemIndex = this._config.startPageIndex * this.getItemsPerPage();
+		}
 
-		// listen for wrap size changes and perform re-layout when needed
-		this._setupResponsiveLayoutListener();
+		// notify the animator that carousel element is ready
+		this._animator.onCarouselElementReady();
+
+		// setup the main layout and move/animate to the start item
+		this._setupLayout(startItemIndex, this._config.animateToStartIndex);
 
 		// remove the loading class
 		$element.removeClass(className.initiating);
@@ -1566,26 +1601,30 @@ define([
 	 *
 	 * @method _setupLayout
 	 * @param {number} [startItemIdex] Optional item index to navigate to instantly
+	 * @param {boolean} [animateToStartItem=false] Should we animate to the start item
 	 * @private
 	 */
-	FlowCarousel.prototype._setupLayout = function(startItemIndex) {
+	FlowCarousel.prototype._setupLayout = function(startItemIndex, animateToStartItem) {
 		var orientation = this._config.orientation,
 			wrapSize = this._getMainWrapSize(),
 			itemCount = this._dataSource.getItemCount(),
 			itemsPerPage = this._config.getItemsPerPage(wrapSize),
 			itemSize = this._calculateItemSize(wrapSize, itemsPerPage),
 			totalSize = Math.ceil(itemCount * itemSize),
+			instantAnimation = animateToStartItem !== true,
 			sizeProp = orientation === Config.Orientation.HORIZONTAL
 				? 'width'
 				: 'height';
 
 		// the wrap size can become zero when hidden, stop the layout process
+		/* istanbul ignore if */
 		if (wrapSize === 0) {
-			//throw new Error('Main wrap size was found to be zero, this should not happen');
-
 			return;
+
+			//throw new Error('Main wrap size was found to be zero, this should not happen');
 		}
 
+		/* istanbul ignore if */
 		if (itemSize === 0) {
 			throw new Error('Item size was found to be zero, this should not happen');
 		}
@@ -1594,11 +1633,15 @@ define([
 		$(this._scrollerWrap).css(sizeProp, totalSize);
 
 		// if the start item index is set then navigate to it instantly
-		if (typeof startItemIndex === 'number') {
+		if (typeof startItemIndex === 'number' && startItemIndex !== 0) {
 			this._targetItemIndex = startItemIndex;
 			this._currentItemIndex = startItemIndex;
 
-			this._animator.animateToItem(startItemIndex, true, true);
+			this.emit(FlowCarousel.Event.NAVIGATING_TO_ITEM, startItemIndex, instantAnimation);
+
+			this._animator.animateToItem(startItemIndex, instantAnimation, true).done(function() {
+				this.emit(FlowCarousel.Event.NAVIGATED_TO_ITEM, startItemIndex, instantAnimation);
+			}.bind(this));
 		}
 
 		// render placeholders that are later replaced with real loaded items
@@ -1606,7 +1649,7 @@ define([
 			this._renderTargetIndexPlaceholders();
 		}
 
-		this.emitEvent(FlowCarousel.Event.LAYOUT_CHANGED);
+		this.emit(FlowCarousel.Event.LAYOUT_CHANGED);
 	};
 
 	/**
@@ -1665,15 +1708,17 @@ define([
 		var renderRange = this.getRenderRange(),
 			filteredPlaceholderItemIndexes = [],
 			filteredRenderedItemIndexes = [],
+			destroyedItemIndexes = [],
 			itemIndex,
 			itemElement,
 			i;
 
 		// destroy rendered placeholders out of the render range
+		// TODO the placeholders and real items destroying should be merged
 		for (i = 0; i < this._renderedPlaceholderIndexes.length; i++) {
 			itemIndex = this._renderedPlaceholderIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex > renderRange.end - 1) {
+			if (itemIndex < renderRange.start || itemIndex > renderRange.end) {
 				itemElement = this.getItemElementByIndex(itemIndex);
 
 				/* istanbul ignore if */
@@ -1684,6 +1729,8 @@ define([
 				}
 
 				this._destroyItem(itemElement, itemIndex);
+
+				destroyedItemIndexes.push(itemIndex);
 			} else {
 				filteredPlaceholderItemIndexes.push(itemIndex);
 			}
@@ -1695,7 +1742,7 @@ define([
 		for (i = 0; i < this._renderedItemIndexes.length; i++) {
 			itemIndex = this._renderedItemIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex > renderRange.end - 1) {
+			if (itemIndex < renderRange.start || itemIndex > renderRange.end) {
 				itemElement = this.getItemElementByIndex(itemIndex);
 
 				/* istanbul ignore if */
@@ -1704,9 +1751,15 @@ define([
 				}
 
 				this._destroyItem(itemElement, itemIndex);
+
+				destroyedItemIndexes.push(itemIndex);
 			} else {
 				filteredRenderedItemIndexes.push(itemIndex);
 			}
+		}
+
+		if (destroyedItemIndexes.length > 0) {
+			this.emit(FlowCarousel.Event.DESTROYED_ITEMS, destroyedItemIndexes);
 		}
 
 		this._renderedItemIndexes = filteredRenderedItemIndexes;
@@ -1724,79 +1777,6 @@ define([
 		this._renderer.destroyItem(element);
 
 		this._removeItemIndexToElement(index);
-	};
-
-	/**
-	 * Renders a range of carousel items.
-	 *
-	 * Emits:
-	 * - FlowCarousel.Event.LOADING_ITEMS [startIndex, endIndex] before starting to load a range of items
-	 * - FlowCarousel.Event.ABORTED_ITEMS [startIndex, endIndex] if loading or a range of items was aborted
-	 * - FlowCarousel.Event.LOADED_ITEMS [startIndex, endIndex, items] after loading and rendering a range of items
-	 * - FlowCarousel.Event.STARTUP_ITEMS_RENDERED if the rendered range of items was the first
-	 *
-	 * @method _renderItemRange
-	 * @param {number} startIndex Range start index
-	 * @param {number} endIndex Range end index
-	 * @return {Deferred.Promise}
-	 * @private
-	 */
-	FlowCarousel.prototype._renderItemRange = function(startIndex, endIndex) {
-		var self = this,
-			deferred = new Deferred(),
-			loadingClassName = this._config.getClassName('loading');
-
-		// for asyncronous data source add the loading class to the main wrap for the duration of the async request
-		if (this._dataSource.isAsynchronous()) {
-			$(this._mainWrap).addClass(loadingClassName);
-		}
-
-		// try to abort existing item loading if possible
-		if (this._getItemsPromise !== null) {
-			/* istanbul ignore if */
-			if (typeof this._getItemsPromise.abort === 'function') {
-				this._getItemsPromise.abort();
-			}
-
-			this._getItemsPromise._ignore = true;
-
-			this._getItemsPromise = null;
-		}
-
-		this.emitEvent(FlowCarousel.Event.LOADING_ITEMS, [startIndex, endIndex]);
-
-		// store the new itemset fetching deferred promise and fetch new items
-		this._getItemsPromise = this._dataSource.getItems(startIndex, endIndex)
-			.done(function(items) {
-				// ignore invalid data if it couldn't be aborted
-				if (this._ignore === true) {
-					self.emitEvent(FlowCarousel.Event.ABORTED_ITEMS, [startIndex, endIndex]);
-
-					return;
-				}
-
-				self._getItemsPromise = null;
-
-				if (self._dataSource.isAsynchronous()) {
-					$(self._mainWrap).removeClass(loadingClassName);
-				}
-
-				// rendering items can be asyncronous as well
-				self._renderItems(items, startIndex).done(function() {
-					// it's possible that the initial first page data loading was cancelled
-					if (!this._startupItemsRenderedEmitted) {
-						this.emitEvent(FlowCarousel.Event.STARTUP_ITEMS_RENDERED);
-
-						this._startupItemsRenderedEmitted = true;
-					}
-
-					this.emitEvent(FlowCarousel.Event.LOADED_ITEMS, [startIndex, endIndex, items]);
-
-					deferred.resolve();
-				}.bind(self));
-			});
-
-		return deferred.promise();
 	};
 
 	/**
@@ -1829,7 +1809,7 @@ define([
 			element,
 			itemIndex;
 
-		for (itemIndex = startIndex; itemIndex < endIndex; itemIndex++) {
+		for (itemIndex = startIndex; itemIndex <= endIndex; itemIndex++) {
 			// don't render a placeholder onto already existing rendered item
 			/* istanbul ignore if */
 			if (this._renderedItemIndexes.indexOf(itemIndex) !== -1) {
@@ -1846,6 +1826,108 @@ define([
 	};
 
 	/**
+	 * Renders a range of carousel items.
+	 *
+	 * Emits:
+	 * - FlowCarousel.Event.LOADING_ITEMS [startIndex, endIndex] before starting to load a range of items
+	 * - FlowCarousel.Event.ABORTED_ITEMS [startIndex, endIndex] if loading or a range of items was aborted
+	 * - FlowCarousel.Event.LOADED_ITEMS [startIndex, endIndex, items] after loading and rendering a range of items
+	 * - FlowCarousel.Event.STARTUP_ITEMS_RENDERED if the rendered range of items was the first
+	 *
+	 * @method _renderItemRange
+	 * @param {number} startIndex Range start index
+	 * @param {number} endIndex Range end index
+	 * @return {Deferred.Promise}
+	 * @private
+	 */
+	FlowCarousel.prototype._renderItemRange = function(startIndex, endIndex) {
+		var self = this,
+			deferred = new Deferred(),
+			loadingClassName = this._config.getClassName('loading'),
+			renderedRange = this.getRenderedRange(),
+			dir = renderedRange === null || startIndex >= renderedRange.start ? 1 : -1,
+			loadRange;
+
+		// don't render anything if already rendered same range
+		if (renderedRange !== null && renderedRange.start === startIndex && renderedRange.end === endIndex) {
+			deferred.resolve();
+
+			return deferred.promise();
+		}
+
+		if (renderedRange === null) {
+			loadRange = {
+				start: startIndex,
+				end: endIndex
+			};
+		} else {
+			if (dir === 1) {
+				loadRange = {
+					start: Math.max(startIndex, renderedRange.end + 1),
+					end: endIndex
+				};
+			} else {
+				loadRange = {
+					start: startIndex,
+					end: Math.min(endIndex, renderedRange.start - 1)
+				};
+			}
+		}
+
+		// for asyncronous data source add the loading class to the main wrap for the duration of the async request
+		if (this._dataSource.isAsynchronous()) {
+			$(this._mainWrap).addClass(loadingClassName);
+		}
+
+		// try to abort existing item loading if possible
+		if (this._getItemsPromise !== null) {
+			/* istanbul ignore if */
+			if (typeof this._getItemsPromise.abort === 'function') {
+				this._getItemsPromise.abort();
+			}
+
+			this._getItemsPromise._ignore = true;
+
+			this._getItemsPromise = null;
+		}
+
+		this.emit(FlowCarousel.Event.LOADING_ITEMS, loadRange.start, loadRange.end);
+
+		// store the new itemset fetching deferred promise and fetch new items
+		this._getItemsPromise = this._dataSource.getItems(loadRange.start, loadRange.end)
+			.done(function(items) {
+				// ignore invalid data if it couldn't be aborted
+				if (this._ignore === true) {
+					self.emit(FlowCarousel.Event.ABORTED_ITEMS, loadRange.start, loadRange.end, items);
+
+					return;
+				}
+
+				self.emit(FlowCarousel.Event.LOADED_ITEMS, loadRange.start, loadRange.end, items);
+
+				self._getItemsPromise = null;
+
+				if (self._dataSource.isAsynchronous()) {
+					$(self._mainWrap).removeClass(loadingClassName);
+				}
+
+				// rendering items can be asyncronous as well
+				self._renderItems(items, loadRange.start).done(function() {
+					// it's possible that the initial first page data loading was cancelled
+					if (!this._startupItemsRenderedEmitted) {
+						this.emit(FlowCarousel.Event.STARTUP_ITEMS_RENDERED);
+
+						this._startupItemsRenderedEmitted = true;
+					}
+
+					deferred.resolve();
+				}.bind(self));
+			});
+
+		return deferred.promise();
+	};
+
+	/**
 	 * Renders given carousel items.
 	 *
 	 * @method _renderItems
@@ -1858,6 +1940,7 @@ define([
 		var deferred = new Deferred(),
 			renderRange = this.getRenderRange(),
 			renderingClassName = this._config.getClassName('rendering'),
+			endIndex = startIndex + items.length - 1,
 			promises = [],
 			outOfRange,
 			itemIndex,
@@ -1878,7 +1961,7 @@ define([
 		for (i = 0; i < items.length; i++) {
 			item = items[i];
 			itemIndex = startIndex + i;
-			outOfRange = itemIndex < renderRange.start || itemIndex > renderRange.end - 1;
+			outOfRange = itemIndex < renderRange.start || itemIndex > renderRange.end;
 
 			/* istanbul ignore if */
 			if (outOfRange) {
@@ -1899,6 +1982,7 @@ define([
 			}
 
 			// only render the item if it's not already rendered and it's not out of current render range
+			/* istanbul ignore else */
 			if (this._renderedItemIndexes.indexOf(itemIndex) === -1 && !outOfRange) {
 				promise = this._renderer.renderItem(this._config, itemIndex, item);
 			} else {
@@ -1918,6 +2002,8 @@ define([
 				$(this._mainWrap).removeClass(renderingClassName);
 
 				this._insertRenderedElements(arguments, startIndex);
+
+				this.emit(FlowCarousel.Event.RENDERED_ITEMS, startIndex, endIndex, arguments);
 
 				deferred.resolve();
 			}.bind(this));
@@ -2058,8 +2144,7 @@ define([
 		}
 
 		// apply some pre-processing to each element about to be inserted into the dom
-		// TODO add back in some form
-		//this._preprocessItemElement($itemWrapper, index);
+		this._preprocessItemElement($itemWrapper, index);
 
 		// append the element to the scroller wrap
 		$wrap.append($itemWrapper);
@@ -2105,8 +2190,8 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._preprocessItemElement = function($itemWrapper, index) {
-		var self = this,
-			itemHoverClass = this._config.getClassName('itemHover');
+		var self = this;
+			//itemHoverClass = this._config.getClassName('itemHover');
 
 		// store the item index in wrapper element data
 		$itemWrapper.data(this._config.cssPrefix + 'index', index);
@@ -2116,12 +2201,13 @@ define([
 			function() {
 				var elementIndex = $(this).data(self._config.cssPrefix + 'index');
 
-				$(this).addClass(itemHoverClass);
+				// TODO not sure if it's a good idea
+				//$(this).addClass(itemHoverClass);
 
 				self._hoverItemIndex = elementIndex;
 			},
 			function() {
-				$(this).removeClass(itemHoverClass);
+				//$(this).removeClass(itemHoverClass);
 
 				self._hoverItemIndex = null;
 			}
@@ -2129,12 +2215,13 @@ define([
 	};
 
 	/**
-	 * Sets the scroller wrap size to the largest visible child size.
+	 * Makes sure that the scroller size matches the largest currently visible item size.
 	 *
-	 * @method _setScrollerSizeToLargestVisibleChildSize
-	 * @private
+	 * This is executed only when using Config.SizeMode.MATCH_LARGEST_ITEM size mode.
+	 *
+	 * @method validateSize
 	 */
-	FlowCarousel.prototype._setScrollerSizeToLargestVisibleChildSize = function() {
+	FlowCarousel.prototype.validateSize = function() {
 		// only perform this routine if matching the largest item size
 		if (this._config.sizeMode !== Config.SizeMode.MATCH_LARGEST_ITEM) {
 			return;
@@ -2192,7 +2279,7 @@ define([
 
 		// update scroller size
 		promise.done(function() {
-			this._setScrollerSizeToLargestVisibleChildSize();
+			this.validateSize();
 		}.bind(this));
 
 		return promise;
@@ -2236,18 +2323,22 @@ define([
 		}.bind(this), this._config.responsiveLayoutListenerInterval);*/
 
 		// also validate on window resize
+		/* istanbul ignore next */
 		$(window).resize(function() {
-			this.validate();
+			this._validateResponsiveLayout();
 		}.bind(this));
 
 		// validate responsive layout when any of the main wrap attributes change
-		$(this._mainWrap).attrchange({
-			callback: function () {
-				console.log('attributes changed');
+		/*$(this._mainWrap).attrchange({
+			callback: function (e) {
+				// ignore class as this is reported to change while animating anyway through shouldn't
+				if (e.attributeName === 'class') {
+					return;
+				}
 
 				this._validateResponsiveLayout();
 			}.bind(this)
-		});
+		});*/
 	};
 
 	/**
@@ -2260,7 +2351,7 @@ define([
 	FlowCarousel.prototype._validateResponsiveLayout = function(force) {
 		// don't perform the validation while animating
 		if (this._isAnimating && force !== true) {
-			return;
+			return false;
 		}
 
 		var $element = $(this._mainWrap),
@@ -2269,19 +2360,17 @@ define([
 
 		$element.data(this._config.cssPrefix + 'last-size', currentSize);
 
-		if (lastSize === null)  {
-			return;
-		}
-
 		// perform the layout routine if the wrap size has changed and it did not change to zero
-		if (
-			(currentSize !== lastSize && currentSize !== 0)
-		) {
+		if (lastSize === null || (currentSize !== lastSize && currentSize !== 0)) {
 			// perform the re-layout routine only when the wrap size has not changed for some time
 			this._performDelayed('re-layout', function() {
 				this._reLayout();
 			}.bind(this), this._config.responsiveLayoutDelay);
+
+			return true;
 		}
+
+		return false;
 	};
 
 	/**
@@ -2385,6 +2474,8 @@ define([
 
 		this._cache.wrapSize = this._getElementSize(this._mainWrap, orientation);
 
+		$(this._mainWrap).data(this._config.cssPrefix + 'last-size', this._cache.wrapSize);
+
 		return this._cache.wrapSize;
 	};
 
@@ -2436,7 +2527,7 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._onDragBegin = function(startPosition, dragOppositePosition, carouselPosition) {
-		this.emitEvent(FlowCarousel.Event.DRAG_BEGIN, [startPosition, dragOppositePosition, carouselPosition]);
+		this.emit(FlowCarousel.Event.DRAG_BEGIN, startPosition, dragOppositePosition, carouselPosition);
 	};
 
 	/**
@@ -2461,7 +2552,8 @@ define([
 		direction,
 		targetElement
 	) {
-		this.emitEvent(FlowCarousel.Event.DRAG_BEGIN, [
+		this.emit(
+			FlowCarousel.Event.DRAG_BEGIN,
 			navigationMode,
 			startPosition,
 			endPosition,
@@ -2469,7 +2561,7 @@ define([
 			deltaDragPosition,
 			direction,
 			targetElement
-		]);
+		);
 	};
 
 	/**

@@ -115,7 +115,7 @@
 
 		// fake asyncronous request that takes some time to complete
 		window.setTimeout(function() {
-			deferred.resolve(this._data.slice(startIndex, endIndex));
+			deferred.resolve(this._data.slice(startIndex, endIndex + 1));
 		}.bind(this), requestDuration);
 
 		return deferred.promise();

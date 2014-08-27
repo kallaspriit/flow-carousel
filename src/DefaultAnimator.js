@@ -1,5 +1,5 @@
 define([
-	'Jquery',
+	'jquery',
 	'AbstractAnimator',
 	'Config',
 	'Util',
@@ -68,8 +68,9 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
-		if (!this._transitionEndListenerCreated) {
-			throw new Error('Requested to animate before transition end listener was created');
+		/* istanbul ignore if */
+		if (!this._transitionEndListenerCreated && instant !== true) {
+			throw new Error('Requested non-instant animation before transition end listener was created');
 		}
 
 		var deferred = new Deferred(),
@@ -77,20 +78,16 @@ define([
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
-			translateCommand,
-			promise;
+			translateCommand;
 
 		// make sure the position is a full integer
 		position = Math.floor(position);
 
 		// resolve existing deferred if exists
+		/* istanbul ignore if */
 		if (this._activeDeferred !== null) {
 			this._activeDeferred.resolve();
 			this._activeDeferred = null;
-
-			console.log('resolve existing animation');
-
-			//throw new Error('An animation is already in progress, this should not happen');
 		}
 
 		// the translate command is different for horizontal and vertical carousels
@@ -100,16 +97,12 @@ define([
 			translateCommand = 'translate3d(0,' + position + 'px,0)';
 		}
 
-
-
 		// add a class that enables transitioning transforms if instant is not required
-		if (instant === true) {
+		if (instant === true && $scrollerWrap.hasClass(animateTransformClass)) {
 			$scrollerWrap.removeClass(animateTransformClass);
-		} else {
+		} else if (instant === false && !$scrollerWrap.hasClass(animateTransformClass)) {
 			$scrollerWrap.addClass(animateTransformClass);
 		}
-
-		console.log('start animation', position, instant);
 
 		// apply the translate
 		$scrollerWrap.css('transform', translateCommand, instant);
@@ -123,8 +116,6 @@ define([
 
 		// if the position is same as current then resolve immediately
 		if (instant || position === currentPosition) {
-			console.log('resolve instant animation');
-
 			deferred.resolve();
 		} else {
 			this._activeDeferred = new Deferred();
@@ -174,8 +165,6 @@ define([
 		if (this._activeDeferred === null) {
 			return;
 		}
-
-		console.log('animation complete');
 
 		this._activeDeferred.resolve();
 	};

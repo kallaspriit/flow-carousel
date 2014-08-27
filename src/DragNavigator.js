@@ -256,7 +256,6 @@ define([
 
 		// calculate the position
 		var newPosition = this._startCarouselPosition + deltaDragPosition,
-			pageSize = this._carousel.getPageSize(),
 			itemSize = this._carousel.getItemSize(),
 			totalSize = this._carousel.getTotalSize(),
 			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
@@ -402,11 +401,14 @@ define([
 	/**
 	 * Ignores given jQuery event.
 	 *
+	 * TODO don't know how to unit-test this yet
+	 *
 	 * @method _ignoreEvent
 	 * @param {jQuery.Event} e jQuery event
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
+	/* istanbul ignore next */
 	DragNavigator.prototype._ignoreEvent = function(e) {
 		e.preventDefault();
 		e.stopPropagation();

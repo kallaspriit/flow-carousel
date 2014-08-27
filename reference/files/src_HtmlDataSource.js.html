@@ -165,20 +165,20 @@ define([
 	HtmlDataSource.prototype.getItems = function(startIndex, endIndex) {
 		var deferred = new Deferred();
 
-		startIndex = startIndex || 0;
-		endIndex = endIndex || this._data.length;
+		startIndex = typeof startIndex === &#x27;number&#x27; ? startIndex : 0;
+		endIndex = typeof endIndex === &#x27;number&#x27; ? endIndex : this._data.length - 1;
 
 		// validate index range
 		if (startIndex &lt; 0) {
 			throw new Error(&#x27;Invalid negative start index &quot;&#x27; + startIndex + &#x27;&quot; requested&#x27;);
-		} else if (endIndex &gt; this._data.length) {
+		} else if (endIndex &gt; this._data.length - 1) {
 			throw new Error(
 				&#x27;Too large end index &quot;&#x27; + endIndex + &#x27;&quot; requested, there are only &#x27; + this._data.length + &#x27; items&#x27;
 			);
 		}
 
 		// resolve the deferred immediately as array data source is syncronous
-		deferred.resolve(this._data.slice(startIndex, endIndex));
+		deferred.resolve(this._data.slice(startIndex, endIndex + 1));
 
 		return deferred.promise();
 	};

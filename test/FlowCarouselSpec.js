@@ -26,10 +26,10 @@ define([
 	'use strict';
 
 	// dummy custom data source
-	function CustomDataSource() {
+	function CustomDataSource(items) {
 		AbstractDataSource.call(this);
 
-		var itemCount = 1000,
+		var itemCount = typeof items === 'number' ? items : 1000,
 			i;
 
 		this._data = [];
@@ -55,7 +55,7 @@ define([
 
 		// fake asyncronous request that takes some time to complete
 		window.setTimeout(function() {
-			deferred.resolve(this._data.slice(startIndex, endIndex));
+			deferred.resolve(this._data.slice(startIndex, endIndex + 1));
 		}.bind(this), requestDuration);
 
 		return deferred.promise();
@@ -346,9 +346,29 @@ define([
 			});
 		});
 
+		it('navigating empty carousel resolves immediately', function (done) {
+			var customDataSource = new CustomDataSource(0),
+				customRenderer = new CustomRenderer();
+
+			carousel.init('.carousel', {
+				dataSource: customDataSource,
+				renderer: customRenderer
+			}).done(function() {
+				expect(carousel.getCurrentPageVisibleItemElements()).toEqual([]);
+				expect(carousel.getItemCount()).toEqual(0);
+				expect(carousel.getItemElementByIndex(0)).toEqual(null);
+
+				carousel.navigateToItem(0).done(function() {
+					expect(carousel.getCurrentItemIndex()).toEqual(0);
+
+					done();
+				});
+			});
+		});
+
 		// for some reason this blows up Karma..
 		/*it('emits "INITIATING" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.INITIATING, function() {
+			carousel.on(FlowCarousel.Event.INITIATING, function() {
 				done();
 			});
 
@@ -358,7 +378,7 @@ define([
 		});*/
 
 		it('emits "INITIATED" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.INITIATED, function() {
+			carousel.on(FlowCarousel.Event.INITIATED, function() {
 				done();
 			});
 
@@ -369,7 +389,7 @@ define([
 			var customDataSource = new CustomDataSource(),
 				customRenderer = new CustomRenderer();
 
-			carousel.addListener(FlowCarousel.Event.STARTUP_ITEMS_RENDERED, function() {
+			carousel.on(FlowCarousel.Event.STARTUP_ITEMS_RENDERED, function() {
 				done();
 			});
 
@@ -380,7 +400,7 @@ define([
 		});
 
 		it('emits "LOADING_ITEMS" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.LOADING_ITEMS, function() {
+			carousel.on(FlowCarousel.Event.LOADING_ITEMS, function() {
 				done();
 			});
 
@@ -388,7 +408,7 @@ define([
 		});
 
 		it('emits "LOADED_ITEMS" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.LOADED_ITEMS, function() {
+			carousel.on(FlowCarousel.Event.LOADED_ITEMS, function() {
 				done();
 			});
 
@@ -399,7 +419,7 @@ define([
 			var customDataSource = new CustomDataSource(),
 				customRenderer = new CustomRenderer();
 
-			carousel.addListener(FlowCarousel.Event.ABORTED_ITEMS, function() {
+			carousel.on(FlowCarousel.Event.ABORTED_ITEMS, function() {
 				done();
 			});
 
@@ -412,7 +432,7 @@ define([
 		});
 
 		it('emits "NAVIGATING_TO_ITEM" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.NAVIGATING_TO_ITEM, function() {
+			carousel.on(FlowCarousel.Event.NAVIGATING_TO_ITEM, function() {
 				done();
 			});
 
@@ -422,7 +442,7 @@ define([
 		});
 
 		it('emits "NAVIGATED_TO_ITEM" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.NAVIGATED_TO_ITEM, function() {
+			carousel.on(FlowCarousel.Event.NAVIGATED_TO_ITEM, function() {
 				done();
 			});
 
@@ -432,7 +452,7 @@ define([
 		});
 
 		it('emits "NAVIGATING_TO_PAGE" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.NAVIGATING_TO_PAGE, function() {
+			carousel.on(FlowCarousel.Event.NAVIGATING_TO_PAGE, function() {
 				done();
 			});
 
@@ -442,7 +462,7 @@ define([
 		});
 
 		it('emits "NAVIGATED_TO_PAGE" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.NAVIGATED_TO_PAGE, function() {
+			carousel.on(FlowCarousel.Event.NAVIGATED_TO_PAGE, function() {
 				done();
 			});
 
@@ -452,7 +472,7 @@ define([
 		});
 
 		it('emits "LAYOUT_CHANGED" event', function (done) {
-			carousel.addListener(FlowCarousel.Event.LAYOUT_CHANGED, function() {
+			carousel.on(FlowCarousel.Event.LAYOUT_CHANGED, function() {
 				done();
 			});
 
@@ -574,7 +594,7 @@ define([
 			expect(requestInvalidOrientation).toThrow();
 		});
 
-		it('changing carousel wrap size triggers responsive layout', function(done) {
+		/*it('changing window size triggers responsive layout', function(done) {
 			spyOn(carousel, '_reLayout').and.callFake(function() {
 				expect(carousel._reLayout).toHaveBeenCalled();
 
@@ -590,36 +610,99 @@ define([
 
 			// give it some time to change
 			window.setTimeout(function() {
-				$('.carousel').css('width', '300px');
+				$(window).trigger('resize');
 			}, 200);
-		});
+		});*/
 
-		it('calling validate triggers re-layout', function(done) {
-			spyOn(carousel, '_reLayout').and.callFake(function() {
-				expect(carousel._reLayout).toHaveBeenCalled();
-
-				done();
-			});
+		it('calling redraw triggers re-layout', function(done) {
+			spyOn(carousel, '_reLayout').and.callThrough();
 
 			carousel.init('.carousel').done(function() {
-				carousel.validate();
+				carousel.redraw().done(function() {
+					expect(carousel._reLayout).toHaveBeenCalled();
+
+					done();
+				});
 			});
 		});
 
-		it('changing carousel wrap size triggers responsive layout', function(done) {
+		// TODO improve the resize test
+		it('window resize triggers re-layout', function(done) {
+			var relayoutScheduled;
+			//spyOn(carousel, '_reLayout').and.callThrough();
+
 			carousel.init('.carousel').done(function() {
-				// give it some time to change
-				window.setTimeout(function() {
-					$('.carousel').css('width', '100px');
-				}, 200);
+				$('.carousel').width('300px');
+
+				//$(window).trigger('resize');
+				relayoutScheduled = carousel._validateResponsiveLayout();
 
 				window.setTimeout(function() {
-					$('.carousel').css('width', '150px');
-				}, 250);
+					//expect(carousel._reLayout).toHaveBeenCalled();
+					expect(relayoutScheduled).toEqual(true);
 
-				// give it some time to change
+					done();
+				}, 1000);
+			});
+		});
+
+		it('several window resizes only apply once after a delay', function(done) {
+			var relayoutScheduled,
+				relayoutScheduled2;
+			//spyOn(carousel, '_reLayout').and.callThrough();
+
+			carousel.init('.carousel').done(function() {
+				$('.carousel').width('300px');
+
+				//$(window).trigger('resize');
+				relayoutScheduled = carousel._validateResponsiveLayout();
+
+				$('.carousel').width('200px');
+
+				relayoutScheduled2 = carousel._validateResponsiveLayout();
+
 				window.setTimeout(function() {
-					expect(carousel.getItemsPerPage()).toEqual(1);
+					//expect(carousel._reLayout).toHaveBeenCalled();
+					expect(relayoutScheduled).toEqual(true);
+					expect(relayoutScheduled2).toEqual(true);
+
+					done();
+				}, 1000);
+			});
+		});
+
+		it('relayout is not triggered by responsive check if the size has not changed', function(done) {
+			var relayoutScheduled;
+			//spyOn(carousel, '_reLayout').and.callThrough();
+
+			carousel.init('.carousel').done(function() {
+				//$(window).trigger('resize');
+				relayoutScheduled = carousel._validateResponsiveLayout();
+
+				window.setTimeout(function() {
+					//expect(carousel._reLayout).toHaveBeenCalled();
+					expect(relayoutScheduled).toEqual(false);
+
+					done();
+				}, 1000);
+			});
+		});
+
+		it('responsive layout validation is ignored if already animating', function(done) {
+			var relayoutScheduled;
+			//spyOn(carousel, '_reLayout').and.callThrough();
+
+			carousel.init('.carousel').done(function() {
+				carousel.navigateToPage(1);
+
+				$('.carousel').width('300px');
+
+				//$(window).trigger('resize');
+				relayoutScheduled = carousel._validateResponsiveLayout();
+
+				window.setTimeout(function() {
+					//expect(carousel._reLayout).toHaveBeenCalled();
+					expect(relayoutScheduled).toEqual(false);
 
 					done();
 				}, 1000);
@@ -647,6 +730,22 @@ define([
 				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
 
 				carousel.navigateToPreviousItem().done(function() {
+					expect(carousel.getCurrentItemIndex()).toEqual(startIndex - 1);
+
+					done();
+				});
+			});
+		});
+
+		it('instant navigation can follow normal one', function(done) {
+			carousel.init('.carousel');
+
+			var startIndex = 5;
+
+			carousel.navigateToItem(startIndex).done(function() {
+				expect(carousel.getCurrentItemIndex()).toEqual(startIndex);
+
+				carousel.navigateToPreviousItem(true).done(function() {
 					expect(carousel.getCurrentItemIndex()).toEqual(startIndex - 1);
 
 					done();
@@ -947,6 +1046,16 @@ define([
 			expect(closestItemBackward).toEqual(3);
 		});
 
+		it('method "getClosestItemIndexAtPosition" returns closest item index to a position', function() {
+			carousel.init('.carousel');
+
+			var closestItemForward = carousel.getClosestItemIndexAtPosition(-1000, 1),
+				closestItemBackward = carousel.getClosestItemIndexAtPosition(-1000, -1);
+
+			expect(closestItemForward).toEqual(2);
+			expect(closestItemBackward).toEqual(3);
+		});
+
 		it('method "getClosestPageIndexAtPosition" returns closest page index to a position', function() {
 			carousel.init('.carousel');
 
@@ -955,6 +1064,25 @@ define([
 
 			expect(closestPageForward).toEqual(0);
 			expect(closestItemBackward).toEqual(1);
+		});
+
+		it('method "isFirstPage" and "isLastPage" returns whether the user is on the first/last page', function(done) {
+			carousel.init('.carousel');
+
+			expect(carousel.isFirstPage()).toEqual(true);
+			expect(carousel.isLastPage()).toEqual(false);
+
+			carousel.navigateToPage(1).done(function() {
+				expect(carousel.isFirstPage()).toEqual(false);
+				expect(carousel.isLastPage()).toEqual(false);
+
+				carousel.navigateToPage(carousel.getPageCount() - 1).done(function() {
+					expect(carousel.isFirstPage()).toEqual(false);
+					expect(carousel.isLastPage()).toEqual(true);
+
+					done();
+				});
+			});
 		});
 
 		it('adding a navigator of type that already exists throws error', function() {

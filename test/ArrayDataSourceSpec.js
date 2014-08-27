@@ -34,7 +34,7 @@ define([
 
 			dataSource = new ArrayDataSource(sourceData);
 
-			dataSource.getItems(1, 2).done(function(items) {
+			dataSource.getItems(1, 1).done(function(items) {
 				expect(items).toEqual([2]);
 
 				done();
@@ -46,8 +46,8 @@ define([
 
 			dataSource = new ArrayDataSource(sourceData);
 
-			dataSource.getItems(1, 1).done(function(items) {
-				expect(items).toEqual([]);
+			dataSource.getItems(0, 0).done(function(items) {
+				expect(items).toEqual([1]);
 
 				done();
 			});
@@ -59,7 +59,19 @@ define([
 			dataSource = new ArrayDataSource(sourceData);
 
 			dataSource.getItems(0, 2).done(function(items) {
-				expect(items).toEqual([1, 2]);
+				expect(items).toEqual([1, 2, 3]);
+
+				done();
+			});
+		});
+
+		it('method "getItems" returns requested range of items', function (done) {
+			var sourceData = [1, 2, 3, 4];
+
+			dataSource = new ArrayDataSource(sourceData);
+
+			dataSource.getItems(1, 3).done(function(items) {
+				expect(items).toEqual([2, 3, 4]);
 
 				done();
 			});
@@ -119,9 +131,23 @@ define([
 			expect(emptyDataSource.getItemCount()).toEqual(0);
 		});
 
-		it('getItems return an empty array by default', function (done) {
+		it('"getItems()" return an empty array by default', function (done) {
 			dataSource.getItems().done(function(items) {
 				expect(items).toEqual([]);
+
+				done();
+			});
+		});
+
+		it('items can be set using "setData()"', function (done) {
+			var newData = [1, 2, 3, 4];
+
+			expect(dataSource.getItemCount()).toEqual(0);
+
+			dataSource.setData(newData);
+
+			dataSource.getItems().done(function(items) {
+				expect(items).toEqual(newData);
 
 				done();
 			});

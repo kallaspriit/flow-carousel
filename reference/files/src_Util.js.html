@@ -190,6 +190,14 @@ define([
 				items,
 				result;
 
+			/* istanbul ignore next */
+			/*if (matrix === &#x27;none&#x27;) {
+				return {
+					x: 0,
+					y: 0
+				};
+			}*/
+
 			// TODO remove the istanbul ignore once karma coverage fixes not counting these lines
 			/* istanbul ignore next */
 			if (matrix.substring(0, 8) === &#x27;matrix3d&#x27;) { // IE uses matrix3d
@@ -236,6 +244,16 @@ define([
 			}
 
 			$(element).prop(&#x27;class&#x27;, filteredClasses.join(&#x27; &#x27;));
+		},
+
+		/**
+		 * Returns a clone of given object.
+		 *
+		 * @param {object} obj Object to clone
+		 * @return {object}
+		 */
+		cloneObj: function(obj) {
+			return JSON.parse(JSON.stringify(obj));
 		}
 	};
 });

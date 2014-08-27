@@ -123,6 +123,41 @@ define([
 ], function($, AbstractAnimator, Config, Util, Deferred) {
 	&#x27;use strict&#x27;;
 
+	// requestAnimationFrame polyfill
+	(function () {
+		var lastTime = 0,
+			vendors = [&#x27;webkit&#x27;, &#x27;moz&#x27;],
+			x;
+
+		for (x = 0; x &lt; vendors.length &amp;&amp; !window.requestAnimationFrame; ++x) {
+			window.requestAnimationFrame = window[vendors[x] + &#x27;RequestAnimationFrame&#x27;];
+
+			window.cancelAnimationFrame = window[vendors[x] + &#x27;CancelAnimationFrame&#x27;]
+				|| window[vendors[x] + &#x27;CancelRequestAnimationFrame&#x27;];
+		}
+
+		if (!window.requestAnimationFrame) {
+			window.requestAnimationFrame = function(callback/*, element*/) {
+				var currTime = new Date().getTime(),
+					timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+					id = window.setTimeout(function () {
+						callback(currTime + timeToCall);
+					},
+					timeToCall);
+
+				lastTime = currTime + timeToCall;
+
+				return id;
+			};
+		}
+
+		if (!window.cancelAnimationFrame) {
+			window.cancelAnimationFrame = function(id) {
+				clearTimeout(id);
+			};
+		}
+	}());
+
 	/**
 	 * Data source interface.
 	 *
@@ -171,7 +206,7 @@ define([
 	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
 		var position = this._carousel.getItemPositionByIndex(itemIndex);
 
-		return this.animateToPosition(-position, instant);
+		return this.animateToPosition(position, instant);
 	};
 
 	/**
@@ -184,12 +219,15 @@ define([
 	 * @return {Deferred.Promise}
 	 */
 	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+		instant = typeof instant === &#x27;boolean&#x27; ? instant : false;
+		noDeferred = typeof noDeferred === &#x27;boolean&#x27; ? noDeferred : false;
+
 		/* istanbul ignore if */
 		if (!this._transitionEndListenerCreated &amp;&amp; instant !== true) {
 			throw new Error(&#x27;Requested non-instant animation before transition end listener was created&#x27;);
 		}
 
-		var deferred = new Deferred(),
+		var deferred = noDeferred ? null : new Deferred(),
 			orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			animateTransformClass = this._carousel.getConfig().getClassName(&#x27;animateTransform&#x27;),
@@ -206,6 +244,11 @@ define([
 			this._activeDeferred = null;
 		}
 
+		// don&#x27;t waste power on current position if not using deferred
+		if (noDeferred !== true) {
+			currentPosition = this.getCurrentPosition();
+		}
+
 		// the translate command is different for horizontal and vertical carousels
 		if (orientation === Config.Orientation.HORIZONTAL) {
 			translateCommand = &#x27;translate3d(&#x27; + position + &#x27;px,0,0)&#x27;;
@@ -220,18 +263,20 @@ define([
 			$scrollerWrap.addClass(animateTransformClass);
 		}
 
-		// apply the translate
-		$scrollerWrap.css(&#x27;transform&#x27;, translateCommand, instant);
+		// apply the translate, use requestAnimationFrame for smoother results
+		window.requestAnimationFrame(function () {
+			$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
+		});
+
+		//$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
 
 		// remove the deferred overhead where not required
 		if (noDeferred) {
 			return;
 		}
 
-		currentPosition = this.getCurrentPosition();
-
 		// if the position is same as current then resolve immediately
-		if (instant || position === currentPosition) {
+		if (instant || (noDeferred !== true &amp;&amp; position === currentPosition)) {
 			deferred.resolve();
 		} else {
 			this._activeDeferred = new Deferred();

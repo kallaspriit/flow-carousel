@@ -367,118 +367,188 @@ define([
 		});
 
 		// for some reason this blows up Karma..
-		/*it('emits "INITIATING" event', function (done) {
+		it('emits "INITIATING" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.INITIATING, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				expect(called).toEqual(true);
 
-			done();
-		});*/
+				done();
+			});
+		});
 
 		it('emits "INITIATED" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.INITIATED, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				expect(called).toEqual(true);
+
+				done();
+			});
 		});
 
 		it('emits STARTUP_ITEMS_RENDERED event', function (done) {
 			var customDataSource = new CustomDataSource(),
-				customRenderer = new CustomRenderer();
+				customRenderer = new CustomRenderer(),
+				called = false;
 
 			carousel.on(FlowCarousel.Event.STARTUP_ITEMS_RENDERED, function() {
-				done();
+				called = true;
 			});
 
 			carousel.init('.carousel', {
 				dataSource: customDataSource,
 				renderer: customRenderer
+			}).done(function() {
+				expect(called).toEqual(true);
+
+				done();
 			});
 		});
 
 		it('emits "LOADING_ITEMS" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.LOADING_ITEMS, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				expect(called).toEqual(true);
+
+				done();
+			});
 		});
 
 		it('emits "LOADED_ITEMS" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.LOADED_ITEMS, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				expect(called).toEqual(true);
+
+				done();
+			});
 		});
 
+		// TODO does not work for some reason
 		it('emits "ABORTED_ITEMS" event', function (done) {
 			var customDataSource = new CustomDataSource(),
-				customRenderer = new CustomRenderer();
+				customRenderer = new CustomRenderer(),
+				called = false;
 
 			carousel.on(FlowCarousel.Event.ABORTED_ITEMS, function() {
-				done();
+				called = true;
 			});
 
 			carousel.init('.carousel', {
 				dataSource: customDataSource,
 				renderer: customRenderer
-			});
+			}).done(function() {
+				carousel.navigateToPage(1).done(function() {
+					carousel.navigateToPage(3);
+					carousel.navigateToPage(2).done(function() {
+						carousel.navigateToPage(3).done(function() {
+							carousel.navigateToPage(0).done(function() {
+								window.setTimeout(function() {
+									expect(called).toEqual(true);
 
-			carousel.navigateToPage(1);
+									done();
+								}, 1000);
+							});
+						});
+					});
+				});
+			});
 		});
 
 		it('emits "NAVIGATING_TO_ITEM" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.NAVIGATING_TO_ITEM, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				carousel.navigateToItem(1).done(function() {
+					expect(called).toEqual(true);
 
-			carousel.navigateToItem(1);
+					done();
+				});
+			});
 		});
 
 		it('emits "NAVIGATED_TO_ITEM" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.NAVIGATED_TO_ITEM, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				carousel.navigateToItem(1).done(function() {
+					expect(called).toEqual(true);
 
-			carousel.navigateToItem(1);
+					done();
+				});
+			});
 		});
 
 		it('emits "NAVIGATING_TO_PAGE" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.NAVIGATING_TO_PAGE, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				carousel.navigateToPage(1).done(function() {
+					expect(called).toEqual(true);
 
-			carousel.navigateToPage(1);
+					done();
+				});
+			});
 		});
 
 		it('emits "NAVIGATED_TO_PAGE" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.NAVIGATED_TO_PAGE, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				carousel.navigateToPage(1).done(function() {
+					expect(called).toEqual(true);
 
-			carousel.navigateToPage(1);
+					done();
+				});
+			});
 		});
 
 		it('emits "LAYOUT_CHANGED" event', function (done) {
+			var called = false;
+
 			carousel.on(FlowCarousel.Event.LAYOUT_CHANGED, function() {
-				done();
+				called = true;
 			});
 
-			carousel.init('.carousel');
+			carousel.init('.carousel').done(function() {
+				expect(called).toEqual(true);
 
-			$('.carousel').width('400px');
+				done();
+			});
 		});
 
 		it('renders placeholders for async custom data source', function (done) {
@@ -732,6 +802,77 @@ define([
 				carousel.navigateToPreviousItem().done(function() {
 					expect(carousel.getCurrentItemIndex()).toEqual(startIndex - 1);
 
+					done();
+				});
+			});
+		});
+
+		it('navigating before first item shows limit', function(done) {
+			carousel.init('.carousel');
+
+			spyOn(carousel, '_showLimit').and.callThrough();
+
+			carousel.navigateToItem(0).done(function() {
+				expect(carousel._showLimit).toHaveBeenCalled();
+
+				done();
+			});
+		});
+
+		it('navigating before first page shows limit', function(done) {
+			carousel.init('.carousel');
+
+			spyOn(carousel, '_showLimit').and.callThrough();
+
+			carousel.navigateToPreviousPage().done(function() {
+				expect(carousel._showLimit).toHaveBeenCalled();
+
+				done();
+			});
+		});
+
+		it('hitting the limit before last animation has ended is ignored', function(done) {
+			carousel.init('.carousel');
+
+			spyOn(carousel, '_showLimit').and.callThrough();
+
+			carousel.navigateToPreviousPage();
+			carousel.navigateToPreviousPage().done(function() {
+				expect(carousel._showLimit).toHaveBeenCalled();
+
+				done();
+			});
+		});
+
+		it('navigating past last item shows limit', function(done) {
+			carousel.init('.carousel');
+
+			spyOn(carousel, '_showLimit').and.callThrough();
+
+			carousel.navigateToPage(carousel.getPageCount() - 1).done(function() {
+				carousel.navigateToNextItem().done(function () {
+					expect(carousel._showLimit).toHaveBeenCalled();
+
+					done();
+				});
+			});
+		});
+
+		it('navigating to the same middle element is ignored', function(done) {
+			carousel.init('.carousel');
+
+			carousel.navigateToItem(3).done(function() {
+				carousel.navigateToItem(3).done(function () {
+					done();
+				});
+			});
+		});
+
+		it('navigating to the same middle page is ignored', function(done) {
+			carousel.init('.carousel');
+
+			carousel.navigateToPage(1).done(function() {
+				carousel.navigateToPage(1).done(function () {
 					done();
 				});
 			});

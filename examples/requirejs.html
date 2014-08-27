@@ -341,16 +341,30 @@
 			}.bind({ eventName: eventName }));
 		}
 
-		basicCarousel.init('#basic-carousel', {
+		/*basicCarousel.init('#basic-carousel', {
 			//startPageIndex: 2,
 			//animateToStartIndex: true
 			//keyboardNavigatorMode: FlowCarousel.KeyboardNavigator.Mode.NAVIGATE_ITEM
-		});
+		});*/
 
-		/*basicCarousel.init('#basic-carousel', {
-			dataSource: new CustomDataSource(),
-			renderer: new CustomRenderer()
-		}).done(function() {
+		basicCarousel.init('#basic-carousel', {
+			//dataSource: new CustomDataSource(),
+			//renderer: new CustomRenderer()
+		})
+
+		/*.done(function() {
+			basicCarousel.navigateToPage(1).done(function() {
+				basicCarousel.navigateToPage(2).done(function() {
+					basicCarousel.navigateToPage(1).done(function() {
+						basicCarousel.navigateToPage(0).done(function() {
+
+						});
+					});
+				});
+			});
+		});*/
+
+		/*.done(function() {
 			// try to get the out of range condition
 			basicCarousel.navigateToNextPage().done(function() {
 				console.log(basicCarousel.getCurrentPageIndex(), 1);

@@ -1002,7 +1002,7 @@ define([
 			itemMargin = this._config.margin,
 			gapPerItem = (itemMargin * (itemsPerPage - 1) / itemsPerPage);
 
-		return Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem));
+		return -Math.floor(itemIndex * itemSize + itemIndex * (itemMargin - gapPerItem));
 	};
 
 	/**
@@ -1250,7 +1250,10 @@ define([
 
 		var deferred = new Deferred(),
 			itemCount = this._dataSource.getItemCount(),
-			isSameItemIndex = itemIndex === this._currentItemIndex;
+			isSameItemIndex = itemIndex === this._currentItemIndex,
+			itemsPerPage = this.getItemsPerPage(),
+			currentItemIndex = this.getCurrentItemIndex(),
+			pageLastItemIndex = Math.min(currentItemIndex + 1, itemCount - itemsPerPage);
 
 		// if there are no items then resolve immediately and give up
 		if (itemCount === 0) {
@@ -1291,10 +1294,16 @@ define([
 			// emitting this event before starting the animation causes lag for some reason
 			this.emit(FlowCarousel.Event.NAVIGATING_TO_ITEM, itemIndex, instant);
 		} else {
-			// if the currently active index is requested then just ignore the call and resolve immediately
-			deferred.resolve();
+			// already at target page index, visualize limit
+			if (itemIndex === 0 || (this.isLastPage() &amp;&amp; itemIndex === pageLastItemIndex)) {
+				this._showLimit(itemIndex).done(function() {
+					deferred.resolve();
+				});
+			} else {
+				deferred.resolve();
+			}
 
-			return deferred;
+			return deferred.promise();
 		}
 
 		// render placeholders that are later replaced with real loaded items
@@ -1350,11 +1359,18 @@ define([
 
 		var currentPageIndex = this.getCurrentPageIndex(),
 			itemIndex = pageIndex * this.getItemsPerPage(),
+			pageCount = this.getPageCount(),
 			deferred = new Deferred();
 
-		// already at target page index, don&#x27;t do anything
+		// already at target page index, visualize limit
 		if (pageIndex === currentPageIndex &amp;&amp; force !== true) {
-			deferred.resolve();
+			if (pageIndex === 0 || pageIndex === pageCount - 1) {
+				this._showLimit(itemIndex).done(function() {
+					deferred.resolve();
+				});
+			} else {
+				deferred.resolve();
+			}
 
 			return deferred.promise();
 		}
@@ -2490,6 +2506,48 @@ define([
 	};
 
 	/**
+	 * Visually notifies the user that carousel limit has been reached.
+	 *
+	 * @method _showLimit
+	 * @param {number} itemIndex Current item index
+	 * @private
+	 */
+	FlowCarousel.prototype._showLimit = function(itemIndex) {
+		var deferred = new Deferred(),
+			limitPixels = 30,
+			limitItemPosition,
+			limitDir,
+			limitMovePosition;
+
+		if (this._animating) {
+			deferred.resolve();
+		} else {
+			if (itemIndex === 0) {
+				limitDir = -1;
+			} else {
+				limitDir = 1;
+			}
+
+			limitItemPosition = this.getItemPositionByIndex(itemIndex);
+			limitMovePosition = limitDir === -1
+				? limitItemPosition + limitPixels
+				: limitItemPosition - limitPixels;
+
+			this._animating = true;
+
+			this._animator.animateToPosition(limitMovePosition).done(function () {
+				this._animator.animateToPosition(limitItemPosition).done(function () {
+					this._animating = false;
+
+					deferred.resolve();
+				}.bind(this));
+			}.bind(this));
+		}
+
+		return deferred.promise();
+	};
+
+	/**
 	 * Calculates and returns a single item size based on wrap size and items per page.
 	 *
 	 * @method _calculateItemSize
@@ -2669,7 +2727,7 @@ define([
 		targetElement
 	) {
 		this.emit(
-			FlowCarousel.Event.DRAG_BEGIN,
+			FlowCarousel.Event.DRAG_END,
 			navigationMode,
 			startPosition,
 			endPosition,

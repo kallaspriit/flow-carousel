@@ -43,10 +43,11 @@ define([
 	 * @method animateToPosition
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
 	 * @return {Deferred.Promise}
 	 */
-	AbstractAnimator.prototype.animateToPosition = function(position, instant) {
-		void(position, instant);
+	AbstractAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+		void(position, instant, noDeferred);
 
 		throw new Error('Not implemented');
 	};

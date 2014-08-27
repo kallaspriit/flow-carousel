@@ -42,10 +42,12 @@ window.waitsForAndRuns = function (escapeFunction, runFunction, escapeTime) {
 
 	// in case we never reach the escapeFunction, we will time out
 	// at the escapeTime
-	var timeOut = setTimeout(function () {
-		clearMe();
-		runFunction();
-	}, escapeTime || 3000);
+	if (typeof escapeTime === 'number') {
+		var timeOut = setTimeout(function () {
+			clearMe();
+			runFunction();
+		}, escapeTime);
+	}
 
 	// clear the interval and the timeout
 	function clearMe() {

@@ -24,6 +24,10 @@ define([
 		this._startTargetElement = null;
 		this._lastPosition = null;
 		this._lastOppositePosition = null;
+		this._accumulatedMagnitude = {
+			main: 0,
+			opposite: 0
+		};
 
 		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -198,6 +202,10 @@ define([
 		this._lastOppositePosition = oppositePosition; // same for this
 		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
 		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
+		this._accumulatedMagnitude = {
+			main: 0,
+			opposite: 0
+		};
 
 		// disable all children click events for the duration of the dragging
 		if (targetElement !== null) {
@@ -234,21 +242,23 @@ define([
 
 		// compare motion in the carousel and the opposite direction
 		var deltaDragPosition = position - this._startPosition,
-			deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
 			noActionThreshold = 15;
+
+		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
+		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
 
 		// we need last move position in the _end() handler
 		this._lastPosition = position;
 		this._lastOppositePosition = oppositePosition;
 
 		// if the drag delta is very small then do nothing not to quit or start moving too soon
-		if (Math.abs(deltaDragPosition) < noActionThreshold) {
+		if (this._accumulatedMagnitude.main < noActionThreshold) {
 			return true;
 		}
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
-		// this allows drag-navigating the page from carousel elements
-		if (Math.abs(deltaDragPosition) < Math.abs(deltaDragOppositePosition)) {
+		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
+		if (this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite) {
 			this._end();
 
 			return true;
@@ -350,6 +360,10 @@ define([
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
 		this._lastPosition = null;
+		this._accumulatedMagnitude = {
+			main: 0,
+			opposite: 0
+		};
 
 		return false;
 	};

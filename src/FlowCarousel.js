@@ -59,6 +59,15 @@ define([
 		this.version = '0.1.0';
 
 		/**
+		 * The index of nth carousel was created (0 for first, 1 for next etc..).
+		 *
+		 * @property _id
+		 * @type {number}
+		 * @private
+		 */
+		this._id = FlowCarousel.instanceCount;
+
+		/**
 		 * Set to true once the component is initiated and to false once it's destroyed.
 		 *
 		 * @property _initiated
@@ -329,9 +338,32 @@ define([
 		 * @private
 		 */
 		this._useCache = true;
+
+		// increment the instance count
+		FlowCarousel.instanceCount++;
 	}
 
 	FlowCarousel.prototype = Object.create(EventEmitter.prototype);
+
+	/**
+	 * Number of instances that have been created in total.
+	 *
+	 * @property instanceCount
+	 * @type {number}
+	 * @default 0
+	 * @static
+	 */
+	FlowCarousel.instanceCount = 0;
+
+	/**
+	 * Number of instances that are currently live meaning they have been initialized but not destroyed.
+	 *
+	 * @property liveCount
+	 * @type {number}
+	 * @default 0
+	 * @static
+	 */
+	FlowCarousel.liveCount = 0;
 
 	// The main FlowCarousel classes are referenced under the main FlowCarousel class so that only the main
 	// class is registered in the global namespace.
@@ -596,6 +628,9 @@ define([
 		// notify the animator that carousel is initiated
 		this._initiated = true;
 
+		// increment the livecount
+		FlowCarousel.liveCount++;
+
 		this.emit(FlowCarousel.Event.INITIATED);
 
 		this._validateItemsToRender().done(function() {
@@ -637,6 +672,9 @@ define([
 		// mark the component destroyed
 		this._initiated = false;
 		this._destroyed = false;
+
+		// decrement the livecount
+		FlowCarousel.liveCount--;
 	};
 
 	/**

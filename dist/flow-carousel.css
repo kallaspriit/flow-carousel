@@ -23,6 +23,11 @@
 	-moz-transition:  height 300ms ease, width 300ms ease, opacity 500ms ease-in-out;
 	-ms-transition:  height 300ms ease, width 300ms ease, opacity 500ms ease-in-out;
 	-o-transition:  height 300ms ease, width 300ms ease, opacity 500ms ease-in-out;
+
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	perspective: 1000;
 }
 .flow-carousel-scroller.flow-carousel-animate-transform {
     transition: height 300ms ease, width 300ms ease, transform 300ms ease, opacity 500ms ease-in-out;

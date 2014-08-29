@@ -184,6 +184,16 @@ define([
 		this._isAnimating = false;
 
 		/**
+		 * Is the carousel currently being dragged.
+		 *
+		 * @property _isDragged
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
+		this._isDragged = false;
+
+		/**
 		 * Target item position index.
 		 *
 		 * This is set when animating to an index is requested.
@@ -756,6 +766,26 @@ define([
 	 */
 	FlowCarousel.prototype.isDestroyed = function() {
 		return this._destroyed;
+	};
+
+	/**
+	 * Returns whether the carousel is currently animating.
+	 *
+	 * @method isAnimating
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isAnimating = function() {
+		return this._isAnimating;
+	};
+
+	/**
+	 * Returns whether the carousel is currently animating.
+	 *
+	 * @method isAnimating
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isDragged = function() {
+		return this._isDragged;
 	};
 
 	/**
@@ -2494,7 +2524,7 @@ define([
 			limitDir,
 			limitMovePosition;
 
-		if (this._animating) {
+		if (this._isAnimating) {
 			deferred.resolve();
 		} else {
 			if (itemIndex === 0) {
@@ -2508,11 +2538,11 @@ define([
 				? limitItemPosition + limitPixels
 				: limitItemPosition - limitPixels;
 
-			this._animating = true;
+			this._isAnimating = true;
 
 			this._animator.animateToPosition(limitMovePosition).done(function () {
 				this._animator.animateToPosition(limitItemPosition).done(function () {
-					this._animating = false;
+					this._isAnimating = false;
 
 					deferred.resolve();
 				}.bind(this));
@@ -2676,6 +2706,8 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._onDragBegin = function(startPosition, dragOppositePosition, carouselPosition) {
+		this._dragging = true;
+
 		this.emit(FlowCarousel.Event.DRAG_BEGIN, startPosition, dragOppositePosition, carouselPosition);
 	};
 
@@ -2701,6 +2733,8 @@ define([
 		direction,
 		targetElement
 	) {
+		this._dragging = false;
+
 		this.emit(
 			FlowCarousel.Event.DRAG_END,
 			navigationMode,

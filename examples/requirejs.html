@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1 minimum-scale=1, maximum-scale=1, user-scalable=no">
 	<meta name="HandheldFriendly" content="True">
+	<meta name="msapplication-tap-highlight" content="no" />
 	<title>FlowCarousel RequireJS example</title>
 	<link rel="stylesheet" href="../dist/flow-carousel.css">
 	<link rel="stylesheet" href="examples.css">
@@ -253,6 +254,8 @@
 		<button class="btn" data-action="change-height" data-target="#dynamic-carousel">Change elements height</button>
 	</div>
 
+	<button id="reload-btn">Reload</button>
+
 	<script src="lib/require.js"></script>
 	<script src="lib/jquery.js"></script>
 	<script>
@@ -492,6 +495,10 @@
 					});
 				break;
 			}
+		});
+
+		$('#reload-btn').click(function() {
+			window.location.reload();
 		});
 
 		// register globally for testing via console

@@ -20,6 +20,12 @@ define([
 
 		this._mouseEntered = false;
 
+		this._eventListeners = {
+			mouseenter: this._onRawMouseEnter.bind(this),
+			mouseleave: this._onRawMouseLeave.bind(this),
+			keydown: this._onRawKeyDown.bind(this),
+		};
+
 		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -82,23 +88,67 @@ define([
 
 		// make sure that the mouse if over the main wrap element
 		$mainWrap
-			.on('mouseenter', function() {
-				this._mouseEntered = true;
-			}.bind(this))
-			.on('mouseleave', function() {
-				this._mouseEntered = false;
-			}.bind(this));
+			.on('mouseenter', this._eventListeners.mouseenter)
+			.on('mouseleave', this._eventListeners.mouseleave);
 
 		// listen for key down events
-		$window.on('keydown', function(e) {
-			var result = this._onKeyDown(e.keyCode);
+		$window.on('keydown', this._eventListeners.keydown);
+	};
 
-			if (result === false) {
-				e.preventDefault();
-			}
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	KeyboardNavigator.prototype.destroy = function() {
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$window = $(window);
 
-			return result;
-		}.bind(this));
+		// remove the event listeners
+		$mainWrap
+			.off('mouseenter', this._eventListeners.mouseenter)
+			.off('mouseleave', this._eventListeners.mouseleave);
+
+		$window.off('keydown', this._eventListeners.keydown);
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseEnter
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawMouseEnter = function(/*e*/) {
+		this._mouseEntered = true;
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseLeave
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawMouseLeave = function(/*e*/) {
+		this._mouseEntered = false;
+	};
+
+	/**
+	 * Called on key down event.
+	 *
+	 * @method _onRawKeyDown
+	 * @param {Event} e Key event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawKeyDown = function(e) {
+		var result = this._onKeyDown(e.keyCode);
+
+		if (result === false) {
+			e.preventDefault();
+		}
+
+		return result;
 	};
 
 	/**

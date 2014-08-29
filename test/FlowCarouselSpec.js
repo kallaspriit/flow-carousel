@@ -442,7 +442,6 @@ define([
 			});
 		});
 
-		// TODO does not work for some reason
 		it('emits "ABORTED_ITEMS" event', function (done) {
 			var customDataSource = new CustomDataSource(),
 				customRenderer = new CustomRenderer(),

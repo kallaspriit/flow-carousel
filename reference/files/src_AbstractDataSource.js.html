@@ -171,6 +171,15 @@ define([
 		throw new Error(&#x27;Not implemented&#x27;);
 	};
 
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractDataSource.prototype.destroy = function() {
+		// do nothing by default
+	};
+
 	return AbstractDataSource;
 });
     </pre>

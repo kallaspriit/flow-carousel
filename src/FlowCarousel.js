@@ -143,16 +143,6 @@ define([
 		this._navigators = {};
 
 		/**
-		 * The interval reference for responsive layout changes.
-		 *
-		 * @property _responsiveLayoutListenerInterval
-		 * @type {number}
-		 * @default null
-		 * @private
-		 */
-		this._responsiveLayoutListenerInterval = null;
-
-		/**
 		 * The top wrap elements jQuery object.
 		 *
 		 * @property _mainWrap
@@ -318,6 +308,17 @@ define([
 		this._cache = {
 			wrapSize: null,
 			wrapOppositeSize: null
+		};
+
+		/**
+		 * List of event listeners bound to the FlowCarousel instance.
+		 *
+		 * @property _eventListeners
+		 * @type {object}
+		 * @private
+		 */
+		this._eventListeners = {
+			onWindowResize: this._onWindowResize.bind(this)
 		};
 
 		/**
@@ -641,7 +642,7 @@ define([
 
 		// listen for wrap size changes and perform re-layout when needed once the carousel is initiated
 		deferred.done(function() {
-			this._setupResponsiveLayoutListener();
+			this._setupWindowResizeListener();
 		}.bind(this));
 
 		return deferred.promise();
@@ -653,8 +654,24 @@ define([
 	 * @method destroy
 	 */
 	FlowCarousel.prototype.destroy = function() {
+		var preservedMethodNames = ['isInitiated', 'isDestroyed'],
+			navigatorName,
+			propertyName;
+
 		if (!this._initiated) {
 			throw new Error('Unable to destroy carousel that has not been initiated');
+		}
+
+		// destroy the sub-components
+		if (this._dataSource instanceof AbstractDataSource) { this._dataSource.destroy(); }
+		if (this._renderer instanceof AbstractRenderer) { this._renderer.destroy(); }
+		if (this._animator instanceof AbstractAnimator) { this._animator.destroy(); }
+
+		// destroy navigators
+		for (navigatorName in this._navigators) {
+			if (this._navigators[navigatorName] instanceof AbstractNavigator) {
+				this._navigators[navigatorName].destroy();
+			}
 		}
 
 		// remove the carousel classes from the main wrap
@@ -669,9 +686,53 @@ define([
 		// remove the data reference
 		$(this._mainWrap).data(this._config.dataTarget, null);
 
+		// remove the window resize listener
+		$(window).off('resize', this._eventListeners.onWindowResize);
+
+		// clear references and state
+		this._config = null;
+		this._dataSource = null;
+		this._renderer = null;
+		this._animator = null;
+		this._navigators = {};
+		this._mainWrap = null;
+		this._itemsWrap = null;
+		this._scrollerWrap = null;
+		this._isAnimating = false;
+		this._targetItemIndex = 0;
+		this._currentItemIndex = 0;
+		this._hoverItemIndex = null;
+		this._renderedItemIndexes = [];
+		this._renderedPlaceholderIndexes = [];
+		this._itemIndexToElementMap = {};
+		this._delayedTasks = {};
+		this._getItemsPromise = null;
+		this._activeAnimationDeferred = null;
+		this._startupItemsRenderedEmitted = false;
+		this._lastLargestChildSize = null;
+		this._cache = Util.cloneObj(this._emptyCache);
+		this._useCache = true;
+
+		// disable all methods
+		for (propertyName in this) {
+			// preserve some methods
+			if (preservedMethodNames.indexOf(propertyName) !== -1) {
+				continue;
+			}
+
+			if (typeof this[propertyName] === 'function') {
+				this[propertyName] = function() {
+					throw new Error(
+						'The carousel is destroyed, attempting to call any of its methods results in an error (' +
+						'tried to call "' + this.name + '")'
+					);
+				}.bind({name: propertyName});
+			}
+		}
+
 		// mark the component destroyed
 		this._initiated = false;
-		this._destroyed = false;
+		this._destroyed = true;
 
 		// decrement the livecount
 		FlowCarousel.liveCount--;
@@ -1674,13 +1735,6 @@ define([
 		/* istanbul ignore if */
 		if (wrapSize === 0) {
 			return;
-
-			//throw new Error('Main wrap size was found to be zero, this should not happen');
-		}
-
-		/* istanbul ignore if */
-		if (itemSize === 0) {
-			throw new Error('Item size was found to be zero, this should not happen');
 		}
 
 		// define the scroller wrap size to fit all items
@@ -1950,6 +2004,11 @@ define([
 		// store the new itemset fetching deferred promise and fetch new items
 		this._getItemsPromise = this._dataSource.getItems(loadRange.start, loadRange.end)
 			.done(function(items) {
+				// the carousel may get destroyed while the items are loading
+				if (!self._initiated) {
+					return;
+				}
+
 				// ignore invalid data if it couldn't be aborted
 				if (this._ignore === true) {
 					self.emit(FlowCarousel.Event.ABORTED_ITEMS, loadRange.start, loadRange.end, items);
@@ -2053,6 +2112,12 @@ define([
 		// TODO Add each element as soon as it renders?
 		Deferred.when.apply($, promises)
 			.done(function() {
+				// the carousel may get destroyed while the items are loading
+				if (!this._initiated) {
+					//return; // TODO restore
+					throw new Error('Carousel was destroyed before rendering items');
+				}
+
 				$(this._mainWrap).removeClass(renderingClassName);
 
 				this._insertRenderedElements(arguments, startIndex);
@@ -2160,7 +2225,7 @@ define([
 
 		// make sure the wrap has size if wrap size matching is used
 		/* istanbul ignore if */
-		if (sizeMode == Config.SizeMode.MATCH_WRAP && wrapOppositeSize === 0) {
+		if (sizeMode == Config.SizeMode.MATCH_WRAP && wrapOppositeSize === 0 && this._initiated) {
 			throw new Error('The wrap opposite size was calculated to be zero, this should not happen');
 		}
 
@@ -2292,13 +2357,6 @@ define([
 				FlowCarousel.SizeMode.OUTER
 			);
 
-		/* istanbul ignore if */
-		/*if (largestChildSize === 0) {
-			throw new Error('Largest child size calculated to be zero, this should not happen');
-		}
-
-		$(this._scrollerWrap).css(sizeProp, largestChildSize + 'px');*/
-
 		// set the scroller to largest child size if it was possible to determine
 		if (largestChildSize > 0 && largestChildSize !== this._lastLargestChildSize) {
 			$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
@@ -2367,32 +2425,26 @@ define([
 	/**
 	 * Sets up main wrap size change listener to apply responsive layout.
 	 *
-	 * @method _setupResponsiveLayoutListener
+	 * @method _setupWindowResizeListener
 	 * @private
 	 */
-	FlowCarousel.prototype._setupResponsiveLayoutListener = function() {
-		// validate periodically
-		/*this._responsiveLayoutListenerInterval = window.setInterval(function() {
-			this._validateResponsiveLayout();
-		}.bind(this), this._config.responsiveLayoutListenerInterval);*/
-
+	FlowCarousel.prototype._setupWindowResizeListener = function() {
 		// also validate on window resize
-		/* istanbul ignore next */
-		$(window).resize(function() {
-			this._validateResponsiveLayout();
-		}.bind(this));
+		$(window).on('resize', this._eventListeners.onWindowResize);
+	};
 
-		// validate responsive layout when any of the main wrap attributes change
-		/*$(this._mainWrap).attrchange({
-			callback: function (e) {
-				// ignore class as this is reported to change while animating anyway through shouldn't
-				if (e.attributeName === 'class') {
-					return;
-				}
+	/**
+	 * Called on window resize event.
+	 *
+	 * @method _onWindowResize
+	 * @private
+	 */
+	FlowCarousel.prototype._onWindowResize = function() {
+		if (!this._initiated) {
+			return;
+		}
 
-				this._validateResponsiveLayout();
-			}.bind(this)
-		});*/
+		this._validateResponsiveLayout();
 	};
 
 	/**
@@ -2400,6 +2452,7 @@ define([
 	 *
 	 * @method _validateResponsiveLayout
 	 * @param {boolean} force Force the validation even if busy
+	 * @return {boolean} Was re-layout scheduled
 	 * @private
 	 */
 	FlowCarousel.prototype._validateResponsiveLayout = function(force) {

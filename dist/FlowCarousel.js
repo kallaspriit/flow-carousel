@@ -959,6 +959,15 @@ define('AbstractDataSource',[
 		throw new Error('Not implemented');
 	};
 
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractDataSource.prototype.destroy = function() {
+		// do nothing by default
+	};
+
 	return AbstractDataSource;
 });
 define('Deferred',[
@@ -1214,6 +1223,15 @@ define('AbstractAnimator',[
 		// do nothing by default
 	};
 
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractAnimator.prototype.destroy = function() {
+		// do nothing by default
+	};
+
 	return AbstractAnimator;
 });
 define('Util',[
@@ -1417,9 +1435,27 @@ define('DefaultAnimator',[
 		this._carousel = carousel;
 		this._activeDeferred = null;
 		this._transitionEndListenerCreated = false;
+		this._eventListeners = {
+			transitionEnd: this._onRawTransitionEnd.bind(this)
+		};
 	}
 
 	DefaultAnimator.prototype = Object.create(AbstractAnimator.prototype);
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractAnimator.prototype.destroy = function() {
+		var $scrollerWrap = $(this._carousel.getScrollerWrap());
+		
+		// remove the transition end listener
+		$scrollerWrap.off(
+			'transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',
+			this._eventListeners.transitionEnd
+		);
+	};
 
 	/**
 	 * Returns current absolute position.
@@ -1554,11 +1590,24 @@ define('DefaultAnimator',[
 	DefaultAnimator.prototype._setupTransitionEndListener = function() {
 		var $scrollerWrap = $(this._carousel.getScrollerWrap());
 
-		$scrollerWrap.on('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
-			this._resolveDeferred();
-		}.bind(this));
+		$scrollerWrap.on(
+			'transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',
+			this._eventListeners.transitionEnd
+		);
 
 		this._transitionEndListenerCreated = true;
+	};
+
+	/**
+	 * Called on transition end event.
+	 *
+	 * @method _onRawTransitionEnd
+	 * @param {Event} e Raw event
+	 * @private
+	 */
+	DefaultAnimator.prototype._onRawTransitionEnd = function(/*e*/) {
+		// resolve the active deferred if exists
+		this._resolveDeferred();
 	};
 
 	/**
@@ -1650,6 +1699,15 @@ define('AbstractRenderer',[
 	AbstractRenderer.prototype.restoreInitialContents = function(dataSource, wrap) {
 		// don't do anything by default
 		void(dataSource, wrap);
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractRenderer.prototype.destroy = function() {
+		// do nothing by default
 	};
 
 	return AbstractRenderer;
@@ -1753,6 +1811,15 @@ define('AbstractNavigator',[
 	};
 
 	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractNavigator.prototype.destroy = function() {
+		// do nothing by default
+	};
+
+	/**
 	 * Called by the init to set up the navigator.
 	 *
 	 * @method _setup
@@ -1785,6 +1852,12 @@ define('KeyboardNavigator',[
 		AbstractNavigator.call(this);
 
 		this._mouseEntered = false;
+
+		this._eventListeners = {
+			mouseenter: this._onRawMouseEnter.bind(this),
+			mouseleave: this._onRawMouseLeave.bind(this),
+			keydown: this._onRawKeyDown.bind(this),
+		};
 
 		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -1848,23 +1921,67 @@ define('KeyboardNavigator',[
 
 		// make sure that the mouse if over the main wrap element
 		$mainWrap
-			.on('mouseenter', function() {
-				this._mouseEntered = true;
-			}.bind(this))
-			.on('mouseleave', function() {
-				this._mouseEntered = false;
-			}.bind(this));
+			.on('mouseenter', this._eventListeners.mouseenter)
+			.on('mouseleave', this._eventListeners.mouseleave);
 
 		// listen for key down events
-		$window.on('keydown', function(e) {
-			var result = this._onKeyDown(e.keyCode);
+		$window.on('keydown', this._eventListeners.keydown);
+	};
 
-			if (result === false) {
-				e.preventDefault();
-			}
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	KeyboardNavigator.prototype.destroy = function() {
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$window = $(window);
 
-			return result;
-		}.bind(this));
+		// remove the event listeners
+		$mainWrap
+			.off('mouseenter', this._eventListeners.mouseenter)
+			.off('mouseleave', this._eventListeners.mouseleave);
+
+		$window.off('keydown', this._eventListeners.keydown);
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseEnter
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawMouseEnter = function(/*e*/) {
+		this._mouseEntered = true;
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseLeave
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawMouseLeave = function(/*e*/) {
+		this._mouseEntered = false;
+	};
+
+	/**
+	 * Called on key down event.
+	 *
+	 * @method _onRawKeyDown
+	 * @param {Event} e Key event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawKeyDown = function(e) {
+		var result = this._onKeyDown(e.keyCode);
+
+		if (result === false) {
+			e.preventDefault();
+		}
+
+		return result;
 	};
 
 	/**
@@ -1956,6 +2073,12 @@ define('DragNavigator',[
 			main: 0,
 			opposite: 0
 		};
+		this._eventListeners = {
+			start: this._onRawStart.bind(this),
+			move: this._onRawMove.bind(this),
+			end: this._onRawEnd.bind(this),
+		};
+		this._noActionThreshold = 15;
 
 		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -2015,94 +2138,131 @@ define('DragNavigator',[
 	 */
 	DragNavigator.prototype._setup = function() {
 		var $scroller = $(this._carousel.getScrollerWrap()),
-			$window = $(window),
-			orientation = this._carousel.getOrientation(),
+			$window = $(window);
+
+		// listen for mouse/touch down, move and up/leave events
+		$scroller.on('mousedown touchstart', this._eventListeners.start);
+		$window.on('mousemove touchmove', this._eventListeners.move);
+		$window.on('mouseup touchend touchcancel', this._eventListeners.end);
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	DragNavigator.prototype.destroy = function() {
+		var $scroller = $(this._carousel.getScrollerWrap()),
+			$window = $(window);
+
+		// listen for mouse/touch down, move and up/leave events
+		$scroller.off('mousedown touchstart', this._eventListeners.start);
+		$window.off('mousemove touchmove', this._eventListeners.move);
+		$window.off('mouseup touchend touchcancel', this._eventListeners.end);
+	};
+
+	/**
+	 * Called on drag start event.
+	 *
+	 * @method _onRawStart
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawStart = function(e) {
+		if (e.which !== 1 && e.type !== 'touchstart') {
+			return true;
+		}
+
+		var orientation = this._carousel.getOrientation(),
 			horizontal = orientation === Config.Orientation.HORIZONTAL;
 
-		// listen for mouse down, move and up/leave events
-		$scroller.on('mousedown touchstart', function(e) {
-			if (e.which !== 1 && e.type !== 'touchstart') {
-				return true;
-			}
-
-			var isTouchEvent = e.type === 'touchstart',
-				x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
-				y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
-				targetElement = e.target,
-				result;
-
-			result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
-
-			// never disable the mousedown/touchstart events
-			return true;
-
-			/*if (result === false) {
-				e.preventDefault();
-
-				return false;
-			} else {
-				return true;
-			}*/
-		}.bind(this));
-
-		$window.on('mousemove touchmove', function(e) {
-			var result,
-				isTouchEvent,
-				x,
-				y;
-
-			// stop if not active
-			if (!this._active) {
-				return true;
-			}
-
-			// only move the carousel when the left mouse button is pressed
-			if (e.which !== 1 && e.type !== 'touchmove') {
-				result = this._end();
-			} else {
-				isTouchEvent = e.type === 'touchmove';
-				x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
-				y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
-
-				result = this._move(horizontal ? x : y, horizontal ? y : x);
-			}
-
-			if (result === false) {
-				e.preventDefault();
-
-				return false;
-			} else {
-				return true;
-			}
-		}.bind(this));
-
-		$window.on('mouseup touchend touchcancel', function(e) {
-			var result,
-				targetElement;
-
-			// quit if invalid event
-			if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
-				return true;
-			}
-
-			// stop if not active
-			if (!this._active) {
-				return true;
-			}
-
+		var isTouchEvent = e.type === 'touchstart',
+			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
+			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
 			targetElement = e.target;
 
-			result = this._end(targetElement);
+		this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
 
-			/* istanbul ignore else */
-			if (result === false) {
-				e.preventDefault();
+		// never disable the mousedown/touchstart events
+		return true;
+	};
 
-				return false;
-			} else {
-				return true;
-			}
-		}.bind(this));
+	/**
+	 * Called on drag move event.
+	 *
+	 * @method _onRawMove
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawMove = function(e) {
+		var orientation = this._carousel.getOrientation(),
+			horizontal = orientation === Config.Orientation.HORIZONTAL,
+			result,
+			isTouchEvent,
+			x,
+			y;
+
+		// stop if not active
+		if (!this._active) {
+			return true;
+		}
+
+		// only move the carousel when the left mouse button is pressed
+		if (e.which !== 1 && e.type !== 'touchmove') {
+			result = this._end();
+		} else {
+			isTouchEvent = e.type === 'touchmove';
+			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
+			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
+
+			result = this._move(horizontal ? x : y, horizontal ? y : x);
+		}
+
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	/**
+	 * Called on drag end event.
+	 *
+	 * @method _onRawEnd
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawEnd = function(e) {
+		var result,
+			targetElement;
+
+		// quit if invalid event
+		if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
+			return true;
+		}
+
+		// stop if not active
+		if (!this._active) {
+			return true;
+		}
+
+		targetElement = e.target;
+
+		result = this._end(targetElement);
+
+		/* istanbul ignore else */
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
 	};
 
 	/**
@@ -2169,8 +2329,7 @@ define('DragNavigator',[
 		}
 
 		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startPosition,
-			noActionThreshold = 15;
+		var deltaDragPosition = position - this._startPosition;
 
 		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
@@ -2180,7 +2339,7 @@ define('DragNavigator',[
 		this._lastOppositePosition = oppositePosition;
 
 		// if the drag delta is very small then do nothing not to quit or start moving too soon
-		if (this._accumulatedMagnitude.main < noActionThreshold) {
+		if (this._accumulatedMagnitude.main < this._noActionThreshold) {
 			return true;
 		}
 
@@ -2236,19 +2395,25 @@ define('DragNavigator',[
 			endHoverItemIndex,
 			isSameItemAsStarted;
 
-		// navigate to closest item or page depending on selected mode
-		switch (this._mode) {
-			case DragNavigator.Mode.NAVIGATE_PAGE:
-				closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
+		// if the carousel was dragged too little or more in the opposite direction then do not navigate
+		if (
+			this._accumulatedMagnitude.main > this._noActionThreshold
+			&& this._accumulatedMagnitude.main > this._accumulatedMagnitude.opposite
+		) {
+			// navigate to closest item or page depending on selected mode
+			switch (this._mode) {
+				case DragNavigator.Mode.NAVIGATE_PAGE:
+					closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
 
-				this._carousel.navigateToPage(closestIndex, false, true);
-			break;
+					this._carousel.navigateToPage(closestIndex, false, true);
+				break;
 
-			case DragNavigator.Mode.NAVIGATE_ITEM:
-				closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
+				case DragNavigator.Mode.NAVIGATE_ITEM:
+					closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
 
-				this._carousel.navigateToItem(closestIndex, false, true);
-			break;
+					this._carousel.navigateToItem(closestIndex, false, true);
+				break;
+			}
 		}
 
 		// restore the element click handler if drag stopped on the same element and was dragged very little
@@ -2307,7 +2472,7 @@ define('DragNavigator',[
 		var $element = $(element),
 			itemWrapperClass = this._carousel.getConfig().getClassName('item'),
 			$itemWrapper = $element.closest('.' + itemWrapperClass),
-			$subElements = $itemWrapper.find('A'),
+			$subElements = $itemWrapper.find('*'),
 			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
 			isAlreadyDisabled = $itemWrapper.data(disabledDataName);
 
@@ -2330,7 +2495,7 @@ define('DragNavigator',[
 			itemWrapperClass = this._carousel.getConfig().getClassName('item'),
 			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
 			$itemWrapper = $element.closest('.' + itemWrapperClass),
-			$subElements = $itemWrapper.find('A'),
+			$subElements = $itemWrapper.find('*'),
 			isDisabled = $itemWrapper.data(disabledDataName);
 
 		if (isDisabled === true) {
@@ -3008,16 +3173,6 @@ define('FlowCarousel',[
 		this._navigators = {};
 
 		/**
-		 * The interval reference for responsive layout changes.
-		 *
-		 * @property _responsiveLayoutListenerInterval
-		 * @type {number}
-		 * @default null
-		 * @private
-		 */
-		this._responsiveLayoutListenerInterval = null;
-
-		/**
 		 * The top wrap elements jQuery object.
 		 *
 		 * @property _mainWrap
@@ -3183,6 +3338,17 @@ define('FlowCarousel',[
 		this._cache = {
 			wrapSize: null,
 			wrapOppositeSize: null
+		};
+
+		/**
+		 * List of event listeners bound to the FlowCarousel instance.
+		 *
+		 * @property _eventListeners
+		 * @type {object}
+		 * @private
+		 */
+		this._eventListeners = {
+			onWindowResize: this._onWindowResize.bind(this)
 		};
 
 		/**
@@ -3506,7 +3672,7 @@ define('FlowCarousel',[
 
 		// listen for wrap size changes and perform re-layout when needed once the carousel is initiated
 		deferred.done(function() {
-			this._setupResponsiveLayoutListener();
+			this._setupWindowResizeListener();
 		}.bind(this));
 
 		return deferred.promise();
@@ -3518,8 +3684,24 @@ define('FlowCarousel',[
 	 * @method destroy
 	 */
 	FlowCarousel.prototype.destroy = function() {
+		var preservedMethodNames = ['isInitiated', 'isDestroyed'],
+			navigatorName,
+			propertyName;
+
 		if (!this._initiated) {
 			throw new Error('Unable to destroy carousel that has not been initiated');
+		}
+
+		// destroy the sub-components
+		if (this._dataSource instanceof AbstractDataSource) { this._dataSource.destroy(); }
+		if (this._renderer instanceof AbstractRenderer) { this._renderer.destroy(); }
+		if (this._animator instanceof AbstractAnimator) { this._animator.destroy(); }
+
+		// destroy navigators
+		for (navigatorName in this._navigators) {
+			if (this._navigators[navigatorName] instanceof AbstractNavigator) {
+				this._navigators[navigatorName].destroy();
+			}
 		}
 
 		// remove the carousel classes from the main wrap
@@ -3534,9 +3716,53 @@ define('FlowCarousel',[
 		// remove the data reference
 		$(this._mainWrap).data(this._config.dataTarget, null);
 
+		// remove the window resize listener
+		$(window).off('resize', this._eventListeners.onWindowResize);
+
+		// clear references and state
+		this._config = null;
+		this._dataSource = null;
+		this._renderer = null;
+		this._animator = null;
+		this._navigators = {};
+		this._mainWrap = null;
+		this._itemsWrap = null;
+		this._scrollerWrap = null;
+		this._isAnimating = false;
+		this._targetItemIndex = 0;
+		this._currentItemIndex = 0;
+		this._hoverItemIndex = null;
+		this._renderedItemIndexes = [];
+		this._renderedPlaceholderIndexes = [];
+		this._itemIndexToElementMap = {};
+		this._delayedTasks = {};
+		this._getItemsPromise = null;
+		this._activeAnimationDeferred = null;
+		this._startupItemsRenderedEmitted = false;
+		this._lastLargestChildSize = null;
+		this._cache = Util.cloneObj(this._emptyCache);
+		this._useCache = true;
+
+		// disable all methods
+		for (propertyName in this) {
+			// preserve some methods
+			if (preservedMethodNames.indexOf(propertyName) !== -1) {
+				continue;
+			}
+
+			if (typeof this[propertyName] === 'function') {
+				this[propertyName] = function() {
+					throw new Error(
+						'The carousel is destroyed, attempting to call any of its methods results in an error (' +
+						'tried to call "' + this.name + '")'
+					);
+				}.bind({name: propertyName});
+			}
+		}
+
 		// mark the component destroyed
 		this._initiated = false;
-		this._destroyed = false;
+		this._destroyed = true;
 
 		// decrement the livecount
 		FlowCarousel.liveCount--;
@@ -4539,13 +4765,6 @@ define('FlowCarousel',[
 		/* istanbul ignore if */
 		if (wrapSize === 0) {
 			return;
-
-			//throw new Error('Main wrap size was found to be zero, this should not happen');
-		}
-
-		/* istanbul ignore if */
-		if (itemSize === 0) {
-			throw new Error('Item size was found to be zero, this should not happen');
 		}
 
 		// define the scroller wrap size to fit all items
@@ -4815,6 +5034,11 @@ define('FlowCarousel',[
 		// store the new itemset fetching deferred promise and fetch new items
 		this._getItemsPromise = this._dataSource.getItems(loadRange.start, loadRange.end)
 			.done(function(items) {
+				// the carousel may get destroyed while the items are loading
+				if (!self._initiated) {
+					return;
+				}
+
 				// ignore invalid data if it couldn't be aborted
 				if (this._ignore === true) {
 					self.emit(FlowCarousel.Event.ABORTED_ITEMS, loadRange.start, loadRange.end, items);
@@ -4918,6 +5142,12 @@ define('FlowCarousel',[
 		// TODO Add each element as soon as it renders?
 		Deferred.when.apply($, promises)
 			.done(function() {
+				// the carousel may get destroyed while the items are loading
+				if (!this._initiated) {
+					//return; // TODO restore
+					throw new Error('Carousel was destroyed before rendering items');
+				}
+
 				$(this._mainWrap).removeClass(renderingClassName);
 
 				this._insertRenderedElements(arguments, startIndex);
@@ -5025,7 +5255,7 @@ define('FlowCarousel',[
 
 		// make sure the wrap has size if wrap size matching is used
 		/* istanbul ignore if */
-		if (sizeMode == Config.SizeMode.MATCH_WRAP && wrapOppositeSize === 0) {
+		if (sizeMode == Config.SizeMode.MATCH_WRAP && wrapOppositeSize === 0 && this._initiated) {
 			throw new Error('The wrap opposite size was calculated to be zero, this should not happen');
 		}
 
@@ -5157,13 +5387,6 @@ define('FlowCarousel',[
 				FlowCarousel.SizeMode.OUTER
 			);
 
-		/* istanbul ignore if */
-		/*if (largestChildSize === 0) {
-			throw new Error('Largest child size calculated to be zero, this should not happen');
-		}
-
-		$(this._scrollerWrap).css(sizeProp, largestChildSize + 'px');*/
-
 		// set the scroller to largest child size if it was possible to determine
 		if (largestChildSize > 0 && largestChildSize !== this._lastLargestChildSize) {
 			$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
@@ -5232,32 +5455,26 @@ define('FlowCarousel',[
 	/**
 	 * Sets up main wrap size change listener to apply responsive layout.
 	 *
-	 * @method _setupResponsiveLayoutListener
+	 * @method _setupWindowResizeListener
 	 * @private
 	 */
-	FlowCarousel.prototype._setupResponsiveLayoutListener = function() {
-		// validate periodically
-		/*this._responsiveLayoutListenerInterval = window.setInterval(function() {
-			this._validateResponsiveLayout();
-		}.bind(this), this._config.responsiveLayoutListenerInterval);*/
-
+	FlowCarousel.prototype._setupWindowResizeListener = function() {
 		// also validate on window resize
-		/* istanbul ignore next */
-		$(window).resize(function() {
-			this._validateResponsiveLayout();
-		}.bind(this));
+		$(window).on('resize', this._eventListeners.onWindowResize);
+	};
 
-		// validate responsive layout when any of the main wrap attributes change
-		/*$(this._mainWrap).attrchange({
-			callback: function (e) {
-				// ignore class as this is reported to change while animating anyway through shouldn't
-				if (e.attributeName === 'class') {
-					return;
-				}
+	/**
+	 * Called on window resize event.
+	 *
+	 * @method _onWindowResize
+	 * @private
+	 */
+	FlowCarousel.prototype._onWindowResize = function() {
+		if (!this._initiated) {
+			return;
+		}
 
-				this._validateResponsiveLayout();
-			}.bind(this)
-		});*/
+		this._validateResponsiveLayout();
 	};
 
 	/**
@@ -5265,6 +5482,7 @@ define('FlowCarousel',[
 	 *
 	 * @method _validateResponsiveLayout
 	 * @param {boolean} force Force the validation even if busy
+	 * @return {boolean} Was re-layout scheduled
 	 * @private
 	 */
 	FlowCarousel.prototype._validateResponsiveLayout = function(force) {

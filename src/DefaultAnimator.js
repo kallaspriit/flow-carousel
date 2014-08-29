@@ -56,9 +56,27 @@ define([
 		this._carousel = carousel;
 		this._activeDeferred = null;
 		this._transitionEndListenerCreated = false;
+		this._eventListeners = {
+			transitionEnd: this._onRawTransitionEnd.bind(this)
+		};
 	}
 
 	DefaultAnimator.prototype = Object.create(AbstractAnimator.prototype);
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractAnimator.prototype.destroy = function() {
+		var $scrollerWrap = $(this._carousel.getScrollerWrap());
+		
+		// remove the transition end listener
+		$scrollerWrap.off(
+			'transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',
+			this._eventListeners.transitionEnd
+		);
+	};
 
 	/**
 	 * Returns current absolute position.
@@ -193,11 +211,24 @@ define([
 	DefaultAnimator.prototype._setupTransitionEndListener = function() {
 		var $scrollerWrap = $(this._carousel.getScrollerWrap());
 
-		$scrollerWrap.on('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd', function () {
-			this._resolveDeferred();
-		}.bind(this));
+		$scrollerWrap.on(
+			'transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',
+			this._eventListeners.transitionEnd
+		);
 
 		this._transitionEndListenerCreated = true;
+	};
+
+	/**
+	 * Called on transition end event.
+	 *
+	 * @method _onRawTransitionEnd
+	 * @param {Event} e Raw event
+	 * @private
+	 */
+	DefaultAnimator.prototype._onRawTransitionEnd = function(/*e*/) {
+		// resolve the active deferred if exists
+		this._resolveDeferred();
 	};
 
 	/**

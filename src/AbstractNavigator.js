@@ -29,6 +29,15 @@ define([
 	};
 
 	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractNavigator.prototype.destroy = function() {
+		// do nothing by default
+	};
+
+	/**
 	 * Called by the init to set up the navigator.
 	 *
 	 * @method _setup

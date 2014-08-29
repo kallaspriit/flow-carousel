@@ -73,5 +73,14 @@ define([
 		void(dataSource, wrap);
 	};
 
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractRenderer.prototype.destroy = function() {
+		// do nothing by default
+	};
+
 	return AbstractRenderer;
 });

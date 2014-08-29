@@ -61,5 +61,14 @@ define([
 		// do nothing by default
 	};
 
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractAnimator.prototype.destroy = function() {
+		// do nothing by default
+	};
+
 	return AbstractAnimator;
 });

@@ -28,6 +28,12 @@ define([
 			main: 0,
 			opposite: 0
 		};
+		this._eventListeners = {
+			start: this._onRawStart.bind(this),
+			move: this._onRawMove.bind(this),
+			end: this._onRawEnd.bind(this),
+		};
+		this._noActionThreshold = 15;
 
 		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -87,94 +93,131 @@ define([
 	 */
 	DragNavigator.prototype._setup = function() {
 		var $scroller = $(this._carousel.getScrollerWrap()),
-			$window = $(window),
-			orientation = this._carousel.getOrientation(),
+			$window = $(window);
+
+		// listen for mouse/touch down, move and up/leave events
+		$scroller.on('mousedown touchstart', this._eventListeners.start);
+		$window.on('mousemove touchmove', this._eventListeners.move);
+		$window.on('mouseup touchend touchcancel', this._eventListeners.end);
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	DragNavigator.prototype.destroy = function() {
+		var $scroller = $(this._carousel.getScrollerWrap()),
+			$window = $(window);
+
+		// listen for mouse/touch down, move and up/leave events
+		$scroller.off('mousedown touchstart', this._eventListeners.start);
+		$window.off('mousemove touchmove', this._eventListeners.move);
+		$window.off('mouseup touchend touchcancel', this._eventListeners.end);
+	};
+
+	/**
+	 * Called on drag start event.
+	 *
+	 * @method _onRawStart
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawStart = function(e) {
+		if (e.which !== 1 && e.type !== 'touchstart') {
+			return true;
+		}
+
+		var orientation = this._carousel.getOrientation(),
 			horizontal = orientation === Config.Orientation.HORIZONTAL;
 
-		// listen for mouse down, move and up/leave events
-		$scroller.on('mousedown touchstart', function(e) {
-			if (e.which !== 1 && e.type !== 'touchstart') {
-				return true;
-			}
-
-			var isTouchEvent = e.type === 'touchstart',
-				x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
-				y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
-				targetElement = e.target,
-				result;
-
-			result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
-
-			// never disable the mousedown/touchstart events
-			return true;
-
-			/*if (result === false) {
-				e.preventDefault();
-
-				return false;
-			} else {
-				return true;
-			}*/
-		}.bind(this));
-
-		$window.on('mousemove touchmove', function(e) {
-			var result,
-				isTouchEvent,
-				x,
-				y;
-
-			// stop if not active
-			if (!this._active) {
-				return true;
-			}
-
-			// only move the carousel when the left mouse button is pressed
-			if (e.which !== 1 && e.type !== 'touchmove') {
-				result = this._end();
-			} else {
-				isTouchEvent = e.type === 'touchmove';
-				x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
-				y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
-
-				result = this._move(horizontal ? x : y, horizontal ? y : x);
-			}
-
-			if (result === false) {
-				e.preventDefault();
-
-				return false;
-			} else {
-				return true;
-			}
-		}.bind(this));
-
-		$window.on('mouseup touchend touchcancel', function(e) {
-			var result,
-				targetElement;
-
-			// quit if invalid event
-			if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
-				return true;
-			}
-
-			// stop if not active
-			if (!this._active) {
-				return true;
-			}
-
+		var isTouchEvent = e.type === 'touchstart',
+			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
+			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
 			targetElement = e.target;
 
-			result = this._end(targetElement);
+		this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
 
-			/* istanbul ignore else */
-			if (result === false) {
-				e.preventDefault();
+		// never disable the mousedown/touchstart events
+		return true;
+	};
 
-				return false;
-			} else {
-				return true;
-			}
-		}.bind(this));
+	/**
+	 * Called on drag move event.
+	 *
+	 * @method _onRawMove
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawMove = function(e) {
+		var orientation = this._carousel.getOrientation(),
+			horizontal = orientation === Config.Orientation.HORIZONTAL,
+			result,
+			isTouchEvent,
+			x,
+			y;
+
+		// stop if not active
+		if (!this._active) {
+			return true;
+		}
+
+		// only move the carousel when the left mouse button is pressed
+		if (e.which !== 1 && e.type !== 'touchmove') {
+			result = this._end();
+		} else {
+			isTouchEvent = e.type === 'touchmove';
+			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
+			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
+
+			result = this._move(horizontal ? x : y, horizontal ? y : x);
+		}
+
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	/**
+	 * Called on drag end event.
+	 *
+	 * @method _onRawEnd
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawEnd = function(e) {
+		var result,
+			targetElement;
+
+		// quit if invalid event
+		if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
+			return true;
+		}
+
+		// stop if not active
+		if (!this._active) {
+			return true;
+		}
+
+		targetElement = e.target;
+
+		result = this._end(targetElement);
+
+		/* istanbul ignore else */
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
 	};
 
 	/**
@@ -241,8 +284,7 @@ define([
 		}
 
 		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startPosition,
-			noActionThreshold = 15;
+		var deltaDragPosition = position - this._startPosition;
 
 		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
@@ -252,7 +294,7 @@ define([
 		this._lastOppositePosition = oppositePosition;
 
 		// if the drag delta is very small then do nothing not to quit or start moving too soon
-		if (this._accumulatedMagnitude.main < noActionThreshold) {
+		if (this._accumulatedMagnitude.main < this._noActionThreshold) {
 			return true;
 		}
 
@@ -308,19 +350,25 @@ define([
 			endHoverItemIndex,
 			isSameItemAsStarted;
 
-		// navigate to closest item or page depending on selected mode
-		switch (this._mode) {
-			case DragNavigator.Mode.NAVIGATE_PAGE:
-				closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
+		// if the carousel was dragged too little or more in the opposite direction then do not navigate
+		if (
+			this._accumulatedMagnitude.main > this._noActionThreshold
+			&& this._accumulatedMagnitude.main > this._accumulatedMagnitude.opposite
+		) {
+			// navigate to closest item or page depending on selected mode
+			switch (this._mode) {
+				case DragNavigator.Mode.NAVIGATE_PAGE:
+					closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
 
-				this._carousel.navigateToPage(closestIndex, false, true);
-			break;
+					this._carousel.navigateToPage(closestIndex, false, true);
+				break;
 
-			case DragNavigator.Mode.NAVIGATE_ITEM:
-				closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
+				case DragNavigator.Mode.NAVIGATE_ITEM:
+					closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
 
-				this._carousel.navigateToItem(closestIndex, false, true);
-			break;
+					this._carousel.navigateToItem(closestIndex, false, true);
+				break;
+			}
 		}
 
 		// restore the element click handler if drag stopped on the same element and was dragged very little
@@ -379,7 +427,7 @@ define([
 		var $element = $(element),
 			itemWrapperClass = this._carousel.getConfig().getClassName('item'),
 			$itemWrapper = $element.closest('.' + itemWrapperClass),
-			$subElements = $itemWrapper.find('A'),
+			$subElements = $itemWrapper.find('*'),
 			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
 			isAlreadyDisabled = $itemWrapper.data(disabledDataName);
 
@@ -402,7 +450,7 @@ define([
 			itemWrapperClass = this._carousel.getConfig().getClassName('item'),
 			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
 			$itemWrapper = $element.closest('.' + itemWrapperClass),
-			$subElements = $itemWrapper.find('A'),
+			$subElements = $itemWrapper.find('*'),
 			isDisabled = $itemWrapper.data(disabledDataName);
 
 		if (isDisabled === true) {

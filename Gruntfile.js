@@ -127,7 +127,25 @@ module.exports = function (grunt) {
 					keepalive: true
 				}
 			}
-		}
+		},
+
+		// counts the source lines of code
+		// https://github.com/rhiokim/grunt-sloc
+		sloc: {
+			options: {
+				// Task-specific options go here.
+			},
+			library: {
+				files: {
+					'src': ['*.js']
+				}
+			},
+			tests: {
+				files: {
+					'test': ['*.js']
+				}
+			}
+		},
 	});
 
 	// register default task

@@ -354,6 +354,8 @@
 		basicCarousel.init('#basic-carousel', {
 			//dataSource: new CustomDataSource(),
 			//renderer: new CustomRenderer()
+			startItemIndex: 5,
+			centerStartItemIndex: true
 		})
 
 		/*.done(function() {
@@ -382,7 +384,7 @@
 		});*/
 
 		// set random heights for the items
-		/*$('#match-largest-element-carousel .carousel-item').each(function() {
+		$('#match-largest-element-carousel .carousel-item').each(function() {
 			$(this).css('height', (100 + Math.random() * 200) + 'px');
 		});
 
@@ -442,7 +444,7 @@
 			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM,
 			//useResponsiveLayout: false,
 			//itemsPerPage: 1
-		});*/
+		});
 
 		// setup buttons
 		$('.btn').click(function() {

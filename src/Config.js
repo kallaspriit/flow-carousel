@@ -117,6 +117,16 @@ define([
 		this.animateToStartIndex = false;
 
 		/**
+		 * When using the {{#crossLink "Config/startItemIndex:property"}}{{/crossLink}} property, should the carousel
+		 * try to center on this item index rather than making it the first one.
+		 *
+		 * @property centerStartItemIndex
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.centerStartItemIndex = false;
+
+		/**
 		 * List of default responsive layout breakpoint.
 		 *
 		 * The list should be ordered from the smallest size to the largest.

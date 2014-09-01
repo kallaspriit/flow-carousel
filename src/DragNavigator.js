@@ -339,7 +339,10 @@ define([
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
-		if (this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite) {
+		if (
+			this._accumulatedMagnitude.main > 0
+			&& this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite
+		) {
 			this._end();
 
 			return true;
@@ -398,10 +401,10 @@ define([
 			isSameItemAsStarted;
 
 		// if the carousel was dragged too little or more in the opposite direction then do not navigate
-		//if (
-		//	this._accumulatedMagnitude.main > this._noActionThreshold
-		//	&& this._accumulatedMagnitude.main > this._accumulatedMagnitude.opposite
-		//) {
+		if (
+			this._accumulatedMagnitude.main > this._noActionThreshold
+			&& this._accumulatedMagnitude.main > this._accumulatedMagnitude.opposite
+		) {
 			// navigate to closest item or page depending on selected mode
 			switch (this._mode) {
 				case DragNavigator.Mode.NAVIGATE_PAGE:
@@ -416,7 +419,7 @@ define([
 					this._carousel.navigateToItem(closestIndex, false, true);
 				break;
 			}
-		//}
+		}
 
 		// restore the element click handler if drag stopped on the same element and was dragged very little
 		if (

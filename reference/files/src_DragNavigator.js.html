@@ -138,6 +138,7 @@ define([
 		this._startCarouselPosition = null;
 		this._startHoverItemIndex = null;
 		this._startTargetElement = null;
+		this._startWindowScrollTop = null;
 		this._lastPosition = null;
 		this._lastOppositePosition = null;
 		this._accumulatedMagnitude = {
@@ -148,8 +149,10 @@ define([
 			start: this._onRawStart.bind(this),
 			move: this._onRawMove.bind(this),
 			end: this._onRawEnd.bind(this),
+			dragStart: this._onRawDragStart.bind(this)
 		};
 		this._noActionThreshold = 15;
+		this._firstMoveEvent = true;
 
 		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -208,13 +211,17 @@ define([
 	 * @protected
 	 */
 	DragNavigator.prototype._setup = function() {
-		var $scroller = $(this._carousel.getScrollerWrap()),
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			$window = $(window);
 
 		// listen for mouse/touch down, move and up/leave events
-		$scroller.on(&#x27;mousedown touchstart&#x27;, this._eventListeners.start);
+		$scrollerWrap.on(&#x27;mousedown touchstart&#x27;, this._eventListeners.start);
 		$window.on(&#x27;mousemove touchmove&#x27;, this._eventListeners.move);
 		$window.on(&#x27;mouseup touchend touchcancel&#x27;, this._eventListeners.end);
+
+		// intercept drag start event
+		$mainWrap.on(&#x27;dragstart&#x27;, this._eventListeners.dragStart);
 	};
 
 	/**
@@ -223,13 +230,15 @@ define([
 	 * @method destroy
 	 */
 	DragNavigator.prototype.destroy = function() {
-		var $scroller = $(this._carousel.getScrollerWrap()),
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			$window = $(window);
 
 		// listen for mouse/touch down, move and up/leave events
-		$scroller.off(&#x27;mousedown touchstart&#x27;, this._eventListeners.start);
+		$scrollerWrap.off(&#x27;mousedown touchstart&#x27;, this._eventListeners.start);
 		$window.off(&#x27;mousemove touchmove&#x27;, this._eventListeners.move);
 		$window.off(&#x27;mouseup touchend touchcancel&#x27;, this._eventListeners.end);
+		$mainWrap.off(&#x27;dragstart&#x27;, this._eventListeners.dragStart);
 	};
 
 	/**
@@ -246,17 +255,22 @@ define([
 		}
 
 		var orientation = this._carousel.getOrientation(),
-			horizontal = orientation === Config.Orientation.HORIZONTAL;
-
-		var isTouchEvent = e.type === &#x27;touchstart&#x27;,
+			horizontal = orientation === Config.Orientation.HORIZONTAL,
+			isTouchEvent = e.type === &#x27;touchstart&#x27;,
 			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
 			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
-			targetElement = e.target;
+			targetElement = e.target,
+			result;
 
-		this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
+		result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
 
-		// never disable the mousedown/touchstart events
-		return true;
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
 	};
 
 	/**
@@ -312,13 +326,13 @@ define([
 		var result,
 			targetElement;
 
-		// quit if invalid event
-		if (e.which !== 1 &amp;&amp; e.type !== &#x27;touchend&#x27; &amp;&amp; e.type !== &#x27;touchcancel&#x27;) {
+		// stop if not active
+		if (!this._active) {
 			return true;
 		}
 
-		// stop if not active
-		if (!this._active) {
+		// quit if invalid event
+		if (e.which !== 1 &amp;&amp; e.type !== &#x27;touchend&#x27; &amp;&amp; e.type !== &#x27;touchcancel&#x27;) {
 			return true;
 		}
 
@@ -334,6 +348,18 @@ define([
 		} else {
 			return true;
 		}
+	};
+
+	/**
+	 * Called on main wrap drag start event.
+	 *
+	 * @method _onRawDragStart
+	 * @param {Event} e Drag start event
+	 * @private
+	 */
+	DragNavigator.prototype._onRawDragStart = function(/*e*/) {
+		// cancel start drag event so images, links etc couldn&#x27;t be dragged
+        return false;
 	};
 
 	/**
@@ -361,10 +387,12 @@ define([
 		this._lastOppositePosition = oppositePosition; // same for this
 		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
 		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
+		this._startWindowScrollTop = $(window).scrollTop();
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
 		};
+		this._firstMoveEvent = true;
 
 		// disable all children click events for the duration of the dragging
 		if (targetElement !== null) {
@@ -377,8 +405,12 @@ define([
 		this._carousel._onDragBegin(
 			this._startPosition,
 			this._startOppositePosition,
-			this._startCarouselPosition
+			this._startCarouselPosition,
+			this._startWindowScrollTop
 		);
+
+		// disable default functionality
+		//return false;
 
 		// do not disable scrolling the page from the carousel component
 		return true;
@@ -401,6 +433,9 @@ define([
 
 		// compare motion in the carousel and the opposite direction
 		var deltaDragPosition = position - this._startPosition;
+			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
+			//currentWindowScrollTop = $(window).scrollTop(),
+			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
 
 		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
@@ -410,16 +445,31 @@ define([
 		this._lastOppositePosition = oppositePosition;
 
 		// if the drag delta is very small then do nothing not to quit or start moving too soon
-		if (this._accumulatedMagnitude.main &lt; this._noActionThreshold) {
-			return true;
-		}
+		// TODO this deadband can not be done on android: https://code.google.com/p/chromium/issues/detail?id=240735
+		/*if (this._accumulatedMagnitude.main &lt; this._noActionThreshold) {
+			// emulate manual scrolling
+			//$(window).scrollTop(this._startWindowScrollTop - windowScrollTopDifference - deltaDragOppositePosition);
+
+			return false;
+		}*/
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
-		if (this._accumulatedMagnitude.main &lt; this._accumulatedMagnitude.opposite) {
+		if (
+			this._accumulatedMagnitude.main &gt; 0
+			&amp;&amp; this._accumulatedMagnitude.main &lt; this._accumulatedMagnitude.opposite
+		) {
 			this._end();
 
 			return true;
+		}
+
+		// if the first move event takes more than 200ms then Android Chrome cancels the scroll, avoid this by returning
+		// quikcly on the first event
+		if (this._firstMoveEvent) {
+			this._firstMoveEvent = false;
+
+			return false;
 		}
 
 		// calculate the position
@@ -523,11 +573,13 @@ define([
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
+		this._startWindowScrollTop = null;
 		this._lastPosition = null;
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
 		};
+		this._firstMoveEvent = true;
 
 		return false;
 	};

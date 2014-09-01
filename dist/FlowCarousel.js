@@ -565,6 +565,16 @@ define('Config',[
 		this.animateToStartIndex = false;
 
 		/**
+		 * When using the {{#crossLink "Config/startItemIndex:property"}}{{/crossLink}} property, should the carousel
+		 * try to center on this item index rather than making it the first one.
+		 *
+		 * @property centerStartItemIndex
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.centerStartItemIndex = false;
+
+		/**
 		 * List of default responsive layout breakpoint.
 		 *
 		 * The list should be ordered from the smallest size to the largest.
@@ -2384,7 +2394,10 @@ define('DragNavigator',[
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
-		if (this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite) {
+		if (
+			this._accumulatedMagnitude.main > 0
+			&& this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite
+		) {
 			this._end();
 
 			return true;
@@ -2443,10 +2456,10 @@ define('DragNavigator',[
 			isSameItemAsStarted;
 
 		// if the carousel was dragged too little or more in the opposite direction then do not navigate
-		//if (
-		//	this._accumulatedMagnitude.main > this._noActionThreshold
-		//	&& this._accumulatedMagnitude.main > this._accumulatedMagnitude.opposite
-		//) {
+		if (
+			this._accumulatedMagnitude.main > this._noActionThreshold
+			&& this._accumulatedMagnitude.main > this._accumulatedMagnitude.opposite
+		) {
 			// navigate to closest item or page depending on selected mode
 			switch (this._mode) {
 				case DragNavigator.Mode.NAVIGATE_PAGE:
@@ -2461,7 +2474,7 @@ define('DragNavigator',[
 					this._carousel.navigateToItem(closestIndex, false, true);
 				break;
 			}
-		//}
+		}
 
 		// restore the element click handler if drag stopped on the same element and was dragged very little
 		if (
@@ -3295,6 +3308,16 @@ define('FlowCarousel',[
 		 * @private
 		 */
 		this._currentItemIndex = 0;
+
+		/**
+		 * Item index of the last centered item.
+		 *
+		 * @property _lastCenterItemIndex
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
+		this._lastCenterItemIndex = null;
 
 		/**
 		 * Index of currently-hovered item or null if not hovering any items.
@@ -4370,6 +4393,13 @@ define('FlowCarousel',[
 
 		// ignore navigation request when already navigating
 		if (this._isAnimating) {
+			if (this._activeAnimationDeferred === null) {
+				/* istanbul ignore if */
+				throw new Error(
+					'Carousel is animating but no active animation deferred is present, this should not happen'
+				);
+			}
+
 			return this._activeAnimationDeferred;
 		}
 
@@ -4406,6 +4436,7 @@ define('FlowCarousel',[
 		// once the animation is complete, update the current item index
 		deferred.done(function() {
 			this._currentItemIndex = this._targetItemIndex;
+			this._lastCenterItemIndex = this.getCurrentCenterItemIndex();
 			this._isAnimating = false;
 			this._activeAnimationDeferred = null;
 
@@ -4495,11 +4526,23 @@ define('FlowCarousel',[
 	 */
 	FlowCarousel.prototype.navigateToNextItem = function(instant) {
 		var currentItemIndex = this.getCurrentItemIndex(),
-			itemsPerPage = this.getItemsPerPage(),
-			itemCount = this.getItemCount(),
-			targetItemIndex = Math.min(currentItemIndex + 1, itemCount - itemsPerPage);
+			maximumValidItemIndex = this.getMaximumValidItemIndex(),
+			targetItemIndex = Math.min(currentItemIndex + 1, maximumValidItemIndex);
 
 		return this.navigateToItem(targetItemIndex, instant);
+	};
+
+	/**
+	 * Returns the maximum item index to scroll to so that the last page would be displayed full.
+	 *
+	 * @method getMaximumValidItemIndex
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getMaximumValidItemIndex = function() {
+		var itemsPerPage = this.getItemsPerPage(),
+			itemCount = this.getItemCount();
+
+		return Math.max(itemCount - itemsPerPage, 0);
 	};
 
 	/**
@@ -4686,6 +4729,42 @@ define('FlowCarousel',[
 	};
 
 	/**
+	 * Calculates the item index to scroll to so that the given index would be centered if possible.
+	 *
+	 * @method calculateCenteredItemStartIndex
+	 * @param {number} startItemIndex Item index to center
+	 * @param {boolean} [inverse=false] Should the inverse positive index be returned
+	 */
+	FlowCarousel.prototype.calculateCenteredItemStartIndex = function(startItemIndex, inverse) {
+		inverse = typeof inverse === 'boolean' ? inverse : false;
+
+		var maximumValidItemIndex = this.getMaximumValidItemIndex(),
+			itemPerPage = this.getItemsPerPage(),
+			isEvenNumberOfPages = itemPerPage % 2 === 0,
+			sign = inverse ? 1 : -1,
+			roundMethod = inverse ? 'floor' : 'ceil',
+			centeredItemIndex = Math[roundMethod](startItemIndex + sign * itemPerPage / 2);
+
+		// prefer before the center rather than after
+		if (isEvenNumberOfPages) {
+			centeredItemIndex -= 1;
+		}
+
+		// limit the calculated item index to valid range
+		return Math.max(Math.min(centeredItemIndex, maximumValidItemIndex), 0);
+	};
+
+	/**
+	 * Returns currently centered item index.
+	 *
+	 * @method getCurrentCenterItemIndex
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getCurrentCenterItemIndex = function() {
+		return this.calculateCenteredItemStartIndex(this._currentItemIndex, true);
+	};
+
+	/**
 	 * Initializes the top-level wrap element.
 	 *
 	 * If the selector matches multiple elements, only the first one is considered.
@@ -4806,7 +4885,7 @@ define('FlowCarousel',[
 		this._animator.onCarouselElementReady();
 
 		// setup the main layout and move/animate to the start item
-		this._setupLayout(startItemIndex, this._config.animateToStartIndex);
+		this._setupLayout(startItemIndex, this._config.animateToStartIndex, this._config.centerStartItemIndex);
 
 		// remove the loading class
 		$element.removeClass(className.initiating);
@@ -4826,9 +4905,10 @@ define('FlowCarousel',[
 	 * @method _setupLayout
 	 * @param {number} [startItemIdex] Optional item index to navigate to instantly
 	 * @param {boolean} [animateToStartItem=false] Should we animate to the start item
+	 * @param {boolean} [centerStartItemIndex=false] Should we try to center on the start item
 	 * @private
 	 */
-	FlowCarousel.prototype._setupLayout = function(startItemIndex, animateToStartItem) {
+	FlowCarousel.prototype._setupLayout = function(startItemIndex, animateToStartItem, centerStartItemIndex) {
 		var orientation = this._config.orientation,
 			wrapSize = this._getMainWrapSize(),
 			itemCount = this._dataSource.getItemCount(),
@@ -4851,8 +4931,14 @@ define('FlowCarousel',[
 
 		// if the start item index is set then navigate to it instantly
 		if (typeof startItemIndex === 'number' && startItemIndex !== 0) {
+			// recalculate the start item index so the initial item is shown centered
+			if (centerStartItemIndex) {
+				startItemIndex = this.calculateCenteredItemStartIndex(startItemIndex);
+			}
+
 			this._targetItemIndex = startItemIndex;
 			this._currentItemIndex = startItemIndex;
+			this._lastCenterItemIndex = this.getCurrentCenterItemIndex();
 
 			this.emit(FlowCarousel.Event.NAVIGATING_TO_ITEM, startItemIndex, instantAnimation);
 
@@ -5448,6 +5534,7 @@ define('FlowCarousel',[
 	 * This is executed only when using Config.SizeMode.MATCH_LARGEST_ITEM size mode.
 	 *
 	 * @method validateSize
+	 * @return {boolean} Was new positive size found
 	 */
 	FlowCarousel.prototype.validateSize = function() {
 		// only perform this routine if matching the largest item size
@@ -5471,7 +5558,11 @@ define('FlowCarousel',[
 			$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
 
 			this._lastLargestChildSize = largestChildSize;
+
+			return true;
 		}
+
+		return false;
 	};
 
 	/**
@@ -5486,14 +5577,21 @@ define('FlowCarousel',[
 	 * @private
 	 */
 	FlowCarousel.prototype._reLayout = function() {
-		var lastItemIndex = this._currentItemIndex,
+		var focusItemIndex,
 			promise;
+
+		// focus to last center item index if requested so by the configuration
+		if (this._config.centerStartItemIndex) {
+			focusItemIndex = this._lastCenterItemIndex;
+		} else {
+			focusItemIndex = this._currentItemIndex;
+		}
 
 		// reset current state
 		this._reset();
 
 		// recalculate the layout navigating instantly to the last item
-		this._setupLayout(lastItemIndex);
+		this._setupLayout(focusItemIndex, false, this._config.centerStartItemIndex);
 
 		// render the items that may have become visible after the layout procedure
 		promise = this._validateItemsToRender();
@@ -5524,6 +5622,7 @@ define('FlowCarousel',[
 		this._isAnimating = false;
 		this._targetItemIndex = 0;
 		this._currentItemIndex = 0;
+		this._lastCenterItemIndex = null;
 		this._lastLargestChildSize = null;
 		this._renderedItemIndexes = [];
 		this._renderedPlaceholderIndexes = [];

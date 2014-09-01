@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>KeyboardNavigator - FlowCarousel</title>
+    <title>SlideshowNavigator - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -112,7 +112,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>KeyboardNavigator Class</h1>
+                        <h1>SlideshowNavigator Class</h1>
 <div class="box meta">
     
 
@@ -124,7 +124,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_KeyboardNavigator.js.html#l8"><code>src\KeyboardNavigator.js:8</code></a>
+            Defined in: <a href="../files/src_SlideshowNavigator.js.html#l7"><code>src\SlideshowNavigator.js:7</code></a>
         </div>
     
 
@@ -136,15 +136,15 @@
 
 
 <div class="box intro">
-    <p>Keyboard navigator.</p>
+    <p>Automatic slideshow navigator.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_KeyboardNavigator" class="method item">
-    <h3 class="name"><code>KeyboardNavigator</code></h3>
+        <div id="method_SlideshowNavigator" class="method item">
+    <h3 class="name"><code>SlideshowNavigator</code></h3>
 
     
         <div class="args">
@@ -152,7 +152,7 @@
             
                 <li class="arg">
                     
-                        <code class="optional">[mode=KeyboardNavigator.Mode.NAVIGATE_PAGE]</code>
+                        <code class="optional">[mode=SlideshowNavigator.Mode.NAVIGATE_PAGE]</code>
                     
                 </li>
             
@@ -185,7 +185,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l8"><code>src\KeyboardNavigator.js:8</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l7"><code>src\SlideshowNavigator.js:7</code></a>
         
         </p>
 
@@ -207,8 +207,8 @@
             
                 <li class="param">
                     
-                        <code class="param-name optional">[mode=KeyboardNavigator.Mode.NAVIGATE_PAGE]</code>
-                        <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+                        <code class="param-name optional">[mode=SlideshowNavigator.Mode.NAVIGATE_PAGE]</code>
+                        <span class="type"><a href="../classes/SlideshowNavigator.html#property_Mode" class="crosslink">Mode</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -259,20 +259,6 @@
                     <ul class="index-list methods extends">
                         
                             <li class="index-item method private">
-                                <a href="#method__onKeyDown">_onKeyDown</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method__onRawKeyDown">_onRawKeyDown</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
                                 <a href="#method__onRawMouseEnter">_onRawMouseEnter</a>
 
                                 
@@ -281,6 +267,20 @@
                         
                             <li class="index-item method private">
                                 <a href="#method__onRawMouseLeave">_onRawMouseLeave</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__performChange">_performChange</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method__scheduleNextChange">_scheduleNextChange</a>
 
                                 
                                 
@@ -315,7 +315,28 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_isActive">isActive</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_setMode">setMode</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_start">start</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_start">start</a>
 
                                 
                                 
@@ -350,206 +371,6 @@
         
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
-
-                
-                    <div id="method__onKeyDown" class="method item private">
-    <h3 class="name"><code>_onKeyDown</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>keyCode</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
-        </span>
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_KeyboardNavigator.js.html#l152"><code>src\KeyboardNavigator.js:152</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Called on key down even for anywhere in the document.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">keyCode</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Key press key-code.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
-                    
-                    <p>Should the key event be propagated further</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method__onRawKeyDown" class="method item private">
-    <h3 class="name"><code>_onRawKeyDown</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>e</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_KeyboardNavigator.js.html#l135"><code>src\KeyboardNavigator.js:135</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Called on key down event.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">e</code>
-                        <span class="type">Event</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Key event</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
 
                 
                     <div id="method__onRawMouseEnter" class="method item private">
@@ -596,7 +417,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l113"><code>src\KeyboardNavigator.js:113</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l205"><code>src\SlideshowNavigator.js:205</code></a>
         
         </p>
 
@@ -687,7 +508,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l124"><code>src\KeyboardNavigator.js:124</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l216"><code>src\SlideshowNavigator.js:216</code></a>
         
         </p>
 
@@ -734,6 +555,120 @@
 </div>
 
                 
+                    <div id="method__performChange" class="method item private">
+    <h3 class="name"><code>_performChange</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_SlideshowNavigator.js.html#l178"><code>src\SlideshowNavigator.js:178</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Performs the change event.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method__scheduleNextChange" class="method item private">
+    <h3 class="name"><code>_scheduleNextChange</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_SlideshowNavigator.js.html#l149"><code>src\SlideshowNavigator.js:149</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Schedules the next change event.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method__setup" class="method item protected">
     <h3 class="name"><code>_setup</code></h3>
 
@@ -768,7 +703,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l77"><code>src\KeyboardNavigator.js:77</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l77"><code>src\SlideshowNavigator.js:77</code></a>
         
         </p>
 
@@ -823,7 +758,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l96"><code>src\KeyboardNavigator.js:96</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l94"><code>src\SlideshowNavigator.js:94</code></a>
         
         </p>
 
@@ -855,7 +790,7 @@
 
     
         <span class="returns-inline">
-            <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+            <span class="type"><a href="../classes/SlideshowNavigator.html#property_Mode" class="crosslink">Mode</a></span>
         </span>
     
 
@@ -882,7 +817,7 @@
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l63"><code>src\KeyboardNavigator.js:63</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l63"><code>src\SlideshowNavigator.js:63</code></a>
         
         </p>
 
@@ -893,9 +828,9 @@
     </div>
 
     <div class="description">
-        <p>Returns current keyboard navigator mode.</p>
-<p>The mode is either KeyboardNavigator/Mode/NAVIGATE_PAGE:property or
-KeyboardNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
+        <p>Returns current slideshow navigator mode.</p>
+<p>The mode is either SlideshowNavigator/Mode/NAVIGATE_PAGE:property or
+SlideshowNavigator/Mode/NAVIGATE_ITEM:property meaning that slideshow changes
 either the page or navigate one item at a time.</p>
 
     </div>
@@ -909,7 +844,7 @@ either the page or navigate one item at a time.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>:
+                        <span class="type"><a href="../classes/SlideshowNavigator.html#property_Mode" class="crosslink">Mode</a></span>:
                     
                 
             </div>
@@ -1007,6 +942,61 @@ either the page or navigate one item at a time.</p>
 </div>
 
                 
+                    <div id="method_isActive" class="method item">
+    <h3 class="name"><code>isActive</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_SlideshowNavigator.js.html#l110"><code>src\SlideshowNavigator.js:110</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Returns whether the slideshow is currently playing.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_setMode" class="method item">
     <h3 class="name"><code>setMode</code></h3>
 
@@ -1049,7 +1039,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l45"><code>src\KeyboardNavigator.js:45</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l45"><code>src\SlideshowNavigator.js:45</code></a>
         
         </p>
 
@@ -1060,9 +1050,9 @@ either the page or navigate one item at a time.</p>
     </div>
 
     <div class="description">
-        <p>Returns current keyboard navigator mode.</p>
+        <p>Returns current slideshow navigator mode.</p>
 <p>The mode is either KeyboardNavigator/Mode/NAVIGATE_PAGE:property or
-KeyboardNavigator/Mode/NAVIGATE_ITEM:property meaning that the arrow keys change
+KeyboardNavigator/Mode/NAVIGATE_ITEM:property meaning that slideshow changes
 either the page or navigate one item at a time.</p>
 
     </div>
@@ -1076,7 +1066,7 @@ either the page or navigate one item at a time.</p>
                 <li class="param">
                     
                         <code class="param-name">mode</code>
-                        <span class="type"><a href="../classes/KeyboardNavigator.html#property_Mode" class="crosslink">Mode</a></span>
+                        <span class="type"><a href="../classes/SlideshowNavigator.html#property_Mode" class="crosslink">Mode</a></span>
                     
 
                     
@@ -1091,6 +1081,116 @@ either the page or navigate one item at a time.</p>
             
             </ul>
         </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_start" class="method item">
+    <h3 class="name"><code>start</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_SlideshowNavigator.js.html#l119"><code>src\SlideshowNavigator.js:119</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Starts the automatic slideshow.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_start" class="method item">
+    <h3 class="name"><code>start</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_SlideshowNavigator.js.html#l134"><code>src\SlideshowNavigator.js:134</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Starts the automatic slideshow.</p>
+
+    </div>
+
     
 
     
@@ -1130,7 +1230,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_KeyboardNavigator.js.html#l32"><code>src\KeyboardNavigator.js:32</code></a>
+        <a href="../files/src_SlideshowNavigator.js.html#l32"><code>src\SlideshowNavigator.js:32</code></a>
         
         </p>
 

@@ -10,6 +10,7 @@ define([
 	'HtmlRenderer',
 	'AbstractNavigator',
 	'KeyboardNavigator',
+	'SlideshowNavigator',
 	'DragNavigator',
 	'Deferred',
 	'Util',
@@ -27,6 +28,7 @@ define([
 	HtmlRenderer,
 	AbstractNavigator,
 	KeyboardNavigator,
+	SlideshowNavigator,
 	DragNavigator,
 	Deferred,
 	Util,
@@ -470,6 +472,14 @@ define([
 	 * @type {KeyboardNavigator}
 	 */
 	FlowCarousel.KeyboardNavigator = KeyboardNavigator;
+
+	/**
+	 * Reference to the {{#crossLink "SlideshowNavigator"}}{{/crossLink}} class.
+	 *
+	 * @property SlideshowNavigator
+	 * @type {SlideshowNavigator}
+	 */
+	FlowCarousel.SlideshowNavigator = SlideshowNavigator;
 
 	/**
 	 * Reference to the {{#crossLink "DragNavigator"}}{{/crossLink}} class.
@@ -1478,6 +1488,32 @@ define([
 	};
 
 	/**
+	 * Returns whether given (or current if no argument is given) item is the first one.
+	 *
+	 * @method isFirstItem
+	 * @param {number} [itemIndex=getCurrentItemIndex()] Optional item index, current by default
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isFirstItem = function(itemIndex) {
+		itemIndex = typeof itemIndex === 'number' ? itemIndex : this.getCurrentPageIndex();
+
+		return itemIndex === 0;
+	};
+
+	/**
+	 * Returns whether given (or current if no argument is given) item is the last one.
+	 *
+	 * @method isLastItem
+	 * @param {number} [itemIndex=getCurrentItemIndex()] Optional item index, current by default
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isLastItem = function(itemIndex) {
+		itemIndex = typeof itemIndex === 'number' ? itemIndex : this.getCurrentItemIndex();
+
+		return this.getItemCount() === 0 || itemIndex >= this.getMaximumValidItemIndex();
+	};
+
+	/**
 	 * Returns whether given (or current if no argument is given) page is the first one.
 	 *
 	 * @method isFirstPage
@@ -1888,6 +1924,10 @@ define([
 
 				case Config.Navigator.DRAG:
 					navigator = new DragNavigator(this._config.dragNavigatorMode);
+				break;
+
+				case Config.Navigator.SLIDESHOW:
+					navigator = new SlideshowNavigator(this._config.slideshowNavigatorMode);
 				break;
 
 				default:

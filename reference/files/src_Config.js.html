@@ -69,6 +69,8 @@
             
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
             
+                <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
+            
                 <li><a href="../classes/Util.html">Util</a></li>
             
             </ul>
@@ -324,6 +326,24 @@ define([
 		this.dragNavigatorMode = &#x27;navigate-page&#x27;;
 
 		/**
+		 * Slideshow navigator mode to use.
+		 *
+		 * @property slideshowNavigatorMode
+		 * @type {SlideshowNavigator/Mode:property}
+		 * @default SlideshowNavigator.Mode.NAVIGATE_PAGE
+		 */
+		this.slideshowNavigatorMode = &#x27;navigate-page&#x27;;
+
+		/**
+		 * The interval in milliseconds at which to automatically change item/page.
+		 *
+		 * @property slideshowNavigatorInterval
+		 * @type {number}
+		 * @default 3000
+		 */
+		this.slideshowNavigatorInterval = 3000;
+
+		/**
 		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
 		 * effect of only applying the change partially. Set to zero to disable this feature.
 		 *
@@ -503,11 +523,14 @@ define([
 	 * @property Navigator
 	 * @type {object}
 	 * @param {string} Navigator.KEYBOARD=&#x27;keyboard&#x27; Keyboard navigator
+	 * @param {string} Navigator.DRAG=&#x27;drag&#x27; Dragging mouse/touch navigator
+	 * @param {string} Navigator.SLIDESHOW=&#x27;slideshow&#x27; Automatic slideshow navigator
 	 * @static
 	 */
 	Config.Navigator = {
 		KEYBOARD: &#x27;keyboard&#x27;,
-		DRAG: &#x27;drag&#x27;
+		DRAG: &#x27;drag&#x27;,
+		SLIDESHOW: &#x27;slideshow&#x27;
 	};
 
 	/**

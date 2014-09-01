@@ -656,6 +656,24 @@ define('Config',[
 		this.dragNavigatorMode = 'navigate-page';
 
 		/**
+		 * Slideshow navigator mode to use.
+		 *
+		 * @property slideshowNavigatorMode
+		 * @type {SlideshowNavigator/Mode:property}
+		 * @default SlideshowNavigator.Mode.NAVIGATE_PAGE
+		 */
+		this.slideshowNavigatorMode = 'navigate-page';
+
+		/**
+		 * The interval in milliseconds at which to automatically change item/page.
+		 *
+		 * @property slideshowNavigatorInterval
+		 * @type {number}
+		 * @default 3000
+		 */
+		this.slideshowNavigatorInterval = 3000;
+
+		/**
 		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
 		 * effect of only applying the change partially. Set to zero to disable this feature.
 		 *
@@ -835,11 +853,14 @@ define('Config',[
 	 * @property Navigator
 	 * @type {object}
 	 * @param {string} Navigator.KEYBOARD='keyboard' Keyboard navigator
+	 * @param {string} Navigator.DRAG='drag' Dragging mouse/touch navigator
+	 * @param {string} Navigator.SLIDESHOW='slideshow' Automatic slideshow navigator
 	 * @static
 	 */
 	Config.Navigator = {
 		KEYBOARD: 'keyboard',
-		DRAG: 'drag'
+		DRAG: 'drag',
+		SLIDESHOW: 'slideshow'
 	};
 
 	/**
@@ -1851,8 +1872,6 @@ define('KeyboardNavigator',[
 	/**
 	 * Keyboard navigator.
 	 *
-	 * TODO when trying to navigate past the first/last item then animate a bit past it and back
-	 *
 	 * @class KeyboardNavigator
 	 * @extends AbstractNavigator
 	 * @param {KeyboardNavigator/Mode:property} [mode=KeyboardNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
@@ -2052,6 +2071,237 @@ define('KeyboardNavigator',[
 	};
 
 	return KeyboardNavigator;
+});
+define('SlideshowNavigator',[
+	'AbstractNavigator',
+	'Util'
+], function(AbstractNavigator, Util) {
+	
+
+	/**
+	 * Automatic slideshow navigator.
+	 *
+	 * @class SlideshowNavigator
+	 * @extends AbstractNavigator
+	 * @param {SlideshowNavigator/Mode:property} [mode=SlideshowNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
+	 * @constructor
+	 */
+	function SlideshowNavigator(mode) {
+		AbstractNavigator.call(this);
+
+		this._delayTimeout = null;
+		this._playing = false;
+		this._mouseEntered = false;
+
+		this._eventListeners = {
+			mouseenter: this._onRawMouseEnter.bind(this),
+			mouseleave: this._onRawMouseLeave.bind(this)
+		};
+
+		this.setMode(mode || SlideshowNavigator.Mode.NAVIGATE_ITEM);
+	}
+
+	SlideshowNavigator.prototype = Object.create(AbstractNavigator.prototype);
+
+	/**
+	 * List of supported navigation modes.
+	 *
+	 * @property Mode
+	 * @type {object}
+	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
+	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
+	 */
+	SlideshowNavigator.Mode = {
+		NAVIGATE_PAGE: 'navigate-page',
+		NAVIGATE_ITEM: 'navigate-item'
+	};
+
+	/**
+	 * Returns current slideshow navigator mode.
+	 *
+	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method setMode
+	 * @param {SlideshowNavigator/Mode:property} mode Mode to use
+	 */
+	SlideshowNavigator.prototype.setMode = function(mode) {
+		if (!Util.objectHasValue(SlideshowNavigator.Mode, mode)) {
+			throw new Error('Invalid mode "' + mode + '" provided');
+		}
+
+		this._mode = mode;
+	};
+
+	/**
+	 * Returns current slideshow navigator mode.
+	 *
+	 * The mode is either {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method getMode
+	 * @return {SlideshowNavigator/Mode:property}
+	 */
+	SlideshowNavigator.prototype.getMode = function() {
+		return this._mode;
+	};
+
+	/**
+	 * Called by the init to set up the navigator.
+	 *
+	 * @method _setup
+	 * @protected
+	 */
+	SlideshowNavigator.prototype._setup = function() {
+		var $mainWrap = $(this._carousel.getMainWrap());
+
+		// make sure that the mouse if over the main wrap element
+		$mainWrap
+			.on('mouseenter', this._eventListeners.mouseenter)
+			.on('mouseleave', this._eventListeners.mouseleave);
+
+		this.start();
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	SlideshowNavigator.prototype.destroy = function() {
+		var $mainWrap = $(this._carousel.getMainWrap());
+
+		this.stop();
+
+		// remove the event listeners
+		$mainWrap
+			.off('mouseenter', this._eventListeners.mouseenter)
+			.off('mouseleave', this._eventListeners.mouseleave);
+	};
+
+	/**
+	 * Returns whether the slideshow is currently playing.
+	 *
+	 * @method isActive
+	 */
+	SlideshowNavigator.prototype.isPlaying = function() {
+		return this._playing;
+	};
+
+	/**
+	 * Starts the automatic slideshow.
+	 *
+	 * @method start
+	 */
+	SlideshowNavigator.prototype.start = function() {
+		if (this.isPlaying()) {
+			this.stop();
+		}
+
+		this._playing = true;
+
+		this._scheduleNextChange();
+	};
+
+	/**
+	 * Starts the automatic slideshow.
+	 *
+	 * @method start
+	 */
+	SlideshowNavigator.prototype.stop = function() {
+		if (this._delayTimeout !== null) {
+			window.clearTimeout(this._delayTimeout);
+
+			this._delayTimeout = null;
+		}
+
+		this._playing = false;
+	};
+
+	/**
+	 * Schedules the next change event.
+	 *
+	 * @method _scheduleNextChange
+	 * @private
+	 */
+	SlideshowNavigator.prototype._scheduleNextChange = function() {
+		if (!this.isPlaying()) {
+			return;
+		}
+
+		var interval = this._carousel.getConfig().slideshowNavigatorInterval;
+
+		if (this._delayTimeout !== null) {
+			window.clearTimeout(this._delayTimeout);
+
+			this._delayTimeout = null;
+		}
+
+		this._delayTimeout = window.setTimeout(function() {
+			if (this._carousel === null || !this._carousel.isInitiated()) {
+				return;
+			}
+
+			this._performChange();
+			this._scheduleNextChange();
+		}.bind(this), interval);
+	};
+
+	/**
+	 * Performs the change event.
+	 *
+	 * @method _performChange
+	 * @private
+	 */
+	SlideshowNavigator.prototype._performChange = function() {
+		// don't control the carousel when user is hovering it
+		if (this._mouseEntered) {
+			return;
+		}
+
+		if (this._mode === SlideshowNavigator.Mode.NAVIGATE_PAGE) {
+			if (this._carousel.isLastPage()) {
+				this._carousel.navigateToPage(0, true);
+			} else {
+				this._carousel.navigateToNextPage();
+			}
+		} else if (this._mode === SlideshowNavigator.Mode.NAVIGATE_ITEM) {
+			if (this._carousel.isLastItem()) {
+				this._carousel.navigateToItem(0, true);
+			} else {
+				this._carousel.navigateToNextItem();
+			}
+		}
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseEnter
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	SlideshowNavigator.prototype._onRawMouseEnter = function(/*e*/) {
+		this._mouseEntered = true;
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseLeave
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	SlideshowNavigator.prototype._onRawMouseLeave = function(/*e*/) {
+		this._mouseEntered = false;
+
+		// re-schedule the change event for consisten timing
+		this._scheduleNextChange();
+	};
+
+	return SlideshowNavigator;
 });
 define('DragNavigator',[
 	'AbstractNavigator',
@@ -3144,6 +3394,7 @@ define('FlowCarousel',[
 	'HtmlRenderer',
 	'AbstractNavigator',
 	'KeyboardNavigator',
+	'SlideshowNavigator',
 	'DragNavigator',
 	'Deferred',
 	'Util',
@@ -3161,6 +3412,7 @@ define('FlowCarousel',[
 	HtmlRenderer,
 	AbstractNavigator,
 	KeyboardNavigator,
+	SlideshowNavigator,
 	DragNavigator,
 	Deferred,
 	Util,
@@ -3604,6 +3856,14 @@ define('FlowCarousel',[
 	 * @type {KeyboardNavigator}
 	 */
 	FlowCarousel.KeyboardNavigator = KeyboardNavigator;
+
+	/**
+	 * Reference to the {{#crossLink "SlideshowNavigator"}}{{/crossLink}} class.
+	 *
+	 * @property SlideshowNavigator
+	 * @type {SlideshowNavigator}
+	 */
+	FlowCarousel.SlideshowNavigator = SlideshowNavigator;
 
 	/**
 	 * Reference to the {{#crossLink "DragNavigator"}}{{/crossLink}} class.
@@ -4612,6 +4872,32 @@ define('FlowCarousel',[
 	};
 
 	/**
+	 * Returns whether given (or current if no argument is given) item is the first one.
+	 *
+	 * @method isFirstItem
+	 * @param {number} [itemIndex=getCurrentItemIndex()] Optional item index, current by default
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isFirstItem = function(itemIndex) {
+		itemIndex = typeof itemIndex === 'number' ? itemIndex : this.getCurrentPageIndex();
+
+		return itemIndex === 0;
+	};
+
+	/**
+	 * Returns whether given (or current if no argument is given) item is the last one.
+	 *
+	 * @method isLastItem
+	 * @param {number} [itemIndex=getCurrentItemIndex()] Optional item index, current by default
+	 * @return {boolean}
+	 */
+	FlowCarousel.prototype.isLastItem = function(itemIndex) {
+		itemIndex = typeof itemIndex === 'number' ? itemIndex : this.getCurrentItemIndex();
+
+		return this.getItemCount() === 0 || itemIndex >= this.getMaximumValidItemIndex();
+	};
+
+	/**
 	 * Returns whether given (or current if no argument is given) page is the first one.
 	 *
 	 * @method isFirstPage
@@ -5022,6 +5308,10 @@ define('FlowCarousel',[
 
 				case Config.Navigator.DRAG:
 					navigator = new DragNavigator(this._config.dragNavigatorMode);
+				break;
+
+				case Config.Navigator.SLIDESHOW:
+					navigator = new SlideshowNavigator(this._config.slideshowNavigatorMode);
 				break;
 
 				default:

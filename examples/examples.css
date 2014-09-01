@@ -21,6 +21,9 @@ BODY {
 .carousel .carousel-item {
     display: none;
 }
+.carousel .carousel-item.selected {
+    background-color: #00814f !important;
+}
 .carousel-item-odd {
     background-color: #5EFF40 !important;
 }
@@ -74,7 +77,6 @@ BODY {
 .carousel-item.image-or-link A {
 	display: block;
 	height: 100%;
-	background-color: #00814f;
 	padding: 0 20px;
 }
 

@@ -264,7 +264,7 @@
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method__disableClickHandler">_disableClickHandler</a>
+                                <a href="#method__callClickHandlers">_callClickHandlers</a>
 
                                 
                                 
@@ -319,15 +319,15 @@
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method__restoreClickHandler">_restoreClickHandler</a>
+                            <li class="index-item method protected inherited">
+                                <a href="#method__setup">_setup</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method protected inherited">
-                                <a href="#method__setup">_setup</a>
+                            <li class="index-item method private">
+                                <a href="#method__setupClickHandlers">_setupClickHandlers</a>
 
                                 
                                 
@@ -545,8 +545,8 @@
 </div>
 
                 
-                    <div id="method__disableClickHandler" class="method item private">
-    <h3 class="name"><code>_disableClickHandler</code></h3>
+                    <div id="method__callClickHandlers" class="method item private">
+    <h3 class="name"><code>_callClickHandlers</code></h3>
 
     
         <div class="args">
@@ -589,7 +589,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l471"><code>src\DragNavigator.js:471</code></a>
+        <a href="../files/src_DragNavigator.js.html#l523"><code>src\DragNavigator.js:523</code></a>
         
         </p>
 
@@ -600,7 +600,7 @@
     </div>
 
     <div class="description">
-        <p>Disables click handler for given element.</p>
+        <p>Calls the original click handlers for given element.</p>
 
     </div>
 
@@ -646,6 +646,12 @@
                 <li class="arg">
                     
                         <code>targetElement</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[isTouchEvent=false]</code>
                     
                 </li>
             
@@ -715,6 +721,23 @@
 
                     <div class="param-description">
                         <p>The element that the drag ended on</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[isTouchEvent=false]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Is this a touch event</p>
 
                     </div>
 
@@ -793,7 +816,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l515"><code>src\DragNavigator.js:515</code></a>
+        <a href="../files/src_DragNavigator.js.html#l557"><code>src\DragNavigator.js:557</code></a>
         
         </p>
 
@@ -1125,7 +1148,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l201"><code>src\DragNavigator.js:201</code></a>
+        <a href="../files/src_DragNavigator.js.html#l200"><code>src\DragNavigator.js:200</code></a>
         
         </p>
 
@@ -1404,97 +1427,6 @@
 </div>
 
                 
-                    <div id="method__restoreClickHandler" class="method item private">
-    <h3 class="name"><code>_restoreClickHandler</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>element</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_DragNavigator.js.html#l493"><code>src\DragNavigator.js:493</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Restores click handler for given element.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">element</code>
-                        <span class="type">DOMElement</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Element to disable click events on</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
                     <div id="method__setup" class="method item protected">
     <h3 class="name"><code>_setup</code></h3>
 
@@ -1544,6 +1476,97 @@
 
     </div>
 
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method__setupClickHandlers" class="method item private">
+    <h3 class="name"><code>_setupClickHandlers</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>element</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l478"><code>src\DragNavigator.js:478</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Disables normal click handler for given element.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">element</code>
+                        <span class="type">DOMElement</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Element to disable click events on</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     

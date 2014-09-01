@@ -1329,6 +1329,8 @@ define([
 				this._showLimit(itemIndex).done(function() {
 					deferred.resolve();
 				});
+
+				this._activeAnimationDeferred = deferred;
 			} else {
 				deferred.resolve();
 			}
@@ -1399,6 +1401,8 @@ define([
 				this._showLimit(itemIndex).done(function() {
 					deferred.resolve();
 				});
+
+				this._activeAnimationDeferred = deferred;
 			} else {
 				deferred.resolve();
 			}

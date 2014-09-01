@@ -4,7 +4,8 @@ define([
 	'KeyboardNavigator',
 	'DragNavigator',
 	'SlideshowNavigator',
-], function($, Deferred, KeyboardNavigator, DragNavigator, SlideshowNavigator) {
+	'InterfaceNavigator',
+], function($, Deferred, KeyboardNavigator, DragNavigator, SlideshowNavigator, InterfaceNavigator) {
 	'use strict';
 
 	/**
@@ -217,6 +218,13 @@ define([
 				instantRollover: true,
 				createInstance: function(carousel) {
 					return new SlideshowNavigator(carousel.getConfig().navigators.slideshow);
+				}
+			},
+			interface: {
+				enabled: false,
+				mode: 'navigate-page',
+				createInstance: function(carousel) {
+					return new InterfaceNavigator(carousel.getConfig().navigators.slideshow);
 				}
 			}
 		};

@@ -26,7 +26,7 @@ define([
 			mouseleave: this._onRawMouseLeave.bind(this)
 		};
 
-		this.setMode(config.mode || SlideshowNavigator.Mode.NAVIGATE_ITEM);
+		this.setMode(config.mode || SlideshowNavigator.Mode.NAVIGATE_PAGE);
 	}
 
 	SlideshowNavigator.prototype = Object.create(AbstractNavigator.prototype);
@@ -36,8 +36,8 @@ define([
 	 *
 	 * @property Mode
 	 * @type {object}
-	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
-	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
+	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' Navigate one page at a time
+	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' Navigate one item at a time
 	 */
 	SlideshowNavigator.Mode = {
 		NAVIGATE_PAGE: 'navigate-page',
@@ -47,8 +47,8 @@ define([
 	/**
 	 * Returns current slideshow navigator mode.
 	 *
-	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
+	 * The mode is either {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
 	 * either the page or navigate one item at a time.
 	 *
 	 * @method setMode

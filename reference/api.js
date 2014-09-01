@@ -14,6 +14,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "FlowCarousel",
         "HtmlDataSource",
         "HtmlRenderer",
+        "InterfaceNavigator",
         "KeyboardNavigator",
         "SlideshowNavigator",
         "Util"

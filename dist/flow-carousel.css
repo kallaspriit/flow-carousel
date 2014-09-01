@@ -67,3 +67,25 @@
 .flow-carousel-placeholder > DIV {
     display: none;
 }
+
+.flow-carousel-item-choice {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-align: center;
+}
+.flow-carousel-item-choice > LI {
+	display: inline-block;
+	margin: 0 5px;
+	width: 10px;
+	height: 10px;
+	overflow: hidden;
+	text-indent: 10px;
+	border-radius: 5px;
+	background-color: #333;
+	cursor: pointer;
+}
+.flow-carousel-item-choice > LI:hover,
+.flow-carousel-item-choice > LI.flow-carousel-active-item-choice {
+	background-color: #111;
+}

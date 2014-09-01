@@ -67,6 +67,8 @@
             
                 <li><a href="../classes/HtmlRenderer.html">HtmlRenderer</a></li>
             
+                <li><a href="../classes/InterfaceNavigator.html">InterfaceNavigator</a></li>
+            
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
             
                 <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
@@ -122,7 +124,8 @@ define([
 	&#x27;KeyboardNavigator&#x27;,
 	&#x27;DragNavigator&#x27;,
 	&#x27;SlideshowNavigator&#x27;,
-], function($, Deferred, KeyboardNavigator, DragNavigator, SlideshowNavigator) {
+	&#x27;InterfaceNavigator&#x27;,
+], function($, Deferred, KeyboardNavigator, DragNavigator, SlideshowNavigator, InterfaceNavigator) {
 	&#x27;use strict&#x27;;
 
 	/**
@@ -335,6 +338,13 @@ define([
 				instantRollover: true,
 				createInstance: function(carousel) {
 					return new SlideshowNavigator(carousel.getConfig().navigators.slideshow);
+				}
+			},
+			interface: {
+				enabled: false,
+				mode: &#x27;navigate-page&#x27;,
+				createInstance: function(carousel) {
+					return new InterfaceNavigator(carousel.getConfig().navigators.slideshow);
 				}
 			}
 		};

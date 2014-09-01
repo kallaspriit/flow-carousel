@@ -130,6 +130,15 @@
             "fors": {},
             "namespaces": {}
         },
+        "src\\InterfaceNavigator.js": {
+            "name": "src\\InterfaceNavigator.js",
+            "modules": {},
+            "classes": {
+                "InterfaceNavigator": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\KeyboardNavigator.js": {
             "name": "src\\KeyboardNavigator.js",
             "modules": {},
@@ -249,7 +258,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\Config.js",
-            "line": 10,
+            "line": 11,
             "description": "Provides configuration.",
             "is_constructor": 1
         },
@@ -363,6 +372,27 @@
             "line": 7,
             "description": "The default renderer for already existing HTML elements.",
             "extends": "AbstractRenderer",
+            "is_constructor": 1
+        },
+        "InterfaceNavigator": {
+            "name": "InterfaceNavigator",
+            "shortname": "InterfaceNavigator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\InterfaceNavigator.js",
+            "line": 7,
+            "description": "Build a user interface for navigating the carousel.",
+            "extends": "AbstractNavigator",
+            "params": [
+                {
+                    "name": "config",
+                    "description": "Navigator configuration",
+                    "type": "Object"
+                }
+            ],
             "is_constructor": 1
         },
         "KeyboardNavigator": {
@@ -755,7 +785,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 18,
+            "line": 19,
             "description": "Carousel orientation to use.\n\nOne of {{#crossLink \"Config/Orientation:property\"}}{{/crossLink}}.\n\nDefaults to horizontal.",
             "itemtype": "property",
             "name": "orientation",
@@ -765,7 +795,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 31,
+            "line": 32,
             "description": "The size mode to use, defaults to matching item sizes to wrap size.",
             "itemtype": "property",
             "name": "sizeMode",
@@ -775,7 +805,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 40,
+            "line": 41,
             "description": "Item margin to use.",
             "itemtype": "property",
             "name": "margin",
@@ -785,7 +815,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 49,
+            "line": 50,
             "description": "Should placeholders be generated while loading actual items.",
             "itemtype": "property",
             "name": "usePlaceholders",
@@ -795,7 +825,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 58,
+            "line": 59,
             "description": "Should responsive layout be used by default.",
             "itemtype": "property",
             "name": "useResponsiveLayout",
@@ -805,7 +835,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 67,
+            "line": 68,
             "description": "Number of items to render side-by-side when not using responsive layout.\n\nThis parameter is ignored when using responsive layout strategy.",
             "itemtype": "property",
             "name": "itemsPerPage",
@@ -815,7 +845,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 78,
+            "line": 79,
             "description": "The index of the element to scroll to at startup.\n\nSet to a number value of valid range to enable.\n\nDefaults to showing the first element.\n\nSet either this or the {{#crossLink \"Config/startPageIndex:property\"}}{{/crossLink}} property, setting both\nthrows error.",
             "itemtype": "property",
             "name": "startItemIndex",
@@ -825,7 +855,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 94,
+            "line": 95,
             "description": "The index of the page to scroll to at startup.\n\nSet to a number value of valid range to enable.\n\nDefaults to showing the first element.\n\nSet either this or the {{#crossLink \"Config/startItemIndex:property\"}}{{/crossLink}} property, setting both\nthrows error.",
             "itemtype": "property",
             "name": "startPageIndex",
@@ -835,7 +865,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 110,
+            "line": 111,
             "description": "If item or page start index is set then should it animate to it or should the position be set immediately.\n\nApplies to both {{#crossLink \"Config/startIndex:property\"}}{{/crossLink}} and\n{{#crossLink \"Config/startPageIndex:property\"}}{{/crossLink}}.\n\nBy default the position is set without animation.",
             "itemtype": "property",
             "name": "animateToStartIndex",
@@ -845,7 +875,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 124,
+            "line": 125,
             "description": "When using the {{#crossLink \"Config/startItemIndex:property\"}}{{/crossLink}} property, should the carousel\ntry to center on this item index rather than making it the first one.",
             "itemtype": "property",
             "name": "centerStartItemIndex",
@@ -855,7 +885,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 134,
+            "line": 135,
             "description": "List of default responsive layout breakpoint.\n\nThe list should be ordered from the smallest size to the largest.",
             "itemtype": "property",
             "name": "responsiveBreakpoints",
@@ -865,7 +895,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 161,
+            "line": 162,
             "description": "The interval at which to check for carousel wrap size changes so responsive layout could be applied.\n\nValue is in milliseconds.",
             "itemtype": "property",
             "name": "responsiveLayoutListenerInterval",
@@ -875,7 +905,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 172,
+            "line": 173,
             "description": "How long to wait for the wrap size to stay the same before starting the responsive layout routine.\n\nThis is useful so when the user is resizing the browser window then the carousel won't try to re-layout\nitself on every frame but rather waits for the size to normalize.\n\nValue is in milliseconds.",
             "itemtype": "property",
             "name": "responsiveLayoutDelay",
@@ -885,7 +915,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 186,
+            "line": 187,
             "description": "List of navigators to use with their configuration and factories.\n\nThe \"createInstance(carousel)\" factory method gets the carousel instance as its only parameter and should\neither return a navigator instance directly or a deferred promise that will be resolved with a navigator\ninstance.",
             "itemtype": "property",
             "name": "navigators",
@@ -894,7 +924,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 224,
+            "line": 232,
             "description": "The css classes prefix to use.\n\nThe same prefix is also used when assigning custom carousel-specific data to the element.",
             "itemtype": "property",
             "name": "cssPrefix",
@@ -904,7 +934,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 235,
+            "line": 243,
             "description": "CSS class names to use.\n\nThe class name is combined with the {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}} property\nso if the prefix is \"flow-carousel-\" and the wrap class is \"wrap\" then the main wrap will get the\n\"flow-carousel-wrap\" class.",
             "itemtype": "property",
             "name": "cssClasses",
@@ -985,7 +1015,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 278,
+            "line": 286,
             "description": "The carousel instance is registered as the main wrap data with the dataTarget name.",
             "itemtype": "property",
             "name": "dataTarget",
@@ -995,7 +1025,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 287,
+            "line": 295,
             "description": "Optional custom data source to use.\n\nAs a special case, a simple array can be provided as data source which is converted to use\n{{#crossLink \"ArrayDataSource\"}}{{/crossLink}} implementation.\n\nIf none is provided then the {{#crossLink \"HtmlDataSource\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
@@ -1005,7 +1035,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 301,
+            "line": 309,
             "description": "Optional custom renderer to use.\n\nIf none is provided then the {{#crossLink \"HtmlRenderer\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
@@ -1015,7 +1045,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 312,
+            "line": 320,
             "description": "Optional custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is provided then the {{#crossLink \"DefaultAnimator\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "animator",
@@ -1025,7 +1055,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 325,
+            "line": 333,
             "description": "Returns the range of items that should be rendered given current item index and items per page.\n\nBy default returns one page before the current page and one after but one may choose to override it.",
             "itemtype": "method",
             "name": "getRenderRange",
@@ -1056,7 +1086,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 345,
+            "line": 353,
             "description": "Enumeration of possible carousel orientations.",
             "itemtype": "property",
             "name": "Orientation",
@@ -1078,7 +1108,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 359,
+            "line": 367,
             "description": "There are two different strategies for setting the size of the wrap and the items:\n> MATCH_WRAP - the size of the items is set to match the wrap size\n> MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item",
             "itemtype": "property",
             "name": "SizeMode",
@@ -1100,7 +1130,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 375,
+            "line": 383,
             "description": "Extends the base default configuration properties with user-defined values.\n\nPerforms a deep-extend.",
             "itemtype": "method",
             "name": "extend",
@@ -1115,7 +1145,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 387,
+            "line": 395,
             "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
             "name": "getItemsPerPage",
@@ -1130,7 +1160,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 414,
+            "line": 422,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -2856,7 +2886,26 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1005,
+            "line": 1003,
+            "description": "Returns given item index page index.\n\nAlways returns an integer flooring to the closest round page number.\n\nThe page number starts at zero for first page.",
+            "itemtype": "method",
+            "name": "getItemPageIndex",
+            "params": [
+                {
+                    "name": "itemIndex",
+                    "description": "Item index to calculate for",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "FlowCarousel"
+        },
+        {
+            "file": "src\\FlowCarousel.js",
+            "line": 1020,
             "description": "Returns current item absolute position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -2868,7 +2917,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1015,
+            "line": 1030,
             "description": "Returns item position at given index.",
             "itemtype": "method",
             "name": "getItemPositionByIndex",
@@ -2887,7 +2936,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1031,
+            "line": 1046,
             "description": "Returns the closest full item index at given position taking into account the direction of movement.",
             "itemtype": "method",
             "name": "getClosestItemIndexAtPosition",
@@ -2913,7 +2962,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1060,
+            "line": 1075,
             "description": "Returns the closest full page index at given position taking into account the direction of movement.",
             "itemtype": "method",
             "name": "getClosestPageIndexAtPosition",
@@ -2939,7 +2988,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1087,
+            "line": 1102,
             "description": "Returns the range of items that should be rendered for current item index and config.",
             "itemtype": "method",
             "name": "getRenderRange",
@@ -2962,7 +3011,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1104,
+            "line": 1119,
             "description": "Returns the range of items that have already been rendered for current item index and config.",
             "itemtype": "method",
             "name": "getRenderedRange",
@@ -2976,7 +3025,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1140,
+            "line": 1155,
             "description": "Returns the current item position index.\n\nThis can be different from the return value of getTargetItemIndex() if the carousel is animating.",
             "itemtype": "method",
             "name": "isAnimating",
@@ -2988,7 +3037,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1152,
+            "line": 1167,
             "description": "Sets the data source to use.\n\nExpects either an instance of AbstractDataSource (you can roll your own) or a simple array that will be\nconverted to an ArrayDataSource.\n\nThis can optionally be set in the init method as second argument.\n\nThis method supports call chaining by returning itself.",
             "itemtype": "method",
             "name": "setDataSource",
@@ -3008,7 +3057,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1182,
+            "line": 1197,
             "description": "Sets the renderer to use.\n\nExpects an instance of AbstractRenderer.\n\nThis method supports call chaining by returning itself.",
             "itemtype": "method",
             "name": "setRenderer",
@@ -3028,7 +3077,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1204,
+            "line": 1219,
             "description": "Adds a new navigator to use.",
             "itemtype": "method",
             "name": "addNavigator",
@@ -3048,7 +3097,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1226,
+            "line": 1241,
             "description": "Returns navigator instance by type.",
             "itemtype": "method",
             "name": "getNavigatorByType",
@@ -3067,7 +3116,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1241,
+            "line": 1256,
             "description": "Returns the data used for rendering the component.\n\nReturns null if the component has not yet been initialized.",
             "itemtype": "method",
             "name": "getDataSource",
@@ -3079,7 +3128,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1253,
+            "line": 1268,
             "description": "Navigates to a carousel item by index.\n\nThrows error if out of bounds index is requested.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation\n- FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation",
             "itemtype": "method",
             "name": "navigateToItem",
@@ -3112,7 +3161,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1371,
+            "line": 1386,
             "description": "Navigates to given page number.\n\nNotice that page numbers start from zero.\n\nThrows error if out of bounds index is requested.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure\n- FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page",
             "itemtype": "method",
             "name": "navigateToPage",
@@ -3145,7 +3194,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1426,
+            "line": 1441,
             "description": "Navigates to next carousel item.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation\n- FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation",
             "itemtype": "method",
             "name": "navigateToNextItem",
@@ -3166,7 +3215,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1447,
+            "line": 1462,
             "description": "Returns the maximum item index to scroll to so that the last page would be displayed full.",
             "itemtype": "method",
             "name": "getMaximumValidItemIndex",
@@ -3178,7 +3227,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1460,
+            "line": 1475,
             "description": "Navigates to previous carousel item.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_ITEM [itemIndex, instant] before animation\n- FlowCarousel.Event.NAVIGATED_TO_ITEM [itemIndex, instant] after animation",
             "itemtype": "method",
             "name": "navigateToPreviousItem",
@@ -3199,7 +3248,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1480,
+            "line": 1495,
             "description": "Returns whether given (or current if no argument is given) item is the first one.",
             "itemtype": "method",
             "name": "isFirstItem",
@@ -3220,7 +3269,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1493,
+            "line": 1508,
             "description": "Returns whether given (or current if no argument is given) item is the last one.",
             "itemtype": "method",
             "name": "isLastItem",
@@ -3241,7 +3290,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1506,
+            "line": 1521,
             "description": "Returns whether given (or current if no argument is given) page is the first one.",
             "itemtype": "method",
             "name": "isFirstPage",
@@ -3262,7 +3311,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1519,
+            "line": 1534,
             "description": "Returns whether given (or current if no argument is given) page is the last one.",
             "itemtype": "method",
             "name": "isLastPage",
@@ -3283,7 +3332,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1532,
+            "line": 1547,
             "description": "Navigates to next page if available.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure\n- FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page",
             "itemtype": "method",
             "name": "navigateToNextPage",
@@ -3304,7 +3353,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1553,
+            "line": 1568,
             "description": "Navigates to previous page if available.\n\nReturns deferred promise that will be resolved once the animation completes.\n\nEmits:\n- FlowCarousel.Event.NAVIGATING_TO_PAGE at the start of the procedure\n- FlowCarousel.Event.NAVIGATED_TO_PAGE after the animation to requested page",
             "itemtype": "method",
             "name": "navigateToPreviousPage",
@@ -3325,7 +3374,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1573,
+            "line": 1588,
             "description": "Returns the range of currently visible carousel item wrappers.",
             "itemtype": "method",
             "name": "getCurrentPageVisibleRange",
@@ -3337,7 +3386,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1591,
+            "line": 1606,
             "description": "Returns the list of currently visible carousel item wrappers.",
             "itemtype": "method",
             "name": "getCurrentPageVisibleItemElements",
@@ -3349,7 +3398,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1623,
+            "line": 1638,
             "description": "Returns the item dom element by item index.\n\nThrows error if invalid index is requested.",
             "itemtype": "method",
             "name": "getItemElementByIndex",
@@ -3370,7 +3419,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1655,
+            "line": 1670,
             "description": "Validates the dataset and redraws the carousel.\n\nYou can call this when the data has changes in the background and the carousel should redraw itself.\n\nReturns promise that is resolved when the new items has been drawn.",
             "itemtype": "method",
             "name": "redraw",
@@ -3382,7 +3431,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1669,
+            "line": 1684,
             "description": "Calculates the item index to scroll to so that the given index would be centered if possible.",
             "itemtype": "method",
             "name": "calculateCenteredItemStartIndex",
@@ -3404,7 +3453,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1695,
+            "line": 1710,
             "description": "Returns currently centered item index.",
             "itemtype": "method",
             "name": "getCurrentCenterItemIndex",
@@ -3416,7 +3465,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1705,
+            "line": 1720,
             "description": "Initializes the top-level wrap element.\n\nIf the selector matches multiple elements, only the first one is considered.\n\nIf the selector does not match any elements, an error is thrown.",
             "itemtype": "method",
             "name": "_setupElement",
@@ -3433,7 +3482,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1748,
+            "line": 1763,
             "description": "Initializes a single wrap element.",
             "itemtype": "method",
             "name": "_setupCarousel",
@@ -3455,7 +3504,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1837,
+            "line": 1852,
             "description": "Sets up the layout and renders the initial set of items.\n\nEmits:\n- FlowCarousel.Event.LAYOUT_CHANGED when the layout changes",
             "itemtype": "method",
             "name": "_setupLayout",
@@ -3487,7 +3536,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1896,
+            "line": 1911,
             "description": "Sets up the default navigators to use as defined in the {{#crossLink \"Config\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "_setupDefaultNavigators",
@@ -3497,7 +3546,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1930,
+            "line": 1945,
             "description": "Validates whether all the required items have been rendered and initiates rendering them if not.",
             "itemtype": "method",
             "name": "_validateItemsToRender",
@@ -3511,7 +3560,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 1943,
+            "line": 1958,
             "description": "Removes items that have gone out of the render range.",
             "itemtype": "method",
             "name": "_destroyInvalidItems",
@@ -3521,7 +3570,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2010,
+            "line": 2025,
             "description": "Destroys an element and removes it from the index to element mapping.",
             "itemtype": "method",
             "name": "_destroyItem",
@@ -3543,7 +3592,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2024,
+            "line": 2039,
             "description": "Renders the item placeholders for current target index.",
             "itemtype": "method",
             "name": "_renderTargetIndexPlaceholders",
@@ -3553,7 +3602,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2039,
+            "line": 2054,
             "description": "Renders the item placeholders that will later be replaced with the actual items.\n\nGives the user some \"loading\" feedback.",
             "itemtype": "method",
             "name": "_renderItemPlaceholders",
@@ -3575,7 +3624,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2070,
+            "line": 2085,
             "description": "Renders a range of carousel items.\n\nEmits:\n- FlowCarousel.Event.LOADING_ITEMS [startIndex, endIndex] before starting to load a range of items\n- FlowCarousel.Event.ABORTED_ITEMS [startIndex, endIndex] if loading or a range of items was aborted\n- FlowCarousel.Event.LOADED_ITEMS [startIndex, endIndex, items] after loading and rendering a range of items\n- FlowCarousel.Event.STARTUP_ITEMS_RENDERED if the rendered range of items was the first",
             "itemtype": "method",
             "name": "_renderItemRange",
@@ -3601,7 +3650,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2177,
+            "line": 2192,
             "description": "Renders given carousel items.",
             "itemtype": "method",
             "name": "_renderItems",
@@ -3627,7 +3676,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2267,
+            "line": 2282,
             "description": "Inserts rendered dom elements into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElements",
@@ -3656,7 +3705,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2333,
+            "line": 2348,
             "description": "Inserts a rendered dom element into the carousel dom structure.",
             "itemtype": "method",
             "name": "_insertRenderedElement",
@@ -3688,7 +3737,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2414,
+            "line": 2429,
             "description": "Adds a mapping between item index and its wrapper element.",
             "itemtype": "method",
             "name": "_mapItemIndexToElement",
@@ -3710,7 +3759,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2426,
+            "line": 2441,
             "description": "Removes mapping between item index and its wrapper element.",
             "itemtype": "method",
             "name": "_removeItemIndexToElement",
@@ -3727,7 +3776,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2437,
+            "line": 2452,
             "description": "Preprocesses the item wrapper element about to be inserted into the DOM.",
             "itemtype": "method",
             "name": "_preprocessCarouselItemElement",
@@ -3749,7 +3798,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2470,
+            "line": 2485,
             "description": "Makes sure that the scroller size matches the largest currently visible item size.\n\nThis is executed only when using Config.SizeMode.MATCH_LARGEST_ITEM size mode.",
             "itemtype": "method",
             "name": "validateSize",
@@ -3761,7 +3810,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2507,
+            "line": 2522,
             "description": "Re-initializes the layout.\n\nUsed to apply responsive layout when the wrap size changes.\n\nSince fetching and rendering items can be asynchronous, this method returns a promise.",
             "itemtype": "method",
             "name": "_reLayout",
@@ -3775,7 +3824,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2546,
+            "line": 2561,
             "description": "Resets the component state and removes all rendered items.",
             "itemtype": "method",
             "name": "_reset",
@@ -3785,7 +3834,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2572,
+            "line": 2587,
             "description": "Sets up main wrap size change listener to apply responsive layout.",
             "itemtype": "method",
             "name": "_setupWindowResizeListener",
@@ -3795,7 +3844,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2583,
+            "line": 2598,
             "description": "Called on window resize event.",
             "itemtype": "method",
             "name": "_onWindowResize",
@@ -3805,7 +3854,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2597,
+            "line": 2612,
             "description": "Checks whether the carousel wrap size has changed and triggers re-layout if so.",
             "itemtype": "method",
             "name": "_validateResponsiveLayout",
@@ -3826,7 +3875,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2630,
+            "line": 2645,
             "description": "Visually notifies the user that carousel limit has been reached.",
             "itemtype": "method",
             "name": "_showLimit",
@@ -3843,7 +3892,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2672,
+            "line": 2687,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -3865,7 +3914,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2684,
+            "line": 2699,
             "description": "Returns the size of an element.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getElementSize",
@@ -3898,7 +3947,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2714,
+            "line": 2729,
             "description": "Returns biggest element size of given elements given orientation and size mode.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getLargestElementSize",
@@ -3931,7 +3980,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2755,
+            "line": 2770,
             "description": "Returns the main wrap size in the main orientation.\n\nUses cached value if available.",
             "itemtype": "method",
             "name": "_getMainWrapSize",
@@ -3952,7 +4001,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2778,
+            "line": 2793,
             "description": "Returns the main wrap size in the opposite orientation.\n\nUses cached value if available.",
             "itemtype": "method",
             "name": "_getMainWrapOppositeSize",
@@ -3973,7 +4022,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2800,
+            "line": 2815,
             "description": "Returns the opposite orientation name.\n\nFor Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.",
             "itemtype": "method",
             "name": "_getOppositeOrientation",
@@ -3994,7 +4043,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2816,
+            "line": 2831,
             "description": "This is called by drag-based navigators on drag begin event.",
             "itemtype": "method",
             "name": "_onDragBegin",
@@ -4021,7 +4070,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2831,
+            "line": 2846,
             "description": "This is called by drag-based navigators on drag end event.",
             "itemtype": "method",
             "name": "_onDragEnd",
@@ -4068,7 +4117,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2867,
+            "line": 2882,
             "description": "Performs some action delayed by given amount.\n\nIf the method is called several times with the same name, the action is executed only once after the time\nhas passed from the last call.",
             "itemtype": "method",
             "name": "performDelayed",
@@ -4200,6 +4249,178 @@
                 }
             ],
             "class": "HtmlRenderer"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 32,
+            "description": "List of supported navigation modes.",
+            "itemtype": "property",
+            "name": "Mode",
+            "type": "{object}",
+            "class": "InterfaceNavigator",
+            "subprops": [
+                {
+                    "name": "NAVIGATE_PAGE='navigate-page'",
+                    "description": "Navigate one page at a time",
+                    "type": "String"
+                },
+                {
+                    "name": "NAVIGATE_ITEM='navigate-item'",
+                    "description": "Navigate one item at a time",
+                    "type": "String"
+                }
+            ]
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 45,
+            "description": "Returns current interface navigator mode.\n\nThe mode is either {{#crossLink \"InterfaceNavigator/Mode/NAVIGATE_PAGE:property\"}}{{/crossLink}} or\n{{#crossLink \"InterfaceNavigator/Mode/NAVIGATE_ITEM:property\"}}{{/crossLink}} meaning that slideshow changes\neither the page or navigate one item at a time.",
+            "itemtype": "method",
+            "name": "setMode",
+            "params": [
+                {
+                    "name": "mode",
+                    "description": "Mode to use",
+                    "type": "InterfaceNavigator/Mode:property"
+                }
+            ],
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 63,
+            "description": "Returns current interface navigator mode.\n\nThe mode is either {{#crossLink \"InterfaceNavigator/Mode/NAVIGATE_PAGE:property\"}}{{/crossLink}} or\n{{#crossLink \"InterfaceNavigator/Mode/NAVIGATE_ITEM:property\"}}{{/crossLink}} meaning that buttons change\neither the page or navigate one item at a time.",
+            "itemtype": "method",
+            "name": "getMode",
+            "return": {
+                "description": "",
+                "type": "InterfaceNavigator/Mode:property"
+            },
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 77,
+            "description": "Called by the init to set up the navigator.",
+            "itemtype": "method",
+            "name": "_setup",
+            "access": "protected",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 97,
+            "description": "Build the user interface.",
+            "itemtype": "method",
+            "name": "_redraw",
+            "access": "protected",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 143,
+            "description": "Called when any of the item choice elements are clicked.",
+            "itemtype": "method",
+            "name": "_onItemChoiceClick",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "Clicked element",
+                    "type": "DOMElement"
+                },
+                {
+                    "name": "index",
+                    "description": "Item index",
+                    "type": "Number"
+                }
+            ],
+            "access": "protected",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 159,
+            "description": "Called by the carousel on destroy.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 181,
+            "description": "Performs the change event.",
+            "itemtype": "method",
+            "name": "_performChange",
+            "access": "private",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 214,
+            "description": "Called on mouse enter event.",
+            "itemtype": "method",
+            "name": "_onRawMouseEnter",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "Mouse event",
+                    "type": "Event"
+                }
+            ],
+            "access": "private",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 225,
+            "description": "Called on mouse enter event.",
+            "itemtype": "method",
+            "name": "_onRawMouseLeave",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "Mouse event",
+                    "type": "Event"
+                }
+            ],
+            "access": "private",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 236,
+            "description": "Called when user navigated to a new item.",
+            "itemtype": "method",
+            "name": "_onNavigatingToItem",
+            "access": "private",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 246,
+            "description": "Gives the right element the active item class.",
+            "itemtype": "method",
+            "name": "_updateActiveItemChoice",
+            "access": "private",
+            "tagname": "",
+            "class": "InterfaceNavigator"
+        },
+        {
+            "file": "src\\InterfaceNavigator.js",
+            "line": 278,
+            "description": "Called when the carousel layout changes.",
+            "itemtype": "method",
+            "name": "_onLayoutChanged",
+            "access": "private",
+            "tagname": "",
+            "class": "InterfaceNavigator"
         },
         {
             "file": "src\\KeyboardNavigator.js",
@@ -4350,12 +4571,12 @@
             "subprops": [
                 {
                     "name": "NAVIGATE_PAGE='navigate-page'",
-                    "description": "The navigation keys navigate one page at a time",
+                    "description": "Navigate one page at a time",
                     "type": "String"
                 },
                 {
                     "name": "NAVIGATE_ITEM='navigate-item'",
-                    "description": "The navigation keys navigate one item at a time",
+                    "description": "Navigate one item at a time",
                     "type": "String"
                 }
             ]
@@ -4363,7 +4584,7 @@
         {
             "file": "src\\SlideshowNavigator.js",
             "line": 47,
-            "description": "Returns current slideshow navigator mode.\n\nThe mode is either {{#crossLink \"KeyboardNavigator/Mode/NAVIGATE_PAGE:property\"}}{{/crossLink}} or\n{{#crossLink \"KeyboardNavigator/Mode/NAVIGATE_ITEM:property\"}}{{/crossLink}} meaning that slideshow changes\neither the page or navigate one item at a time.",
+            "description": "Returns current slideshow navigator mode.\n\nThe mode is either {{#crossLink \"SlideshowNavigator/Mode/NAVIGATE_PAGE:property\"}}{{/crossLink}} or\n{{#crossLink \"SlideshowNavigator/Mode/NAVIGATE_ITEM:property\"}}{{/crossLink}} meaning that slideshow changes\neither the page or navigate one item at a time.",
             "itemtype": "method",
             "name": "setMode",
             "params": [

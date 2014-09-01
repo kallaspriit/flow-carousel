@@ -997,9 +997,24 @@ define([
 	 * @return {number}
 	 */
 	FlowCarousel.prototype.getCurrentPageIndex = function() {
+		return this.getItemPageIndex(this._currentItemIndex);
+	};
+
+	/**
+	 * Returns given item index page index.
+	 *
+	 * Always returns an integer flooring to the closest round page number.
+	 *
+	 * The page number starts at zero for first page.
+	 *
+	 * @method getItemPageIndex
+	 * @param {number} itemIndex Item index to calculate for
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getItemPageIndex = function(itemIndex) {
 		var itemsPerPage = this.getItemsPerPage();
 
-		return Math.floor(this._currentItemIndex / itemsPerPage);
+		return Math.floor(itemIndex / itemsPerPage);
 	};
 
 	/**

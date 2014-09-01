@@ -31,7 +31,7 @@ define([
 		it('is loaded by default', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.DRAG);
+			var navigator = carousel.getNavigatorByType('drag');
 
 			expect(navigator).toEqual(jasmine.any(DragNavigator));
 		});
@@ -39,7 +39,7 @@ define([
 		it('default mode is navigating pages', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.DRAG);
+			var navigator = carousel.getNavigatorByType('drag');
 
 			expect(navigator.getMode()).toEqual(DragNavigator.Mode.NAVIGATE_PAGE);
 		});
@@ -47,7 +47,7 @@ define([
 		it('mode can be changed', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.DRAG);
+			var navigator = carousel.getNavigatorByType('drag');
 
 			navigator.setMode(DragNavigator.Mode.NAVIGATE_ITEM);
 
@@ -57,7 +57,7 @@ define([
 		it('requesting invalid mode throws error', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.DRAG),
+			var navigator = carousel.getNavigatorByType('drag'),
 				setInvalidMode = function() {
 					navigator.setMode('foobar');
 				};

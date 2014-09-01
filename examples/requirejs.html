@@ -370,11 +370,13 @@
 			//renderer: new CustomRenderer()
 			//startItemIndex: 5,
 			//centerStartItemIndex: true
-			navigators: [
-				FlowCarousel.Config.Navigator.KEYBOARD,
-				FlowCarousel.Config.Navigator.DRAG,
-				FlowCarousel.Config.Navigator.SLIDESHOW
-			]
+
+			//slideshowNavigatorInterval: 5000
+			navigators: {
+				slideshow: {
+					enabled: true
+				}
+			}
 		})
 
 		/*.done(function() {
@@ -409,8 +411,8 @@
 
 		matchLargestElementCarousel.init('#match-largest-element-carousel', {
 			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM,
-			keyboardNavigatorMode: FlowCarousel.KeyboardNavigator.Mode.NAVIGATE_ITEM,
-			dragNavigatorMode: FlowCarousel.DragNavigator.Mode.NAVIGATE_ITEM
+			//keyboardNavigatorMode: FlowCarousel.KeyboardNavigator.Mode.NAVIGATE_ITEM,
+			//dragNavigatorMode: FlowCarousel.DragNavigator.Mode.NAVIGATE_ITEM
 		});
 
 		halfWidthCarousel.init('#half-width-carousel', {

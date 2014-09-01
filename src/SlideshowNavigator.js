@@ -9,12 +9,14 @@ define([
 	 *
 	 * @class SlideshowNavigator
 	 * @extends AbstractNavigator
-	 * @param {SlideshowNavigator/Mode:property} [mode=SlideshowNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
+	 * @param {object} config Navigator configuration
 	 * @constructor
 	 */
-	function SlideshowNavigator(mode) {
+	function SlideshowNavigator(config) {
 		AbstractNavigator.call(this);
 
+		this._config = config;
+		this._mode = null;
 		this._delayTimeout = null;
 		this._playing = false;
 		this._mouseEntered = false;
@@ -24,7 +26,7 @@ define([
 			mouseleave: this._onRawMouseLeave.bind(this)
 		};
 
-		this.setMode(mode || SlideshowNavigator.Mode.NAVIGATE_ITEM);
+		this.setMode(config.mode || SlideshowNavigator.Mode.NAVIGATE_ITEM);
 	}
 
 	SlideshowNavigator.prototype = Object.create(AbstractNavigator.prototype);
@@ -87,6 +89,8 @@ define([
 		$mainWrap
 			.on('mouseenter', this._eventListeners.mouseenter)
 			.on('mouseleave', this._eventListeners.mouseleave);
+
+		this._carousel.on(this._carousel.Event.NAVIGATED_TO_ITEM, this._onNavigatedToItem.bind(this));
 
 		this.start();
 	};
@@ -157,14 +161,16 @@ define([
 			return;
 		}
 
-		var interval = this._carousel.getConfig().slideshowNavigatorInterval;
+		var interval = this._config.interval;
 
+		// clear existing
 		if (this._delayTimeout !== null) {
 			window.clearTimeout(this._delayTimeout);
 
 			this._delayTimeout = null;
 		}
 
+		// perform action after timeout and schedule another one
 		this._delayTimeout = window.setTimeout(function() {
 			if (this._carousel === null || !this._carousel.isInitiated()) {
 				return;
@@ -187,17 +193,23 @@ define([
 			return;
 		}
 
+		var instantRollover = this._config.instantRollover;
+
 		if (this._mode === SlideshowNavigator.Mode.NAVIGATE_PAGE) {
-			if (this._carousel.isLastPage()) {
-				this._carousel.navigateToPage(0, true);
-			} else {
-				this._carousel.navigateToNextPage();
+			if (this._carousel.getPageCount() > 0) {
+				if (this._carousel.isLastPage()) {
+					this._carousel.navigateToPage(0, instantRollover);
+				} else {
+					this._carousel.navigateToNextPage();
+				}
 			}
 		} else if (this._mode === SlideshowNavigator.Mode.NAVIGATE_ITEM) {
-			if (this._carousel.isLastItem()) {
-				this._carousel.navigateToItem(0, true);
-			} else {
-				this._carousel.navigateToNextItem();
+			if (this._carousel.getItemCount() > 0) {
+				if (this._carousel.isLastItem()) {
+					this._carousel.navigateToItem(0, instantRollover);
+				} else {
+					this._carousel.navigateToNextItem();
+				}
 			}
 		}
 	};
@@ -223,7 +235,18 @@ define([
 	SlideshowNavigator.prototype._onRawMouseLeave = function(/*e*/) {
 		this._mouseEntered = false;
 
-		// re-schedule the change event for consisten timing
+		// re-schedule the change event for consistent timing
+		this._scheduleNextChange();
+	};
+
+	/**
+	 * Called when user navigated to a new item.
+	 *
+	 * @method _onNavigatedToItem
+	 * @private
+	 */
+	SlideshowNavigator.prototype._onNavigatedToItem = function() {
+		// re-schedule the change event for consistent timing
 		this._scheduleNextChange();
 	};
 

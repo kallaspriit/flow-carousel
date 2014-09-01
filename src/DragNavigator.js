@@ -1,8 +1,7 @@
 define([
 	'AbstractNavigator',
-	'Config',
 	'Util'
-], function(AbstractNavigator, Config, Util) {
+], function(AbstractNavigator, Util) {
 	'use strict';
 
 	/**
@@ -10,12 +9,14 @@ define([
 	 *
 	 * @class DragNavigator
 	 * @extends AbstractNavigator
-	 * @param {DragNavigator/Mode:property} [mode=DragNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
+	 * @param {object} config Navigator configuration
 	 * @constructor
 	 */
-	function DragNavigator(mode) {
+	function DragNavigator(config) {
 		AbstractNavigator.call(this);
 
+		this._config = config;
+		this._mode = null;
 		this._active = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
@@ -38,7 +39,7 @@ define([
 		this._noActionThreshold = 15;
 		this._firstMoveEvent = true;
 
-		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
+		this.setMode(config.mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
 
 	DragNavigator.prototype = Object.create(AbstractNavigator.prototype);
@@ -139,7 +140,7 @@ define([
 		}
 
 		var orientation = this._carousel.getOrientation(),
-			horizontal = orientation === Config.Orientation.HORIZONTAL,
+			horizontal = orientation === this._carousel.Config.Orientation.HORIZONTAL,
 			isTouchEvent = e.type === 'touchstart',
 			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
 			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
@@ -167,7 +168,7 @@ define([
 	 */
 	DragNavigator.prototype._onRawMove = function(e) {
 		var orientation = this._carousel.getOrientation(),
-			horizontal = orientation === Config.Orientation.HORIZONTAL,
+			horizontal = orientation === this._carousel.Config.Orientation.HORIZONTAL,
 			isTouchEvent = e.type === 'touchmove',
 			result,
 			x,
@@ -361,7 +362,7 @@ define([
 			itemSize = this._carousel.getItemSize(),
 			totalSize = this._carousel.getTotalSize(),
 			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
-			edgeMultiplier = this._carousel.getConfig().dragNavigatorOverEdgeDragPositionMultiplier,
+			edgeMultiplier = this._config.overEdgeDragPositionMultiplier,
 			minLimit = 0,
 			maxLimit = -totalSize + itemCountOnLastPage * itemSize;
 
@@ -398,7 +399,7 @@ define([
 			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
 			direction = deltaDragPosition < 0 ? -1 : 1,
 			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
-			ignoreClickThreshold = this._carousel.getConfig().dragNavigatorIgnoreClickThreshold,
+			ignoreClickThreshold = this._config.ignoreClickThreshold,
 			performNavigation = Math.abs(deltaDragPosition) > 0,
 			propagate = false,
 			performClick,

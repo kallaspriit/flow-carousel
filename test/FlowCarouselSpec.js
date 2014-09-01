@@ -1138,7 +1138,7 @@ define([
 		it('method "getNavigatorByType" returns navigator instance for valid type', function() {
 			carousel.init('.carousel');
 
-			var validNavigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD);
+			var validNavigator = carousel.getNavigatorByType('keyboard');
 
 			expect(validNavigator).toEqual(jasmine.any(AbstractNavigator));
 			expect(validNavigator).toEqual(jasmine.any(KeyboardNavigator));

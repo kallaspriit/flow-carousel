@@ -1,5 +1,10 @@
 define([
-], function() {
+	'jquery',
+	'Deferred',
+	'KeyboardNavigator',
+	'DragNavigator',
+	'SlideshowNavigator',
+], function($, Deferred, KeyboardNavigator, DragNavigator, SlideshowNavigator) {
 	'use strict';
 
 	/**
@@ -179,72 +184,42 @@ define([
 		this.responsiveLayoutDelay = 500;
 
 		/**
-		 * Default built-in navigators to use.
+		 * List of navigators to use with their configuration and factories.
+		 *
+		 * The "createInstance(carousel)" factory method gets the carousel instance as its only parameter and should
+		 * either return a navigator instance directly or a deferred promise that will be resolved with a navigator
+		 * instance.
 		 *
 		 * @property navigators
-		 * @type {Config/Navigator:property[]}
+		 * @type {object}
 		 */
-		this.navigators = [
-			Config.Navigator.KEYBOARD,
-			Config.Navigator.DRAG
-		];
-
-		/**
-		 * Keyboard navigator mode to use.
-		 *
-		 * @property keyboardNavigatorMode
-		 * @type {KeyboardNavigator/Mode:property}
-		 * @default KeyboardNavigator.Mode.NAVIGATE_PAGE
-		 */
-		this.keyboardNavigatorMode = 'navigate-page';
-
-		/**
-		 * Drag navigator mode to use.
-		 *
-		 * @property dragNavigatorMode
-		 * @type {DragNavigator/Mode:property}
-		 * @default DragNavigator.Mode.NAVIGATE_PAGE
-		 */
-		this.dragNavigatorMode = 'navigate-page';
-
-		/**
-		 * Slideshow navigator mode to use.
-		 *
-		 * @property slideshowNavigatorMode
-		 * @type {SlideshowNavigator/Mode:property}
-		 * @default SlideshowNavigator.Mode.NAVIGATE_PAGE
-		 */
-		this.slideshowNavigatorMode = 'navigate-page';
-
-		/**
-		 * The interval in milliseconds at which to automatically change item/page.
-		 *
-		 * @property slideshowNavigatorInterval
-		 * @type {number}
-		 * @default 3000
-		 */
-		this.slideshowNavigatorInterval = 3000;
-
-		/**
-		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
-		 * effect of only applying the change partially. Set to zero to disable this feature.
-		 *
-		 *
-		 * @property dragNavigatorOverEdgeDragPositionMultiplier
-		 * @type {number}
-		 * @default 0.2
-		 */
-		this.dragNavigatorOverEdgeDragPositionMultiplier = 0.2;
-
-		/**
-		 * If the number of pixels the user dragged an element exceeds this threshold then the click event and link
-		 * element navigation are ignored.
-		 *
-		 * @property dragNavigatorIgnoreClickThreshold
-		 * @type {number}
-		 * @default 10
-		 */
-		this.dragNavigatorIgnoreClickThreshold = 10;
+		this.navigators = {
+			keyboard: {
+				enabled: true,
+				mode: 'navigate-page',
+				createInstance: function(carousel) {
+					return new KeyboardNavigator(carousel.getConfig().navigators.keyboard);
+				}
+			},
+			drag: {
+				enabled: true,
+				mode: 'navigate-page',
+				overEdgeDragPositionMultiplier: 0.2,
+				ignoreClickThreshold: 10,
+				createInstance: function(carousel) {
+					return new DragNavigator(carousel.getConfig().navigators.drag);
+				}
+			},
+			slideshow: {
+				enabled: false,
+				mode: 'navigate-page',
+				interval: 3000,
+				instantRollover: true,
+				createInstance: function(carousel) {
+					return new SlideshowNavigator(carousel.getConfig().navigators.slideshow);
+				}
+			}
+		};
 
 		/**
 		 * The css classes prefix to use.
@@ -398,42 +373,15 @@ define([
 	};
 
 	/**
-	 * List of built-in navigators that the carousel can use.
-	 *
-	 * Set using {{#crossLink "Config/navigators:property"}}{{/crossLink}} option.
-	 *
-	 * @property Navigator
-	 * @type {object}
-	 * @param {string} Navigator.KEYBOARD='keyboard' Keyboard navigator
-	 * @param {string} Navigator.DRAG='drag' Dragging mouse/touch navigator
-	 * @param {string} Navigator.SLIDESHOW='slideshow' Automatic slideshow navigator
-	 * @static
-	 */
-	Config.Navigator = {
-		KEYBOARD: 'keyboard',
-		DRAG: 'drag',
-		SLIDESHOW: 'slideshow'
-	};
-
-	/**
 	 * Extends the base default configuration properties with user-defined values.
+	 *
+	 * Performs a deep-extend.
 	 *
 	 * @method extend
 	 * @param {object} userConfig
 	 */
 	Config.prototype.extend = function(userConfig) {
-		var key,
-			value;
-
-		for (key in userConfig) {
-			value = userConfig[key];
-
-			if (typeof this[key] === 'undefined') {
-				throw new Error('user configuration contains unknown "' + key + '" property');
-			}
-
-			this[key] = value;
-		}
+		$.extend(true, this, userConfig);
 	};
 
 	/**

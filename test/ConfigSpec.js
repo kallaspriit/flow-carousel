@@ -46,16 +46,6 @@ define([
 			expect(config.useResponsiveLayout).toEqual(true);
 		});
 
-		it('throws error when user property does not exist', function () {
-			var setInvalidProperty = function() {
-				config.extend({
-					foobar: 5
-				});
-			};
-
-			expect(setInvalidProperty).toThrow();
-		});
-
 		it('calculates default responsive breakpoints', function () {
 			expect(config.getItemsPerPage(2000)).toEqual(5);
 			expect(config.getItemsPerPage(1800)).toEqual(4);

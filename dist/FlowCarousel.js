@@ -446,8 +446,1269 @@ define('jquery',[
 	 */
 	return window.jQuery;
 });
-define('Config',[
+define('Deferred',[
+	'jquery'
+], function($) {
+	
+
+	/**
+	 * Provides utility functionality.
+	 *
+	 * Uses the jQuery deferred implementation.
+	 *
+	 * @class Deferred
+	 * @constructor
+	 */
+	var Deferred = $.Deferred;
+
+	// proxy to jQuery when()
+	Deferred.when = $.when;
+
+	return Deferred;
+});
+define('AbstractNavigator',[
 ], function() {
+	
+
+	/**
+	 * Abstract navigator base class.
+	 *
+	 * Use navigators to navigate the carousel using mouse, touch, keyboard, ui, urls etc.
+	 *
+	 * @class AbstractNavigator
+	 * @constructor
+	 */
+	function AbstractNavigator() {
+		this._carousel = null;
+	}
+
+	/**
+	 * Initiated the navigator.
+	 *
+	 * This is called automatically by the carousel and calls _setup() in turn that the subclasses should implement.
+	 *
+	 * @method init
+	 * @param {FlowCarousel} carousel The carousel component
+	 */
+	AbstractNavigator.prototype.init = function(carousel) {
+		this._carousel = carousel;
+
+		this._setup();
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	AbstractNavigator.prototype.destroy = function() {
+		// do nothing by default
+	};
+
+	/**
+	 * Called by the init to set up the navigator.
+	 *
+	 * @method _setup
+	 * @protected
+	 */
+	AbstractNavigator.prototype._setup = function() {
+		throw new Error('Not implemented');
+	};
+
+	return AbstractNavigator;
+});
+define('Util',[
+], function() {
+	
+
+	/**
+	 * Provides utility functionality.
+	 *
+	 * @class Util
+	 * @constructor
+	 */
+	return {
+
+		/**
+		 * Returns whether given arguments is an object (and not an array nor null).
+		 *
+		 * @method isObject
+		 * @param {*} arg Arguments to check
+		 * @return {boolean}
+		 * @static
+		 */
+		isObject: function(arg) {
+			return typeof arg === 'object' && arg !== null;
+		},
+
+		/**
+		 * Returns whether given arguments is an array (and not a object nor null).
+		 *
+		 * @method isArray
+		 * @param {*} arg Arguments to check
+		 * @return {boolean}
+		 * @static
+		 */
+		isArray: function(arg) {
+			return Object.prototype.toString.call(arg) === '[object Array]';
+		},
+
+		/**
+		 * Returns whether given object contains given value.
+		 *
+		 * @method objectHasValue
+		 * @param {object} obj Object to check
+		 * @param {*} value Value to search for
+		 * @return {boolean}
+		 */
+		objectHasValue: function(obj, value) {
+			var prop;
+
+			for (prop in obj) {
+				if(obj.hasOwnProperty(prop) && obj[prop] === value) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+
+		/**
+		 * Parses a css transform matrix.
+		 *
+		 * Input is something along the way of "matrix(1, 0, 0, 1, -1877, 0)" or a 3D matrix like
+		 * "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -100, 0, 0, 1)"
+		 *
+		 * Returns objects with keys x, y.
+		 *
+		 * @method parseTransformMatrix
+		 * @param {string} matrix Matrix to parse
+		 * @return {object}
+		 */
+		parseTransformMatrix: function(matrix) {
+			var offset,
+				itemIndexes,
+				trimmed,
+				noWhitespace,
+				items,
+				result;
+
+			/* istanbul ignore next */
+			/*if (matrix === 'none') {
+				return {
+					x: 0,
+					y: 0
+				};
+			}*/
+
+			// TODO remove the istanbul ignore once karma coverage fixes not counting these lines
+			/* istanbul ignore next */
+			if (matrix.substring(0, 8) === 'matrix3d') { // IE uses matrix3d
+				offset = 9;
+				itemIndexes = [12, 13];
+			} else if (matrix.substring(0, 6) === 'matrix') { // webkit, safari, opera
+				offset = 7;
+				itemIndexes = [4, 5];
+			} else if (matrix.substring(0, 11) === 'translate3d') { // Safari uses translate3d sometimes
+				offset = 12;
+				itemIndexes = [0, 1];
+			} else {
+				throw new Error('Unsupported matrix format "' + matrix + '"');
+			}
+
+			trimmed = matrix.substr(offset).substr(0, matrix.length - offset - 1);
+			noWhitespace = trimmed.replace(/ +/g, '');
+			items = noWhitespace.split(/,/);
+
+			result = {
+				x: parseInt(items[itemIndexes[0]], 10),
+				y: parseInt(items[itemIndexes[1]], 10)
+			};
+
+			return result;
+		},
+
+		/**
+		 * Removes CSS classes from current element that have the given prefix.
+		 *
+		 * @method removeElementClassesPrefixedWith
+		 * @param {DOMElement} element Element to modify
+		 * @param {string} cssPrefix The CSS prefix
+		 */
+		removeElementClassesPrefixedWith: function(element, cssPrefix) {
+			var wrapClasses = $(element).prop('class').split(' '),
+				filteredClasses = [],
+				i;
+
+			for (i = 0; i < wrapClasses.length; i++) {
+				if (wrapClasses[i].substr(0, cssPrefix.length) !== cssPrefix) {
+					filteredClasses.push(wrapClasses[i]);
+				}
+			}
+
+			$(element).prop('class', filteredClasses.join(' '));
+		},
+
+		/**
+		 * Returns a clone of given object.
+		 *
+		 * @param {object} obj Object to clone
+		 * @return {object}
+		 */
+		cloneObj: function(obj) {
+			return JSON.parse(JSON.stringify(obj));
+		}
+	};
+});
+define('KeyboardNavigator',[
+	'AbstractNavigator',
+	'Util'
+], function(AbstractNavigator, Util) {
+	
+
+	/**
+	 * Keyboard navigator.
+	 *
+	 * @class KeyboardNavigator
+	 * @extends AbstractNavigator
+	 * @param {object} config Navigator configuration
+	 * @constructor
+	 */
+	function KeyboardNavigator(config) {
+		AbstractNavigator.call(this);
+
+		this._config = config;
+		this._mode = null;
+		this._mouseEntered = false;
+
+		this._eventListeners = {
+			mouseenter: this._onRawMouseEnter.bind(this),
+			mouseleave: this._onRawMouseLeave.bind(this),
+			keydown: this._onRawKeyDown.bind(this),
+		};
+
+		this.setMode(config.mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
+	}
+
+	KeyboardNavigator.prototype = Object.create(AbstractNavigator.prototype);
+
+	/**
+	 * List of supported navigation modes.
+	 *
+	 * @property Mode
+	 * @type {object}
+	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
+	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
+	 */
+	KeyboardNavigator.Mode = {
+		NAVIGATE_PAGE: 'navigate-page',
+		NAVIGATE_ITEM: 'navigate-item'
+	};
+
+	/**
+	 * Returns current keyboard navigator mode.
+	 *
+	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method setMode
+	 * @param {KeyboardNavigator/Mode:property} mode Mode to use
+	 */
+	KeyboardNavigator.prototype.setMode = function(mode) {
+		if (!Util.objectHasValue(KeyboardNavigator.Mode, mode)) {
+			throw new Error('Invalid mode "' + mode + '" provided');
+		}
+
+		this._mode = mode;
+	};
+
+	/**
+	 * Returns current keyboard navigator mode.
+	 *
+	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method getMode
+	 * @return {KeyboardNavigator/Mode:property}
+	 */
+	KeyboardNavigator.prototype.getMode = function() {
+		return this._mode;
+	};
+
+	/**
+	 * Called by the init to set up the navigator.
+	 *
+	 * @method _setup
+	 * @protected
+	 */
+	KeyboardNavigator.prototype._setup = function() {
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$window = $(window);
+
+		// make sure that the mouse if over the main wrap element
+		$mainWrap
+			.on('mouseenter', this._eventListeners.mouseenter)
+			.on('mouseleave', this._eventListeners.mouseleave);
+
+		// listen for key down events
+		$window.on('keydown', this._eventListeners.keydown);
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	KeyboardNavigator.prototype.destroy = function() {
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$window = $(window);
+
+		// remove the event listeners
+		$mainWrap
+			.off('mouseenter', this._eventListeners.mouseenter)
+			.off('mouseleave', this._eventListeners.mouseleave);
+
+		$window.off('keydown', this._eventListeners.keydown);
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseEnter
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawMouseEnter = function(/*e*/) {
+		this._mouseEntered = true;
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseLeave
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawMouseLeave = function(/*e*/) {
+		this._mouseEntered = false;
+	};
+
+	/**
+	 * Called on key down event.
+	 *
+	 * @method _onRawKeyDown
+	 * @param {Event} e Key event
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onRawKeyDown = function(e) {
+		var result = this._onKeyDown(e.keyCode);
+
+		if (result === false) {
+			e.preventDefault();
+		}
+
+		return result;
+	};
+
+	/**
+	 * Called on key down even for anywhere in the document.
+	 *
+	 * @method _onKeyDown
+	 * @param {number} keyCode Key press key-code.
+	 * @return {boolean} Should the key event be propagated further
+	 * @private
+	 */
+	KeyboardNavigator.prototype._onKeyDown = function(keyCode) {
+		var keyCodes;
+
+		// don't do anything if the mouse is not over given component
+		if (!this._mouseEntered) {
+			return;
+		}
+
+		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
+		switch (this._carousel.getOrientation()) {
+			case this._carousel.Config.Orientation.HORIZONTAL:
+				keyCodes = {
+					previous: 37, // arrow left
+					next: 39 // arrow right
+				};
+			break;
+
+			case this._carousel.Config.Orientation.VERTICAL:
+				keyCodes = {
+					previous: 38, // arrow up
+					next: 40 // arrow down
+				};
+			break;
+		}
+
+		// navigate using the key-codes defined above
+		switch (keyCode) {
+			case keyCodes.next:
+				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
+					this._carousel.navigateToNextPage();
+				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
+					this._carousel.navigateToNextItem();
+				}
+
+				return false;
+
+			case keyCodes.previous:
+				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
+					this._carousel.navigateToPreviousPage();
+				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
+					this._carousel.navigateToPreviousItem();
+				}
+
+				return false;
+		}
+
+		return true;
+	};
+
+	return KeyboardNavigator;
+});
+define('DragNavigator',[
+	'AbstractNavigator',
+	'Util'
+], function(AbstractNavigator, Util) {
+	
+
+	/**
+	 * Drag navigator.
+	 *
+	 * @class DragNavigator
+	 * @extends AbstractNavigator
+	 * @param {object} config Navigator configuration
+	 * @constructor
+	 */
+	function DragNavigator(config) {
+		AbstractNavigator.call(this);
+
+		this._config = config;
+		this._mode = null;
+		this._active = false;
+		this._startPosition = null;
+		this._startOppositePosition = null;
+		this._startCarouselPosition = null;
+		this._startHoverItemIndex = null;
+		this._startTargetElement = null;
+		this._startWindowScrollTop = null;
+		this._lastPosition = null;
+		this._lastOppositePosition = null;
+		this._accumulatedMagnitude = {
+			main: 0,
+			opposite: 0
+		};
+		this._eventListeners = {
+			start: this._onRawStart.bind(this),
+			move: this._onRawMove.bind(this),
+			end: this._onRawEnd.bind(this),
+			dragStart: this._onRawDragStart.bind(this)
+		};
+		this._noActionThreshold = 15;
+		this._firstMoveEvent = true;
+
+		this.setMode(config.mode || DragNavigator.Mode.NAVIGATE_PAGE);
+	}
+
+	DragNavigator.prototype = Object.create(AbstractNavigator.prototype);
+
+	/**
+	 * List of supported navigation modes.
+	 *
+	 * @property Mode
+	 * @type {object}
+	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
+	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
+	 */
+	DragNavigator.Mode = {
+		NAVIGATE_PAGE: 'navigate-page',
+		NAVIGATE_ITEM: 'navigate-item'
+	};
+
+	/**
+	 * Returns current drag navigator mode.
+	 *
+	 * The mode is either {{#crossLink "DragNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "DragNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method setMode
+	 * @param {DragNavigator/Mode:property} mode Mode to use
+	 */
+	DragNavigator.prototype.setMode = function(mode) {
+		if (!Util.objectHasValue(DragNavigator.Mode, mode)) {
+			throw new Error('Invalid mode "' + mode + '" provided');
+		}
+
+		this._mode = mode;
+	};
+
+	/**
+	 * Returns current drag navigator mode.
+	 *
+	 * The mode is either {{#crossLink "DragNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "DragNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method getMode
+	 * @return {DragNavigator/Mode:property}
+	 */
+	DragNavigator.prototype.getMode = function() {
+		return this._mode;
+	};
+
+	/**
+	 * Called by the init to set up the navigator.
+	 *
+	 * @method _setup
+	 * @protected
+	 */
+	DragNavigator.prototype._setup = function() {
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$scrollerWrap = $(this._carousel.getScrollerWrap()),
+			$window = $(window);
+
+		// listen for mouse/touch down, move and up/leave events
+		$scrollerWrap.on('mousedown touchstart', this._eventListeners.start);
+		$window.on('mousemove touchmove', this._eventListeners.move);
+		$window.on('mouseup touchend touchcancel', this._eventListeners.end);
+
+		// intercept drag start event
+		$mainWrap.on('dragstart', this._eventListeners.dragStart);
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	DragNavigator.prototype.destroy = function() {
+		var $mainWrap = $(this._carousel.getMainWrap()),
+			$scrollerWrap = $(this._carousel.getScrollerWrap()),
+			$window = $(window);
+
+		// listen for mouse/touch down, move and up/leave events
+		$scrollerWrap.off('mousedown touchstart', this._eventListeners.start);
+		$window.off('mousemove touchmove', this._eventListeners.move);
+		$window.off('mouseup touchend touchcancel', this._eventListeners.end);
+		$mainWrap.off('dragstart', this._eventListeners.dragStart);
+	};
+
+	/**
+	 * Called on drag start event.
+	 *
+	 * @method _onRawStart
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawStart = function(e) {
+		if (e.which !== 1 && e.type !== 'touchstart') {
+			return true;
+		}
+
+		var orientation = this._carousel.getOrientation(),
+			horizontal = orientation === this._carousel.Config.Orientation.HORIZONTAL,
+			isTouchEvent = e.type === 'touchstart',
+			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
+			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
+			targetElement = e.target,
+			result;
+
+		result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
+
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	/**
+	 * Called on drag move event.
+	 *
+	 * @method _onRawMove
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawMove = function(e) {
+		var orientation = this._carousel.getOrientation(),
+			horizontal = orientation === this._carousel.Config.Orientation.HORIZONTAL,
+			isTouchEvent = e.type === 'touchmove',
+			result,
+			x,
+			y;
+
+		// stop if not active
+		if (!this._active) {
+			return true;
+		}
+
+		// only move the carousel when the left mouse button is pressed
+		if (e.which !== 1 && e.type !== 'touchmove') {
+			result = this._end(e.target, isTouchEvent);
+		} else {
+			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
+			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
+
+			result = this._move(horizontal ? x : y, horizontal ? y : x);
+		}
+
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	/**
+	 * Called on drag end event.
+	 *
+	 * @method _onRawEnd
+	 * @param {Event} e Raw event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._onRawEnd = function(e) {
+		var isTouchEvent = e.type === 'touchend' || e.type === 'touchcancel',
+			result,
+			targetElement;
+
+		// stop if not active
+		if (!this._active) {
+			return true;
+		}
+
+		// quit if invalid event
+		if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
+			return true;
+		}
+
+		targetElement = e.target;
+
+		result = this._end(targetElement, isTouchEvent);
+
+		/* istanbul ignore else */
+		if (result === false) {
+			e.preventDefault();
+
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	/**
+	 * Called on main wrap drag start event.
+	 *
+	 * @method _onRawDragStart
+	 * @param {Event} e Drag start event
+	 * @private
+	 */
+	DragNavigator.prototype._onRawDragStart = function(/*e*/) {
+		// cancel start drag event so images, links etc couldn't be dragged
+        return false;
+	};
+
+	/**
+	 * Begins the navigation.
+	 *
+	 * @method _begin
+	 * @param {number} position Drag position
+	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
+	 * @param {DOMElement} targetElement The element that was under the cursor when drag started
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._begin = function(position, oppositePosition, targetElement) {
+		targetElement = targetElement || null;
+
+		// don't allow dragging when already animating
+		if (this._carousel.isAnimating()) {
+			return true;
+		}
+
+		this._active = true;
+		this._startPosition = position;
+		this._startOppositePosition = oppositePosition;
+		this._lastPosition = position; // it's possible that the move event never occurs so set it here alrady
+		this._lastOppositePosition = oppositePosition; // same for this
+		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
+		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
+		this._startWindowScrollTop = $(window).scrollTop();
+		this._accumulatedMagnitude = {
+			main: 0,
+			opposite: 0
+		};
+		this._firstMoveEvent = true;
+
+		// disable all children click events for the duration of the dragging
+		if (targetElement !== null) {
+			this._startTargetElement = targetElement;
+
+			this._setupClickHandlers(targetElement);
+		}
+
+		// notify the carousel that dragging has begun
+		this._carousel._onDragBegin(
+			this._startPosition,
+			this._startOppositePosition,
+			this._startCarouselPosition,
+			this._startWindowScrollTop
+		);
+
+		// disable default functionality
+		//return false;
+
+		// do not disable scrolling the page from the carousel component
+		return true;
+	};
+
+	/**
+	 * Called on mouse/finger move.
+	 *
+	 * @method _move
+	 * @param {number} position Drag position
+	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._move = function(position, oppositePosition) {
+		/* istanbul ignore if */
+		if (!this._active) {
+			return true;
+		}
+
+		// compare motion in the carousel and the opposite direction
+		var deltaDragPosition = position - this._startPosition;
+			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
+			//currentWindowScrollTop = $(window).scrollTop(),
+			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
+
+		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
+		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
+
+		// we need last move position in the _end() handler
+		this._lastPosition = position;
+		this._lastOppositePosition = oppositePosition;
+
+		// if the drag delta is very small then do nothing not to quit or start moving too soon
+		// TODO this deadband can not be done on android: https://code.google.com/p/chromium/issues/detail?id=240735
+		/*if (this._accumulatedMagnitude.main < this._noActionThreshold) {
+			// emulate manual scrolling
+			//$(window).scrollTop(this._startWindowScrollTop - windowScrollTopDifference - deltaDragOppositePosition);
+
+			return false;
+		}*/
+
+		// if the carousel is dragged more in the opposite direction then cancel and propagate
+		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
+		if (
+			this._accumulatedMagnitude.main > 0
+			&& this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite
+		) {
+			this._end();
+
+			return true;
+		}
+
+		// if the first move event takes more than 200ms then Android Chrome cancels the scroll, avoid this by returning
+		// quikcly on the first event
+		if (this._firstMoveEvent) {
+			this._firstMoveEvent = false;
+
+			return false;
+		}
+
+		// calculate the position
+		var newPosition = this._startCarouselPosition + deltaDragPosition,
+			itemSize = this._carousel.getItemSize(),
+			totalSize = this._carousel.getTotalSize(),
+			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
+			edgeMultiplier = this._config.overEdgeDragPositionMultiplier,
+			minLimit = 0,
+			maxLimit = -totalSize + itemCountOnLastPage * itemSize;
+
+		// create smooth limit at the edges applying the drag motion partially
+		if (newPosition > minLimit || newPosition < maxLimit) {
+			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
+		}
+
+		// use the animator to move to calculated position instantly
+		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
+
+		return false;
+	};
+
+	/**
+	 * Called on gesture end.
+	 *
+	 * @method _end
+	 * @param {DOMElement} targetElement The element that the drag ended on
+	 * @param {boolean} [isTouchEvent=false] Is this a touch event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	DragNavigator.prototype._end = function(targetElement, isTouchEvent) {
+		/* istanbul ignore if */
+		if (!this._active) {
+			return true;
+		}
+
+		isTouchEvent = typeof isTouchEvent === 'boolean' ? isTouchEvent : false;
+
+		var deltaDragPosition = this._lastPosition - this._startPosition,
+			deltaDragOppositePosition = this._lastOppositePosition - this._startOppositePosition,
+			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
+			direction = deltaDragPosition < 0 ? -1 : 1,
+			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
+			ignoreClickThreshold = this._config.ignoreClickThreshold,
+			performNavigation = Math.abs(deltaDragPosition) > 0,
+			propagate = false,
+			performClick,
+			closestIndex,
+			endHoverItemIndex;
+
+		// we have to perform the navigation if the carousel was dragged in the main direction
+		if (performNavigation) {
+			// navigate to closest item or page depending on selected mode
+			switch (this._mode) {
+				case DragNavigator.Mode.NAVIGATE_PAGE:
+					closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
+
+					this._carousel.navigateToPage(closestIndex, false, true);
+				break;
+
+				case DragNavigator.Mode.NAVIGATE_ITEM:
+					closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
+
+					this._carousel.navigateToItem(closestIndex, false, true);
+				break;
+			}
+		}
+
+		// for touch events we don't have the hover indexes
+		if (isTouchEvent) {
+			performClick = targetElement !== null
+				&& targetElement === this._startTargetElement
+				&& dragMagnitude < ignoreClickThreshold;
+		} else {
+			endHoverItemIndex = this._carousel.getHoverItemIndex();
+
+			performClick = this._startHoverItemIndex !== null
+				&& targetElement !== null
+				&& targetElement === this._startTargetElement
+				&& endHoverItemIndex === this._startHoverItemIndex
+				&& dragMagnitude < ignoreClickThreshold;
+		}
+
+		// restore the element click handler if drag stopped on the same element and was dragged very little
+		if (performClick) {
+			this._callClickHandlers(targetElement);
+
+			this._dragStartHoverItemIndex = null;
+
+			// make sure the event propagates so the correct listeners get fired
+			propagate = true;
+		}
+
+		// notify the carousel that dragging has begun
+		this._carousel._onDragEnd(
+			this._mode,
+			this._startPosition,
+			this._lastPosition,
+			deltaDragPosition,
+			closestIndex,
+			direction,
+			targetElement
+		);
+
+		// reset
+		this._active = false;
+		this._startPosition = null;
+		this._startOppositePosition = null;
+		this._startCarouselPosition = null;
+		this._startWindowScrollTop = null;
+		this._lastPosition = null;
+		this._accumulatedMagnitude = {
+			main: 0,
+			opposite: 0
+		};
+		this._firstMoveEvent = true;
+
+		return propagate;
+	};
+
+	/**
+	 * Disables normal click handler for given element.
+	 *
+	 * @method _setupClickHandlers
+	 * @param {DOMElement} element Element to disable click events on
+	 * @private
+	 */
+	DragNavigator.prototype._setupClickHandlers = function(element) {
+		var $element = $(element),
+			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
+			isAlreadyDisabled = $element.data(disabledDataName);
+
+		if (isAlreadyDisabled !== true) {
+			var currentEventHandlers = $._data(element, 'events'),
+				clickHandlerFunctions = [],
+				currentClickHandlers,
+				i;
+
+			// extract the existing click event handlers if got any
+			if (
+				Util.isObject(currentEventHandlers)
+				&& Util.isArray(currentEventHandlers.click)
+				&& currentEventHandlers.click.length > 0
+			) {
+				// extract the current clickhandler functions
+				currentClickHandlers = currentEventHandlers.click;
+
+				for (i = 0; i < currentClickHandlers.length; i++) {
+					clickHandlerFunctions.push(currentClickHandlers[i].handler);
+				}
+
+				// store the original click handlers
+				$element.data('original-click-handlers', clickHandlerFunctions);
+
+				// remove the current click handlers and add the ignore handler
+				$element.off('click');
+			}
+
+			// add an ignoring click handler
+			$element.on('click', this._ignoreEvent);
+
+			$element.data(disabledDataName, true);
+		}
+	};
+
+	/**
+	 * Calls the original click handlers for given element.
+	 *
+	 * @method _callClickHandlers
+	 * @param {DOMElement} element Element to disable click events on
+	 * @private
+	 */
+	DragNavigator.prototype._callClickHandlers = function(element) {
+		var $element = $(element),
+			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
+			isDisabled = $element.data(disabledDataName);
+
+		if (isDisabled === true) {
+			// fetch the original click handlers
+			var originalClickHandlers = $element.data('original-click-handlers'),
+				i;
+
+			// remove the ignore handler
+			$element.off('click');
+
+			// restore the old click handlers if present
+			if (Util.isArray(originalClickHandlers)) {
+				// restore the original click handlers
+				for (i = 0; i < originalClickHandlers.length; i++) {
+					$element.on('click', originalClickHandlers[i].bind(element));
+
+					//originalClickHandlers[i].call(element);
+				}
+			}
+
+			$element.data(disabledDataName, false);
+		}
+	};
+
+	/**
+	 * Ignores given jQuery event.
+	 *
+	 * TODO don't know how to unit-test this yet
+	 *
+	 * @method _ignoreEvent
+	 * @param {jQuery.Event} e jQuery event
+	 * @return {boolean} Should the event propagate
+	 * @private
+	 */
+	/* istanbul ignore next */
+	DragNavigator.prototype._ignoreEvent = function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		return false;
+	};
+
+	return DragNavigator;
+});
+define('SlideshowNavigator',[
+	'AbstractNavigator',
+	'Util'
+], function(AbstractNavigator, Util) {
+	
+
+	/**
+	 * Automatic slideshow navigator.
+	 *
+	 * @class SlideshowNavigator
+	 * @extends AbstractNavigator
+	 * @param {object} config Navigator configuration
+	 * @constructor
+	 */
+	function SlideshowNavigator(config) {
+		AbstractNavigator.call(this);
+
+		this._config = config;
+		this._mode = null;
+		this._delayTimeout = null;
+		this._playing = false;
+		this._mouseEntered = false;
+
+		this._eventListeners = {
+			mouseenter: this._onRawMouseEnter.bind(this),
+			mouseleave: this._onRawMouseLeave.bind(this)
+		};
+
+		this.setMode(config.mode || SlideshowNavigator.Mode.NAVIGATE_ITEM);
+	}
+
+	SlideshowNavigator.prototype = Object.create(AbstractNavigator.prototype);
+
+	/**
+	 * List of supported navigation modes.
+	 *
+	 * @property Mode
+	 * @type {object}
+	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
+	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
+	 */
+	SlideshowNavigator.Mode = {
+		NAVIGATE_PAGE: 'navigate-page',
+		NAVIGATE_ITEM: 'navigate-item'
+	};
+
+	/**
+	 * Returns current slideshow navigator mode.
+	 *
+	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method setMode
+	 * @param {SlideshowNavigator/Mode:property} mode Mode to use
+	 */
+	SlideshowNavigator.prototype.setMode = function(mode) {
+		if (!Util.objectHasValue(SlideshowNavigator.Mode, mode)) {
+			throw new Error('Invalid mode "' + mode + '" provided');
+		}
+
+		this._mode = mode;
+	};
+
+	/**
+	 * Returns current slideshow navigator mode.
+	 *
+	 * The mode is either {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
+	 * {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
+	 * either the page or navigate one item at a time.
+	 *
+	 * @method getMode
+	 * @return {SlideshowNavigator/Mode:property}
+	 */
+	SlideshowNavigator.prototype.getMode = function() {
+		return this._mode;
+	};
+
+	/**
+	 * Called by the init to set up the navigator.
+	 *
+	 * @method _setup
+	 * @protected
+	 */
+	SlideshowNavigator.prototype._setup = function() {
+		var $mainWrap = $(this._carousel.getMainWrap());
+
+		// make sure that the mouse if over the main wrap element
+		$mainWrap
+			.on('mouseenter', this._eventListeners.mouseenter)
+			.on('mouseleave', this._eventListeners.mouseleave);
+
+		this._carousel.on(this._carousel.Event.NAVIGATED_TO_ITEM, this._onNavigatedToItem.bind(this));
+
+		this.start();
+	};
+
+	/**
+	 * Called by the carousel on destroy.
+	 *
+	 * @method destroy
+	 */
+	SlideshowNavigator.prototype.destroy = function() {
+		var $mainWrap = $(this._carousel.getMainWrap());
+
+		this.stop();
+
+		// remove the event listeners
+		$mainWrap
+			.off('mouseenter', this._eventListeners.mouseenter)
+			.off('mouseleave', this._eventListeners.mouseleave);
+	};
+
+	/**
+	 * Returns whether the slideshow is currently playing.
+	 *
+	 * @method isActive
+	 */
+	SlideshowNavigator.prototype.isPlaying = function() {
+		return this._playing;
+	};
+
+	/**
+	 * Starts the automatic slideshow.
+	 *
+	 * @method start
+	 */
+	SlideshowNavigator.prototype.start = function() {
+		if (this.isPlaying()) {
+			this.stop();
+		}
+
+		this._playing = true;
+
+		this._scheduleNextChange();
+	};
+
+	/**
+	 * Starts the automatic slideshow.
+	 *
+	 * @method start
+	 */
+	SlideshowNavigator.prototype.stop = function() {
+		if (this._delayTimeout !== null) {
+			window.clearTimeout(this._delayTimeout);
+
+			this._delayTimeout = null;
+		}
+
+		this._playing = false;
+	};
+
+	/**
+	 * Schedules the next change event.
+	 *
+	 * @method _scheduleNextChange
+	 * @private
+	 */
+	SlideshowNavigator.prototype._scheduleNextChange = function() {
+		if (!this.isPlaying()) {
+			return;
+		}
+
+		var interval = this._config.interval;
+
+		// clear existing
+		if (this._delayTimeout !== null) {
+			window.clearTimeout(this._delayTimeout);
+
+			this._delayTimeout = null;
+		}
+
+		// perform action after timeout and schedule another one
+		this._delayTimeout = window.setTimeout(function() {
+			if (this._carousel === null || !this._carousel.isInitiated()) {
+				return;
+			}
+
+			this._performChange();
+			this._scheduleNextChange();
+		}.bind(this), interval);
+	};
+
+	/**
+	 * Performs the change event.
+	 *
+	 * @method _performChange
+	 * @private
+	 */
+	SlideshowNavigator.prototype._performChange = function() {
+		// don't control the carousel when user is hovering it
+		if (this._mouseEntered) {
+			return;
+		}
+
+		var instantRollover = this._config.instantRollover;
+
+		if (this._mode === SlideshowNavigator.Mode.NAVIGATE_PAGE) {
+			if (this._carousel.getPageCount() > 0) {
+				if (this._carousel.isLastPage()) {
+					this._carousel.navigateToPage(0, instantRollover);
+				} else {
+					this._carousel.navigateToNextPage();
+				}
+			}
+		} else if (this._mode === SlideshowNavigator.Mode.NAVIGATE_ITEM) {
+			if (this._carousel.getItemCount() > 0) {
+				if (this._carousel.isLastItem()) {
+					this._carousel.navigateToItem(0, instantRollover);
+				} else {
+					this._carousel.navigateToNextItem();
+				}
+			}
+		}
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseEnter
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	SlideshowNavigator.prototype._onRawMouseEnter = function(/*e*/) {
+		this._mouseEntered = true;
+	};
+
+	/**
+	 * Called on mouse enter event.
+	 *
+	 * @method _onRawMouseLeave
+	 * @param {Event} e Mouse event
+	 * @private
+	 */
+	SlideshowNavigator.prototype._onRawMouseLeave = function(/*e*/) {
+		this._mouseEntered = false;
+
+		// re-schedule the change event for consistent timing
+		this._scheduleNextChange();
+	};
+
+	/**
+	 * Called when user navigated to a new item.
+	 *
+	 * @method _onNavigatedToItem
+	 * @private
+	 */
+	SlideshowNavigator.prototype._onNavigatedToItem = function() {
+		// re-schedule the change event for consistent timing
+		this._scheduleNextChange();
+	};
+
+	return SlideshowNavigator;
+});
+define('Config',[
+	'jquery',
+	'Deferred',
+	'KeyboardNavigator',
+	'DragNavigator',
+	'SlideshowNavigator',
+], function($, Deferred, KeyboardNavigator, DragNavigator, SlideshowNavigator) {
 	
 
 	/**
@@ -627,72 +1888,42 @@ define('Config',[
 		this.responsiveLayoutDelay = 500;
 
 		/**
-		 * Default built-in navigators to use.
+		 * List of navigators to use with their configuration and factories.
+		 *
+		 * The "createInstance(carousel)" factory method gets the carousel instance as its only parameter and should
+		 * either return a navigator instance directly or a deferred promise that will be resolved with a navigator
+		 * instance.
 		 *
 		 * @property navigators
-		 * @type {Config/Navigator:property[]}
+		 * @type {object}
 		 */
-		this.navigators = [
-			Config.Navigator.KEYBOARD,
-			Config.Navigator.DRAG
-		];
-
-		/**
-		 * Keyboard navigator mode to use.
-		 *
-		 * @property keyboardNavigatorMode
-		 * @type {KeyboardNavigator/Mode:property}
-		 * @default KeyboardNavigator.Mode.NAVIGATE_PAGE
-		 */
-		this.keyboardNavigatorMode = 'navigate-page';
-
-		/**
-		 * Drag navigator mode to use.
-		 *
-		 * @property dragNavigatorMode
-		 * @type {DragNavigator/Mode:property}
-		 * @default DragNavigator.Mode.NAVIGATE_PAGE
-		 */
-		this.dragNavigatorMode = 'navigate-page';
-
-		/**
-		 * Slideshow navigator mode to use.
-		 *
-		 * @property slideshowNavigatorMode
-		 * @type {SlideshowNavigator/Mode:property}
-		 * @default SlideshowNavigator.Mode.NAVIGATE_PAGE
-		 */
-		this.slideshowNavigatorMode = 'navigate-page';
-
-		/**
-		 * The interval in milliseconds at which to automatically change item/page.
-		 *
-		 * @property slideshowNavigatorInterval
-		 * @type {number}
-		 * @default 3000
-		 */
-		this.slideshowNavigatorInterval = 3000;
-
-		/**
-		 * If the user attempts to drag the items over the edge (before first or after last) then we can apply the
-		 * effect of only applying the change partially. Set to zero to disable this feature.
-		 *
-		 *
-		 * @property dragNavigatorOverEdgeDragPositionMultiplier
-		 * @type {number}
-		 * @default 0.2
-		 */
-		this.dragNavigatorOverEdgeDragPositionMultiplier = 0.2;
-
-		/**
-		 * If the number of pixels the user dragged an element exceeds this threshold then the click event and link
-		 * element navigation are ignored.
-		 *
-		 * @property dragNavigatorIgnoreClickThreshold
-		 * @type {number}
-		 * @default 10
-		 */
-		this.dragNavigatorIgnoreClickThreshold = 10;
+		this.navigators = {
+			keyboard: {
+				enabled: true,
+				mode: 'navigate-page',
+				createInstance: function(carousel) {
+					return new KeyboardNavigator(carousel.getConfig().navigators.keyboard);
+				}
+			},
+			drag: {
+				enabled: true,
+				mode: 'navigate-page',
+				overEdgeDragPositionMultiplier: 0.2,
+				ignoreClickThreshold: 10,
+				createInstance: function(carousel) {
+					return new DragNavigator(carousel.getConfig().navigators.drag);
+				}
+			},
+			slideshow: {
+				enabled: false,
+				mode: 'navigate-page',
+				interval: 3000,
+				instantRollover: true,
+				createInstance: function(carousel) {
+					return new SlideshowNavigator(carousel.getConfig().navigators.slideshow);
+				}
+			}
+		};
 
 		/**
 		 * The css classes prefix to use.
@@ -846,42 +2077,15 @@ define('Config',[
 	};
 
 	/**
-	 * List of built-in navigators that the carousel can use.
-	 *
-	 * Set using {{#crossLink "Config/navigators:property"}}{{/crossLink}} option.
-	 *
-	 * @property Navigator
-	 * @type {object}
-	 * @param {string} Navigator.KEYBOARD='keyboard' Keyboard navigator
-	 * @param {string} Navigator.DRAG='drag' Dragging mouse/touch navigator
-	 * @param {string} Navigator.SLIDESHOW='slideshow' Automatic slideshow navigator
-	 * @static
-	 */
-	Config.Navigator = {
-		KEYBOARD: 'keyboard',
-		DRAG: 'drag',
-		SLIDESHOW: 'slideshow'
-	};
-
-	/**
 	 * Extends the base default configuration properties with user-defined values.
+	 *
+	 * Performs a deep-extend.
 	 *
 	 * @method extend
 	 * @param {object} userConfig
 	 */
 	Config.prototype.extend = function(userConfig) {
-		var key,
-			value;
-
-		for (key in userConfig) {
-			value = userConfig[key];
-
-			if (typeof this[key] === 'undefined') {
-				throw new Error('user configuration contains unknown "' + key + '" property');
-			}
-
-			this[key] = value;
-		}
+		$.extend(true, this, userConfig);
 	};
 
 	/**
@@ -1000,26 +2204,6 @@ define('AbstractDataSource',[
 	};
 
 	return AbstractDataSource;
-});
-define('Deferred',[
-	'jquery'
-], function($) {
-	
-
-	/**
-	 * Provides utility functionality.
-	 *
-	 * Uses the jQuery deferred implementation.
-	 *
-	 * @class Deferred
-	 * @constructor
-	 */
-	var Deferred = $.Deferred;
-
-	// proxy to jQuery when()
-	Deferred.when = $.when;
-
-	return Deferred;
 });
 define('ArrayDataSource',[
 	'AbstractDataSource',
@@ -1264,149 +2448,6 @@ define('AbstractAnimator',[
 	};
 
 	return AbstractAnimator;
-});
-define('Util',[
-], function() {
-	
-
-	/**
-	 * Provides utility functionality.
-	 *
-	 * @class Util
-	 * @constructor
-	 */
-	return {
-
-		/**
-		 * Returns whether given arguments is an object (and not an array nor null).
-		 *
-		 * @method isObject
-		 * @param {*} arg Arguments to check
-		 * @return {boolean}
-		 * @static
-		 */
-		isObject: function(arg) {
-			return typeof arg === 'object' && arg !== null;
-		},
-
-		/**
-		 * Returns whether given arguments is an array (and not a object nor null).
-		 *
-		 * @method isArray
-		 * @param {*} arg Arguments to check
-		 * @return {boolean}
-		 * @static
-		 */
-		isArray: function(arg) {
-			return Object.prototype.toString.call(arg) === '[object Array]';
-		},
-
-		/**
-		 * Returns whether given object contains given value.
-		 *
-		 * @method objectHasValue
-		 * @param {object} obj Object to check
-		 * @param {*} value Value to search for
-		 * @return {boolean}
-		 */
-		objectHasValue: function(obj, value) {
-			var prop;
-
-			for (prop in obj) {
-				if(obj.hasOwnProperty(prop) && obj[prop] === value) {
-					return true;
-				}
-			}
-
-			return false;
-		},
-
-		/**
-		 * Parses a css transform matrix.
-		 *
-		 * Input is something along the way of "matrix(1, 0, 0, 1, -1877, 0)" or a 3D matrix like
-		 * "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -100, 0, 0, 1)"
-		 *
-		 * Returns objects with keys x, y.
-		 *
-		 * @method parseTransformMatrix
-		 * @param {string} matrix Matrix to parse
-		 * @return {object}
-		 */
-		parseTransformMatrix: function(matrix) {
-			var offset,
-				itemIndexes,
-				trimmed,
-				noWhitespace,
-				items,
-				result;
-
-			/* istanbul ignore next */
-			/*if (matrix === 'none') {
-				return {
-					x: 0,
-					y: 0
-				};
-			}*/
-
-			// TODO remove the istanbul ignore once karma coverage fixes not counting these lines
-			/* istanbul ignore next */
-			if (matrix.substring(0, 8) === 'matrix3d') { // IE uses matrix3d
-				offset = 9;
-				itemIndexes = [12, 13];
-			} else if (matrix.substring(0, 6) === 'matrix') { // webkit, safari, opera
-				offset = 7;
-				itemIndexes = [4, 5];
-			} else if (matrix.substring(0, 11) === 'translate3d') { // Safari uses translate3d sometimes
-				offset = 12;
-				itemIndexes = [0, 1];
-			} else {
-				throw new Error('Unsupported matrix format "' + matrix + '"');
-			}
-
-			trimmed = matrix.substr(offset).substr(0, matrix.length - offset - 1);
-			noWhitespace = trimmed.replace(/ +/g, '');
-			items = noWhitespace.split(/,/);
-
-			result = {
-				x: parseInt(items[itemIndexes[0]], 10),
-				y: parseInt(items[itemIndexes[1]], 10)
-			};
-
-			return result;
-		},
-
-		/**
-		 * Removes CSS classes from current element that have the given prefix.
-		 *
-		 * @method removeElementClassesPrefixedWith
-		 * @param {DOMElement} element Element to modify
-		 * @param {string} cssPrefix The CSS prefix
-		 */
-		removeElementClassesPrefixedWith: function(element, cssPrefix) {
-			var wrapClasses = $(element).prop('class').split(' '),
-				filteredClasses = [],
-				i;
-
-			for (i = 0; i < wrapClasses.length; i++) {
-				if (wrapClasses[i].substr(0, cssPrefix.length) !== cssPrefix) {
-					filteredClasses.push(wrapClasses[i]);
-				}
-			}
-
-			$(element).prop('class', filteredClasses.join(' '));
-		},
-
-		/**
-		 * Returns a clone of given object.
-		 *
-		 * @param {object} obj Object to clone
-		 * @return {object}
-		 */
-		cloneObj: function(obj) {
-			return JSON.parse(JSON.stringify(obj));
-		}
-	};
 });
 define('DefaultAnimator',[
 	'jquery',
@@ -1810,1074 +2851,6 @@ define('HtmlRenderer',[
 	};
 
 	return HtmlRenderer;
-});
-define('AbstractNavigator',[
-], function() {
-	
-
-	/**
-	 * Abstract navigator base class.
-	 *
-	 * Use navigators to navigate the carousel using mouse, touch, keyboard, ui, urls etc.
-	 *
-	 * @class AbstractNavigator
-	 * @constructor
-	 */
-	function AbstractNavigator() {
-		this._carousel = null;
-	}
-
-	/**
-	 * Initiated the navigator.
-	 *
-	 * This is called automatically by the carousel and calls _setup() in turn that the subclasses should implement.
-	 *
-	 * @method init
-	 * @param {FlowCarousel} carousel The carousel component
-	 */
-	AbstractNavigator.prototype.init = function(carousel) {
-		this._carousel = carousel;
-
-		this._setup();
-	};
-
-	/**
-	 * Called by the carousel on destroy.
-	 *
-	 * @method destroy
-	 */
-	AbstractNavigator.prototype.destroy = function() {
-		// do nothing by default
-	};
-
-	/**
-	 * Called by the init to set up the navigator.
-	 *
-	 * @method _setup
-	 * @protected
-	 */
-	AbstractNavigator.prototype._setup = function() {
-		throw new Error('Not implemented');
-	};
-
-	return AbstractNavigator;
-});
-define('KeyboardNavigator',[
-	'AbstractNavigator',
-	'Config',
-	'Util'
-], function(AbstractNavigator, Config, Util) {
-	
-
-	/**
-	 * Keyboard navigator.
-	 *
-	 * @class KeyboardNavigator
-	 * @extends AbstractNavigator
-	 * @param {KeyboardNavigator/Mode:property} [mode=KeyboardNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
-	 * @constructor
-	 */
-	function KeyboardNavigator(mode) {
-		AbstractNavigator.call(this);
-
-		this._mouseEntered = false;
-
-		this._eventListeners = {
-			mouseenter: this._onRawMouseEnter.bind(this),
-			mouseleave: this._onRawMouseLeave.bind(this),
-			keydown: this._onRawKeyDown.bind(this),
-		};
-
-		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
-	}
-
-	KeyboardNavigator.prototype = Object.create(AbstractNavigator.prototype);
-
-	/**
-	 * List of supported navigation modes.
-	 *
-	 * @property Mode
-	 * @type {object}
-	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
-	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
-	 */
-	KeyboardNavigator.Mode = {
-		NAVIGATE_PAGE: 'navigate-page',
-		NAVIGATE_ITEM: 'navigate-item'
-	};
-
-	/**
-	 * Returns current keyboard navigator mode.
-	 *
-	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
-	 * either the page or navigate one item at a time.
-	 *
-	 * @method setMode
-	 * @param {KeyboardNavigator/Mode:property} mode Mode to use
-	 */
-	KeyboardNavigator.prototype.setMode = function(mode) {
-		if (!Util.objectHasValue(KeyboardNavigator.Mode, mode)) {
-			throw new Error('Invalid mode "' + mode + '" provided');
-		}
-
-		this._mode = mode;
-	};
-
-	/**
-	 * Returns current keyboard navigator mode.
-	 *
-	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
-	 * either the page or navigate one item at a time.
-	 *
-	 * @method getMode
-	 * @return {KeyboardNavigator/Mode:property}
-	 */
-	KeyboardNavigator.prototype.getMode = function() {
-		return this._mode;
-	};
-
-	/**
-	 * Called by the init to set up the navigator.
-	 *
-	 * @method _setup
-	 * @protected
-	 */
-	KeyboardNavigator.prototype._setup = function() {
-		var $mainWrap = $(this._carousel.getMainWrap()),
-			$window = $(window);
-
-		// make sure that the mouse if over the main wrap element
-		$mainWrap
-			.on('mouseenter', this._eventListeners.mouseenter)
-			.on('mouseleave', this._eventListeners.mouseleave);
-
-		// listen for key down events
-		$window.on('keydown', this._eventListeners.keydown);
-	};
-
-	/**
-	 * Called by the carousel on destroy.
-	 *
-	 * @method destroy
-	 */
-	KeyboardNavigator.prototype.destroy = function() {
-		var $mainWrap = $(this._carousel.getMainWrap()),
-			$window = $(window);
-
-		// remove the event listeners
-		$mainWrap
-			.off('mouseenter', this._eventListeners.mouseenter)
-			.off('mouseleave', this._eventListeners.mouseleave);
-
-		$window.off('keydown', this._eventListeners.keydown);
-	};
-
-	/**
-	 * Called on mouse enter event.
-	 *
-	 * @method _onRawMouseEnter
-	 * @param {Event} e Mouse event
-	 * @private
-	 */
-	KeyboardNavigator.prototype._onRawMouseEnter = function(/*e*/) {
-		this._mouseEntered = true;
-	};
-
-	/**
-	 * Called on mouse enter event.
-	 *
-	 * @method _onRawMouseLeave
-	 * @param {Event} e Mouse event
-	 * @private
-	 */
-	KeyboardNavigator.prototype._onRawMouseLeave = function(/*e*/) {
-		this._mouseEntered = false;
-	};
-
-	/**
-	 * Called on key down event.
-	 *
-	 * @method _onRawKeyDown
-	 * @param {Event} e Key event
-	 * @private
-	 */
-	KeyboardNavigator.prototype._onRawKeyDown = function(e) {
-		var result = this._onKeyDown(e.keyCode);
-
-		if (result === false) {
-			e.preventDefault();
-		}
-
-		return result;
-	};
-
-	/**
-	 * Called on key down even for anywhere in the document.
-	 *
-	 * @method _onKeyDown
-	 * @param {number} keyCode Key press key-code.
-	 * @return {boolean} Should the key event be propagated further
-	 * @private
-	 */
-	KeyboardNavigator.prototype._onKeyDown = function(keyCode) {
-		var keyCodes;
-
-		// don't do anything if the mouse is not over given component
-		if (!this._mouseEntered) {
-			return;
-		}
-
-		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
-		switch (this._carousel.getOrientation()) {
-			case Config.Orientation.HORIZONTAL:
-				keyCodes = {
-					previous: 37, // arrow left
-					next: 39 // arrow right
-				};
-			break;
-
-			case Config.Orientation.VERTICAL:
-				keyCodes = {
-					previous: 38, // arrow up
-					next: 40 // arrow down
-				};
-			break;
-		}
-
-		// navigate using the key-codes defined above
-		switch (keyCode) {
-			case keyCodes.next:
-				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
-					this._carousel.navigateToNextPage();
-				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
-					this._carousel.navigateToNextItem();
-				}
-
-				return false;
-
-			case keyCodes.previous:
-				if (this._mode === KeyboardNavigator.Mode.NAVIGATE_PAGE) {
-					this._carousel.navigateToPreviousPage();
-				} else if (this._mode === KeyboardNavigator.Mode.NAVIGATE_ITEM) {
-					this._carousel.navigateToPreviousItem();
-				}
-
-				return false;
-		}
-
-		return true;
-	};
-
-	return KeyboardNavigator;
-});
-define('SlideshowNavigator',[
-	'AbstractNavigator',
-	'Util'
-], function(AbstractNavigator, Util) {
-	
-
-	/**
-	 * Automatic slideshow navigator.
-	 *
-	 * @class SlideshowNavigator
-	 * @extends AbstractNavigator
-	 * @param {SlideshowNavigator/Mode:property} [mode=SlideshowNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
-	 * @constructor
-	 */
-	function SlideshowNavigator(mode) {
-		AbstractNavigator.call(this);
-
-		this._delayTimeout = null;
-		this._playing = false;
-		this._mouseEntered = false;
-
-		this._eventListeners = {
-			mouseenter: this._onRawMouseEnter.bind(this),
-			mouseleave: this._onRawMouseLeave.bind(this)
-		};
-
-		this.setMode(mode || SlideshowNavigator.Mode.NAVIGATE_ITEM);
-	}
-
-	SlideshowNavigator.prototype = Object.create(AbstractNavigator.prototype);
-
-	/**
-	 * List of supported navigation modes.
-	 *
-	 * @property Mode
-	 * @type {object}
-	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
-	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
-	 */
-	SlideshowNavigator.Mode = {
-		NAVIGATE_PAGE: 'navigate-page',
-		NAVIGATE_ITEM: 'navigate-item'
-	};
-
-	/**
-	 * Returns current slideshow navigator mode.
-	 *
-	 * The mode is either {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "KeyboardNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
-	 * either the page or navigate one item at a time.
-	 *
-	 * @method setMode
-	 * @param {SlideshowNavigator/Mode:property} mode Mode to use
-	 */
-	SlideshowNavigator.prototype.setMode = function(mode) {
-		if (!Util.objectHasValue(SlideshowNavigator.Mode, mode)) {
-			throw new Error('Invalid mode "' + mode + '" provided');
-		}
-
-		this._mode = mode;
-	};
-
-	/**
-	 * Returns current slideshow navigator mode.
-	 *
-	 * The mode is either {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "SlideshowNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that slideshow changes
-	 * either the page or navigate one item at a time.
-	 *
-	 * @method getMode
-	 * @return {SlideshowNavigator/Mode:property}
-	 */
-	SlideshowNavigator.prototype.getMode = function() {
-		return this._mode;
-	};
-
-	/**
-	 * Called by the init to set up the navigator.
-	 *
-	 * @method _setup
-	 * @protected
-	 */
-	SlideshowNavigator.prototype._setup = function() {
-		var $mainWrap = $(this._carousel.getMainWrap());
-
-		// make sure that the mouse if over the main wrap element
-		$mainWrap
-			.on('mouseenter', this._eventListeners.mouseenter)
-			.on('mouseleave', this._eventListeners.mouseleave);
-
-		this.start();
-	};
-
-	/**
-	 * Called by the carousel on destroy.
-	 *
-	 * @method destroy
-	 */
-	SlideshowNavigator.prototype.destroy = function() {
-		var $mainWrap = $(this._carousel.getMainWrap());
-
-		this.stop();
-
-		// remove the event listeners
-		$mainWrap
-			.off('mouseenter', this._eventListeners.mouseenter)
-			.off('mouseleave', this._eventListeners.mouseleave);
-	};
-
-	/**
-	 * Returns whether the slideshow is currently playing.
-	 *
-	 * @method isActive
-	 */
-	SlideshowNavigator.prototype.isPlaying = function() {
-		return this._playing;
-	};
-
-	/**
-	 * Starts the automatic slideshow.
-	 *
-	 * @method start
-	 */
-	SlideshowNavigator.prototype.start = function() {
-		if (this.isPlaying()) {
-			this.stop();
-		}
-
-		this._playing = true;
-
-		this._scheduleNextChange();
-	};
-
-	/**
-	 * Starts the automatic slideshow.
-	 *
-	 * @method start
-	 */
-	SlideshowNavigator.prototype.stop = function() {
-		if (this._delayTimeout !== null) {
-			window.clearTimeout(this._delayTimeout);
-
-			this._delayTimeout = null;
-		}
-
-		this._playing = false;
-	};
-
-	/**
-	 * Schedules the next change event.
-	 *
-	 * @method _scheduleNextChange
-	 * @private
-	 */
-	SlideshowNavigator.prototype._scheduleNextChange = function() {
-		if (!this.isPlaying()) {
-			return;
-		}
-
-		var interval = this._carousel.getConfig().slideshowNavigatorInterval;
-
-		if (this._delayTimeout !== null) {
-			window.clearTimeout(this._delayTimeout);
-
-			this._delayTimeout = null;
-		}
-
-		this._delayTimeout = window.setTimeout(function() {
-			if (this._carousel === null || !this._carousel.isInitiated()) {
-				return;
-			}
-
-			this._performChange();
-			this._scheduleNextChange();
-		}.bind(this), interval);
-	};
-
-	/**
-	 * Performs the change event.
-	 *
-	 * @method _performChange
-	 * @private
-	 */
-	SlideshowNavigator.prototype._performChange = function() {
-		// don't control the carousel when user is hovering it
-		if (this._mouseEntered) {
-			return;
-		}
-
-		if (this._mode === SlideshowNavigator.Mode.NAVIGATE_PAGE) {
-			if (this._carousel.isLastPage()) {
-				this._carousel.navigateToPage(0, true);
-			} else {
-				this._carousel.navigateToNextPage();
-			}
-		} else if (this._mode === SlideshowNavigator.Mode.NAVIGATE_ITEM) {
-			if (this._carousel.isLastItem()) {
-				this._carousel.navigateToItem(0, true);
-			} else {
-				this._carousel.navigateToNextItem();
-			}
-		}
-	};
-
-	/**
-	 * Called on mouse enter event.
-	 *
-	 * @method _onRawMouseEnter
-	 * @param {Event} e Mouse event
-	 * @private
-	 */
-	SlideshowNavigator.prototype._onRawMouseEnter = function(/*e*/) {
-		this._mouseEntered = true;
-	};
-
-	/**
-	 * Called on mouse enter event.
-	 *
-	 * @method _onRawMouseLeave
-	 * @param {Event} e Mouse event
-	 * @private
-	 */
-	SlideshowNavigator.prototype._onRawMouseLeave = function(/*e*/) {
-		this._mouseEntered = false;
-
-		// re-schedule the change event for consisten timing
-		this._scheduleNextChange();
-	};
-
-	return SlideshowNavigator;
-});
-define('DragNavigator',[
-	'AbstractNavigator',
-	'Config',
-	'Util'
-], function(AbstractNavigator, Config, Util) {
-	
-
-	/**
-	 * Drag navigator.
-	 *
-	 * @class DragNavigator
-	 * @extends AbstractNavigator
-	 * @param {DragNavigator/Mode:property} [mode=DragNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
-	 * @constructor
-	 */
-	function DragNavigator(mode) {
-		AbstractNavigator.call(this);
-
-		this._active = false;
-		this._startPosition = null;
-		this._startOppositePosition = null;
-		this._startCarouselPosition = null;
-		this._startHoverItemIndex = null;
-		this._startTargetElement = null;
-		this._startWindowScrollTop = null;
-		this._lastPosition = null;
-		this._lastOppositePosition = null;
-		this._accumulatedMagnitude = {
-			main: 0,
-			opposite: 0
-		};
-		this._eventListeners = {
-			start: this._onRawStart.bind(this),
-			move: this._onRawMove.bind(this),
-			end: this._onRawEnd.bind(this),
-			dragStart: this._onRawDragStart.bind(this)
-		};
-		this._noActionThreshold = 15;
-		this._firstMoveEvent = true;
-
-		this.setMode(mode || DragNavigator.Mode.NAVIGATE_PAGE);
-	}
-
-	DragNavigator.prototype = Object.create(AbstractNavigator.prototype);
-
-	/**
-	 * List of supported navigation modes.
-	 *
-	 * @property Mode
-	 * @type {object}
-	 * @param {string} Mode.NAVIGATE_PAGE='navigate-page' The navigation keys navigate one page at a time
-	 * @param {string} Mode.NAVIGATE_ITEM='navigate-item' The navigation keys navigate one item at a time
-	 */
-	DragNavigator.Mode = {
-		NAVIGATE_PAGE: 'navigate-page',
-		NAVIGATE_ITEM: 'navigate-item'
-	};
-
-	/**
-	 * Returns current drag navigator mode.
-	 *
-	 * The mode is either {{#crossLink "DragNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "DragNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
-	 * either the page or navigate one item at a time.
-	 *
-	 * @method setMode
-	 * @param {DragNavigator/Mode:property} mode Mode to use
-	 */
-	DragNavigator.prototype.setMode = function(mode) {
-		if (!Util.objectHasValue(DragNavigator.Mode, mode)) {
-			throw new Error('Invalid mode "' + mode + '" provided');
-		}
-
-		this._mode = mode;
-	};
-
-	/**
-	 * Returns current drag navigator mode.
-	 *
-	 * The mode is either {{#crossLink "DragNavigator/Mode/NAVIGATE_PAGE:property"}}{{/crossLink}} or
-	 * {{#crossLink "DragNavigator/Mode/NAVIGATE_ITEM:property"}}{{/crossLink}} meaning that the arrow keys change
-	 * either the page or navigate one item at a time.
-	 *
-	 * @method getMode
-	 * @return {DragNavigator/Mode:property}
-	 */
-	DragNavigator.prototype.getMode = function() {
-		return this._mode;
-	};
-
-	/**
-	 * Called by the init to set up the navigator.
-	 *
-	 * @method _setup
-	 * @protected
-	 */
-	DragNavigator.prototype._setup = function() {
-		var $mainWrap = $(this._carousel.getMainWrap()),
-			$scrollerWrap = $(this._carousel.getScrollerWrap()),
-			$window = $(window);
-
-		// listen for mouse/touch down, move and up/leave events
-		$scrollerWrap.on('mousedown touchstart', this._eventListeners.start);
-		$window.on('mousemove touchmove', this._eventListeners.move);
-		$window.on('mouseup touchend touchcancel', this._eventListeners.end);
-
-		// intercept drag start event
-		$mainWrap.on('dragstart', this._eventListeners.dragStart);
-	};
-
-	/**
-	 * Called by the carousel on destroy.
-	 *
-	 * @method destroy
-	 */
-	DragNavigator.prototype.destroy = function() {
-		var $mainWrap = $(this._carousel.getMainWrap()),
-			$scrollerWrap = $(this._carousel.getScrollerWrap()),
-			$window = $(window);
-
-		// listen for mouse/touch down, move and up/leave events
-		$scrollerWrap.off('mousedown touchstart', this._eventListeners.start);
-		$window.off('mousemove touchmove', this._eventListeners.move);
-		$window.off('mouseup touchend touchcancel', this._eventListeners.end);
-		$mainWrap.off('dragstart', this._eventListeners.dragStart);
-	};
-
-	/**
-	 * Called on drag start event.
-	 *
-	 * @method _onRawStart
-	 * @param {Event} e Raw event
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	DragNavigator.prototype._onRawStart = function(e) {
-		if (e.which !== 1 && e.type !== 'touchstart') {
-			return true;
-		}
-
-		var orientation = this._carousel.getOrientation(),
-			horizontal = orientation === Config.Orientation.HORIZONTAL,
-			isTouchEvent = e.type === 'touchstart',
-			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
-			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
-			targetElement = e.target,
-			result;
-
-		result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
-
-		if (result === false) {
-			e.preventDefault();
-
-			return false;
-		} else {
-			return true;
-		}
-	};
-
-	/**
-	 * Called on drag move event.
-	 *
-	 * @method _onRawMove
-	 * @param {Event} e Raw event
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	DragNavigator.prototype._onRawMove = function(e) {
-		var orientation = this._carousel.getOrientation(),
-			horizontal = orientation === Config.Orientation.HORIZONTAL,
-			isTouchEvent = e.type === 'touchmove',
-			result,
-			x,
-			y;
-
-		// stop if not active
-		if (!this._active) {
-			return true;
-		}
-
-		// only move the carousel when the left mouse button is pressed
-		if (e.which !== 1 && e.type !== 'touchmove') {
-			result = this._end(e.target, isTouchEvent);
-		} else {
-			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
-			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
-
-			result = this._move(horizontal ? x : y, horizontal ? y : x);
-		}
-
-		if (result === false) {
-			e.preventDefault();
-
-			return false;
-		} else {
-			return true;
-		}
-	};
-
-	/**
-	 * Called on drag end event.
-	 *
-	 * @method _onRawEnd
-	 * @param {Event} e Raw event
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	DragNavigator.prototype._onRawEnd = function(e) {
-		var isTouchEvent = e.type === 'touchend' || e.type === 'touchcancel',
-			result,
-			targetElement;
-
-		// stop if not active
-		if (!this._active) {
-			return true;
-		}
-
-		// quit if invalid event
-		if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
-			return true;
-		}
-
-		targetElement = e.target;
-
-		result = this._end(targetElement, isTouchEvent);
-
-		/* istanbul ignore else */
-		if (result === false) {
-			e.preventDefault();
-
-			return false;
-		} else {
-			return true;
-		}
-	};
-
-	/**
-	 * Called on main wrap drag start event.
-	 *
-	 * @method _onRawDragStart
-	 * @param {Event} e Drag start event
-	 * @private
-	 */
-	DragNavigator.prototype._onRawDragStart = function(/*e*/) {
-		// cancel start drag event so images, links etc couldn't be dragged
-        return false;
-	};
-
-	/**
-	 * Begins the navigation.
-	 *
-	 * @method _begin
-	 * @param {number} position Drag position
-	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
-	 * @param {DOMElement} targetElement The element that was under the cursor when drag started
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	DragNavigator.prototype._begin = function(position, oppositePosition, targetElement) {
-		targetElement = targetElement || null;
-
-		// don't allow dragging when already animating
-		if (this._carousel.isAnimating()) {
-			return true;
-		}
-
-		this._active = true;
-		this._startPosition = position;
-		this._startOppositePosition = oppositePosition;
-		this._lastPosition = position; // it's possible that the move event never occurs so set it here alrady
-		this._lastOppositePosition = oppositePosition; // same for this
-		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
-		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
-		this._startWindowScrollTop = $(window).scrollTop();
-		this._accumulatedMagnitude = {
-			main: 0,
-			opposite: 0
-		};
-		this._firstMoveEvent = true;
-
-		// disable all children click events for the duration of the dragging
-		if (targetElement !== null) {
-			this._startTargetElement = targetElement;
-
-			this._setupClickHandlers(targetElement);
-		}
-
-		// notify the carousel that dragging has begun
-		this._carousel._onDragBegin(
-			this._startPosition,
-			this._startOppositePosition,
-			this._startCarouselPosition,
-			this._startWindowScrollTop
-		);
-
-		// disable default functionality
-		//return false;
-
-		// do not disable scrolling the page from the carousel component
-		return true;
-	};
-
-	/**
-	 * Called on mouse/finger move.
-	 *
-	 * @method _move
-	 * @param {number} position Drag position
-	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	DragNavigator.prototype._move = function(position, oppositePosition) {
-		/* istanbul ignore if */
-		if (!this._active) {
-			return true;
-		}
-
-		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startPosition;
-			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
-			//currentWindowScrollTop = $(window).scrollTop(),
-			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
-
-		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
-		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
-
-		// we need last move position in the _end() handler
-		this._lastPosition = position;
-		this._lastOppositePosition = oppositePosition;
-
-		// if the drag delta is very small then do nothing not to quit or start moving too soon
-		// TODO this deadband can not be done on android: https://code.google.com/p/chromium/issues/detail?id=240735
-		/*if (this._accumulatedMagnitude.main < this._noActionThreshold) {
-			// emulate manual scrolling
-			//$(window).scrollTop(this._startWindowScrollTop - windowScrollTopDifference - deltaDragOppositePosition);
-
-			return false;
-		}*/
-
-		// if the carousel is dragged more in the opposite direction then cancel and propagate
-		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
-		if (
-			this._accumulatedMagnitude.main > 0
-			&& this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite
-		) {
-			this._end();
-
-			return true;
-		}
-
-		// if the first move event takes more than 200ms then Android Chrome cancels the scroll, avoid this by returning
-		// quikcly on the first event
-		if (this._firstMoveEvent) {
-			this._firstMoveEvent = false;
-
-			return false;
-		}
-
-		// calculate the position
-		var newPosition = this._startCarouselPosition + deltaDragPosition,
-			itemSize = this._carousel.getItemSize(),
-			totalSize = this._carousel.getTotalSize(),
-			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
-			edgeMultiplier = this._carousel.getConfig().dragNavigatorOverEdgeDragPositionMultiplier,
-			minLimit = 0,
-			maxLimit = -totalSize + itemCountOnLastPage * itemSize;
-
-		// create smooth limit at the edges applying the drag motion partially
-		if (newPosition > minLimit || newPosition < maxLimit) {
-			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
-		}
-
-		// use the animator to move to calculated position instantly
-		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
-
-		return false;
-	};
-
-	/**
-	 * Called on gesture end.
-	 *
-	 * @method _end
-	 * @param {DOMElement} targetElement The element that the drag ended on
-	 * @param {boolean} [isTouchEvent=false] Is this a touch event
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	DragNavigator.prototype._end = function(targetElement, isTouchEvent) {
-		/* istanbul ignore if */
-		if (!this._active) {
-			return true;
-		}
-
-		isTouchEvent = typeof isTouchEvent === 'boolean' ? isTouchEvent : false;
-
-		var deltaDragPosition = this._lastPosition - this._startPosition,
-			deltaDragOppositePosition = this._lastOppositePosition - this._startOppositePosition,
-			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
-			direction = deltaDragPosition < 0 ? -1 : 1,
-			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
-			ignoreClickThreshold = this._carousel.getConfig().dragNavigatorIgnoreClickThreshold,
-			performNavigation = Math.abs(deltaDragPosition) > 0,
-			propagate = false,
-			performClick,
-			closestIndex,
-			endHoverItemIndex;
-
-		// we have to perform the navigation if the carousel was dragged in the main direction
-		if (performNavigation) {
-			// navigate to closest item or page depending on selected mode
-			switch (this._mode) {
-				case DragNavigator.Mode.NAVIGATE_PAGE:
-					closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
-
-					this._carousel.navigateToPage(closestIndex, false, true);
-				break;
-
-				case DragNavigator.Mode.NAVIGATE_ITEM:
-					closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
-
-					this._carousel.navigateToItem(closestIndex, false, true);
-				break;
-			}
-		}
-
-		// for touch events we don't have the hover indexes
-		if (isTouchEvent) {
-			performClick = targetElement !== null
-				&& targetElement === this._startTargetElement
-				&& dragMagnitude < ignoreClickThreshold;
-		} else {
-			endHoverItemIndex = this._carousel.getHoverItemIndex();
-
-			performClick = this._startHoverItemIndex !== null
-				&& targetElement !== null
-				&& targetElement === this._startTargetElement
-				&& endHoverItemIndex === this._startHoverItemIndex
-				&& dragMagnitude < ignoreClickThreshold;
-		}
-
-		// restore the element click handler if drag stopped on the same element and was dragged very little
-		if (performClick) {
-			this._callClickHandlers(targetElement);
-
-			this._dragStartHoverItemIndex = null;
-
-			// make sure the event propagates so the correct listeners get fired
-			propagate = true;
-		}
-
-		// notify the carousel that dragging has begun
-		this._carousel._onDragEnd(
-			this._mode,
-			this._startPosition,
-			this._lastPosition,
-			deltaDragPosition,
-			closestIndex,
-			direction,
-			targetElement
-		);
-
-		// reset
-		this._active = false;
-		this._startPosition = null;
-		this._startOppositePosition = null;
-		this._startCarouselPosition = null;
-		this._startWindowScrollTop = null;
-		this._lastPosition = null;
-		this._accumulatedMagnitude = {
-			main: 0,
-			opposite: 0
-		};
-		this._firstMoveEvent = true;
-
-		return propagate;
-	};
-
-	/**
-	 * Disables normal click handler for given element.
-	 *
-	 * @method _setupClickHandlers
-	 * @param {DOMElement} element Element to disable click events on
-	 * @private
-	 */
-	DragNavigator.prototype._setupClickHandlers = function(element) {
-		var $element = $(element),
-			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
-			isAlreadyDisabled = $element.data(disabledDataName);
-
-		if (isAlreadyDisabled !== true) {
-			var currentEventHandlers = $._data(element, 'events'),
-				clickHandlerFunctions = [],
-				currentClickHandlers,
-				i;
-
-			// extract the existing click event handlers if got any
-			if (
-				Util.isObject(currentEventHandlers)
-				&& Util.isArray(currentEventHandlers.click)
-				&& currentEventHandlers.click.length > 0
-			) {
-				// extract the current clickhandler functions
-				currentClickHandlers = currentEventHandlers.click;
-
-				for (i = 0; i < currentClickHandlers.length; i++) {
-					clickHandlerFunctions.push(currentClickHandlers[i].handler);
-				}
-
-				// store the original click handlers
-				$element.data('original-click-handlers', clickHandlerFunctions);
-
-				// remove the current click handlers and add the ignore handler
-				$element.off('click');
-			}
-
-			// add an ignoring click handler
-			$element.on('click', this._ignoreEvent);
-
-			$element.data(disabledDataName, true);
-		}
-	};
-
-	/**
-	 * Calls the original click handlers for given element.
-	 *
-	 * @method _callClickHandlers
-	 * @param {DOMElement} element Element to disable click events on
-	 * @private
-	 */
-	DragNavigator.prototype._callClickHandlers = function(element) {
-		var $element = $(element),
-			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
-			isDisabled = $element.data(disabledDataName);
-
-		if (isDisabled === true) {
-			// fetch the original click handlers
-			var originalClickHandlers = $element.data('original-click-handlers'),
-				i;
-
-			// remove the ignore handler
-			$element.off('click');
-
-			// restore the old click handlers if present
-			if (Util.isArray(originalClickHandlers)) {
-				// restore the original click handlers
-				for (i = 0; i < originalClickHandlers.length; i++) {
-					$element.on('click', originalClickHandlers[i].bind(element));
-
-					//originalClickHandlers[i].call(element);
-				}
-			}
-
-			$element.data(disabledDataName, false);
-		}
-	};
-
-	/**
-	 * Ignores given jQuery event.
-	 *
-	 * TODO don't know how to unit-test this yet
-	 *
-	 * @method _ignoreEvent
-	 * @param {jQuery.Event} e jQuery event
-	 * @return {boolean} Should the event propagate
-	 * @private
-	 */
-	/* istanbul ignore next */
-	DragNavigator.prototype._ignoreEvent = function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		return false;
-	};
-
-	return DragNavigator;
 });
 /*!
  * EventEmitter v4.2.7 - git.io/ee
@@ -3393,9 +3366,6 @@ define('FlowCarousel',[
 	'AbstractRenderer',
 	'HtmlRenderer',
 	'AbstractNavigator',
-	'KeyboardNavigator',
-	'SlideshowNavigator',
-	'DragNavigator',
 	'Deferred',
 	'Util',
 	'EventEmitter',
@@ -3411,9 +3381,6 @@ define('FlowCarousel',[
 	AbstractRenderer,
 	HtmlRenderer,
 	AbstractNavigator,
-	KeyboardNavigator,
-	SlideshowNavigator,
-	DragNavigator,
 	Deferred,
 	Util,
 	EventEmitter,
@@ -3746,6 +3713,26 @@ define('FlowCarousel',[
 		 */
 		this._useCache = true;
 
+		/**
+		 * Reference to the Event list.
+		 *
+		 * Useful for when you have an instance of the carousel but no reference to the class.
+		 *
+		 * @property Event
+		 * @type FlowCarousel.Event
+		 */
+		this.Event = FlowCarousel.Event;
+
+		/**
+		 * Reference to the Config class.
+		 *
+		 * Useful for when you have an instance of the carousel but no reference to the class.
+		 *
+		 * @property Config
+		 * @type FlowCarousel.Config
+		 */
+		this.Config = FlowCarousel.Config;
+
 		// increment the instance count
 		FlowCarousel.instanceCount++;
 	}
@@ -3848,30 +3835,6 @@ define('FlowCarousel',[
 	 * @type {Config}
 	 */
 	FlowCarousel.AbstractNavigator = AbstractNavigator;
-
-	/**
-	 * Reference to the {{#crossLink "KeyboardNavigator"}}{{/crossLink}} class.
-	 *
-	 * @property KeyboardNavigator
-	 * @type {KeyboardNavigator}
-	 */
-	FlowCarousel.KeyboardNavigator = KeyboardNavigator;
-
-	/**
-	 * Reference to the {{#crossLink "SlideshowNavigator"}}{{/crossLink}} class.
-	 *
-	 * @property SlideshowNavigator
-	 * @type {SlideshowNavigator}
-	 */
-	FlowCarousel.SlideshowNavigator = SlideshowNavigator;
-
-	/**
-	 * Reference to the {{#crossLink "DragNavigator"}}{{/crossLink}} class.
-	 *
-	 * @property DragNavigator
-	 * @type {DragNavigator}
-	 */
-	FlowCarousel.DragNavigator = DragNavigator;
 
 	/**
 	 * Reference to the {{#crossLink "Deferred"}}{{/crossLink}} class.
@@ -5294,33 +5257,30 @@ define('FlowCarousel',[
 	 * @private
 	 */
 	FlowCarousel.prototype._setupDefaultNavigators = function() {
-		var navigator = null,
-			type,
-			i;
+		var type;
 
-		for (i = 0; i < this._config.navigators.length; i++) {
-			type = this._config.navigators[i];
-
-			switch (type) {
-				case Config.Navigator.KEYBOARD:
-					navigator = new KeyboardNavigator(this._config.keyboardNavigatorMode);
-				break;
-
-				case Config.Navigator.DRAG:
-					navigator = new DragNavigator(this._config.dragNavigatorMode);
-				break;
-
-				case Config.Navigator.SLIDESHOW:
-					navigator = new SlideshowNavigator(this._config.slideshowNavigatorMode);
-				break;
-
-				default:
-					throw new Error('Navigator of type "' + type + '" is not supported');
+		for (type in this._config.navigators) {
+			if (typeof this._config.navigators[type].createInstance !== 'function') {
+				throw new Error(
+					'Expected the navigator definition to include "createInstance" method that returns a deferred ' +
+					'promise that is resolved with a new instance of the given navigator'
+				);
 			}
 
-			if (navigator !== null) {
-				this.addNavigator(type, navigator);
+			// skip disabled navigators
+			if (!this._config.navigators[type].enabled) {
+				continue;
 			}
+
+			// create navigator instance asyncronously and add it
+			Deferred.when(this._config.navigators[type].createInstance(this)).done(function(navigator) {
+				// the carousel may have gotten destroyed while the navigator was loading
+				if (this.carousel === null || this.carousel.isDestroyed()) {
+					return;
+				}
+
+				this.carousel.addNavigator(this.type, navigator);
+			}.bind({carousel: this, type: type}));
 		}
 	};
 

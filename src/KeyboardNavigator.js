@@ -1,8 +1,7 @@
 define([
 	'AbstractNavigator',
-	'Config',
 	'Util'
-], function(AbstractNavigator, Config, Util) {
+], function(AbstractNavigator, Util) {
 	'use strict';
 
 	/**
@@ -10,12 +9,14 @@ define([
 	 *
 	 * @class KeyboardNavigator
 	 * @extends AbstractNavigator
-	 * @param {KeyboardNavigator/Mode:property} [mode=KeyboardNavigator.Mode.NAVIGATE_PAGE] Navigation mode to use
+	 * @param {object} config Navigator configuration
 	 * @constructor
 	 */
-	function KeyboardNavigator(mode) {
+	function KeyboardNavigator(config) {
 		AbstractNavigator.call(this);
 
+		this._config = config;
+		this._mode = null;
 		this._mouseEntered = false;
 
 		this._eventListeners = {
@@ -24,7 +25,7 @@ define([
 			keydown: this._onRawKeyDown.bind(this),
 		};
 
-		this.setMode(mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
+		this.setMode(config.mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
 	}
 
 	KeyboardNavigator.prototype = Object.create(AbstractNavigator.prototype);
@@ -167,14 +168,14 @@ define([
 
 		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
 		switch (this._carousel.getOrientation()) {
-			case Config.Orientation.HORIZONTAL:
+			case this._carousel.Config.Orientation.HORIZONTAL:
 				keyCodes = {
 					previous: 37, // arrow left
 					next: 39 // arrow right
 				};
 			break;
 
-			case Config.Orientation.VERTICAL:
+			case this._carousel.Config.Orientation.VERTICAL:
 				keyCodes = {
 					previous: 38, // arrow up
 					next: 40 // arrow down

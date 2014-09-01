@@ -31,7 +31,7 @@ define([
 		it('is loaded by default', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD);
+			var navigator = carousel.getNavigatorByType('keyboard');
 
 			expect(navigator).toEqual(jasmine.any(KeyboardNavigator));
 		});
@@ -39,7 +39,7 @@ define([
 		it('default mode is navigating pages', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD);
+			var navigator = carousel.getNavigatorByType('keyboard');
 
 			expect(navigator.getMode()).toEqual(KeyboardNavigator.Mode.NAVIGATE_PAGE);
 		});
@@ -47,7 +47,7 @@ define([
 		it('mode can be changed', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD);
+			var navigator = carousel.getNavigatorByType('keyboard');
 
 			navigator.setMode(KeyboardNavigator.Mode.NAVIGATE_ITEM);
 
@@ -57,7 +57,7 @@ define([
 		it('requesting invalid mode throws error', function () {
 			carousel.init('.carousel');
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD),
+			var navigator = carousel.getNavigatorByType('keyboard'),
 				setInvalidMode = function() {
 					navigator.setMode('foobar');
 				};
@@ -120,7 +120,7 @@ define([
 				orientation: FlowCarousel.Config.Orientation.VERTICAL
 			});
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD),
+			var navigator = carousel.getNavigatorByType('keyboard'),
 				$mainWrap = $(carousel.getMainWrap()),
 				$window = $(window),
 				keyDownEvent = jQuery.Event('keydown');
@@ -150,7 +150,7 @@ define([
 				orientation: FlowCarousel.Config.Orientation.VERTICAL
 			});
 
-			var navigator = carousel.getNavigatorByType(FlowCarousel.Config.Navigator.KEYBOARD),
+			var navigator = carousel.getNavigatorByType('keyboard'),
 				$mainWrap = $(carousel.getMainWrap()),
 				$window = $(window),
 				keyDownEvent = jQuery.Event('keydown');

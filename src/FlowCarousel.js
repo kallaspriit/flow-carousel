@@ -9,9 +9,6 @@ define([
 	'AbstractRenderer',
 	'HtmlRenderer',
 	'AbstractNavigator',
-	'KeyboardNavigator',
-	'SlideshowNavigator',
-	'DragNavigator',
 	'Deferred',
 	'Util',
 	'EventEmitter',
@@ -27,9 +24,6 @@ define([
 	AbstractRenderer,
 	HtmlRenderer,
 	AbstractNavigator,
-	KeyboardNavigator,
-	SlideshowNavigator,
-	DragNavigator,
 	Deferred,
 	Util,
 	EventEmitter,
@@ -362,6 +356,26 @@ define([
 		 */
 		this._useCache = true;
 
+		/**
+		 * Reference to the Event list.
+		 *
+		 * Useful for when you have an instance of the carousel but no reference to the class.
+		 *
+		 * @property Event
+		 * @type FlowCarousel.Event
+		 */
+		this.Event = FlowCarousel.Event;
+
+		/**
+		 * Reference to the Config class.
+		 *
+		 * Useful for when you have an instance of the carousel but no reference to the class.
+		 *
+		 * @property Config
+		 * @type FlowCarousel.Config
+		 */
+		this.Config = FlowCarousel.Config;
+
 		// increment the instance count
 		FlowCarousel.instanceCount++;
 	}
@@ -464,30 +478,6 @@ define([
 	 * @type {Config}
 	 */
 	FlowCarousel.AbstractNavigator = AbstractNavigator;
-
-	/**
-	 * Reference to the {{#crossLink "KeyboardNavigator"}}{{/crossLink}} class.
-	 *
-	 * @property KeyboardNavigator
-	 * @type {KeyboardNavigator}
-	 */
-	FlowCarousel.KeyboardNavigator = KeyboardNavigator;
-
-	/**
-	 * Reference to the {{#crossLink "SlideshowNavigator"}}{{/crossLink}} class.
-	 *
-	 * @property SlideshowNavigator
-	 * @type {SlideshowNavigator}
-	 */
-	FlowCarousel.SlideshowNavigator = SlideshowNavigator;
-
-	/**
-	 * Reference to the {{#crossLink "DragNavigator"}}{{/crossLink}} class.
-	 *
-	 * @property DragNavigator
-	 * @type {DragNavigator}
-	 */
-	FlowCarousel.DragNavigator = DragNavigator;
 
 	/**
 	 * Reference to the {{#crossLink "Deferred"}}{{/crossLink}} class.
@@ -1910,33 +1900,30 @@ define([
 	 * @private
 	 */
 	FlowCarousel.prototype._setupDefaultNavigators = function() {
-		var navigator = null,
-			type,
-			i;
+		var type;
 
-		for (i = 0; i < this._config.navigators.length; i++) {
-			type = this._config.navigators[i];
-
-			switch (type) {
-				case Config.Navigator.KEYBOARD:
-					navigator = new KeyboardNavigator(this._config.keyboardNavigatorMode);
-				break;
-
-				case Config.Navigator.DRAG:
-					navigator = new DragNavigator(this._config.dragNavigatorMode);
-				break;
-
-				case Config.Navigator.SLIDESHOW:
-					navigator = new SlideshowNavigator(this._config.slideshowNavigatorMode);
-				break;
-
-				default:
-					throw new Error('Navigator of type "' + type + '" is not supported');
+		for (type in this._config.navigators) {
+			if (typeof this._config.navigators[type].createInstance !== 'function') {
+				throw new Error(
+					'Expected the navigator definition to include "createInstance" method that returns a deferred ' +
+					'promise that is resolved with a new instance of the given navigator'
+				);
 			}
 
-			if (navigator !== null) {
-				this.addNavigator(type, navigator);
+			// skip disabled navigators
+			if (!this._config.navigators[type].enabled) {
+				continue;
 			}
+
+			// create navigator instance asyncronously and add it
+			Deferred.when(this._config.navigators[type].createInstance(this)).done(function(navigator) {
+				// the carousel may have gotten destroyed while the navigator was loading
+				if (this.carousel === null || this.carousel.isDestroyed()) {
+					return;
+				}
+
+				this.carousel.addNavigator(this.type, navigator);
+			}.bind({carousel: this, type: type}));
 		}
 	};
 

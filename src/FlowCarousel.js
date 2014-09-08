@@ -759,6 +759,16 @@ define([
 	};
 
 	/**
+	 * Returns the unique id and carousel index.
+	 *
+	 * @method getId
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getId = function() {
+		return this._id;
+	};
+
+	/**
 	 * Returns whether the carousel has been initiated.
 	 *
 	 * @method isInitiated
@@ -1407,12 +1417,17 @@ define([
 
 		var currentPageIndex = this.getCurrentPageIndex(),
 			itemIndex = pageIndex * this.getItemsPerPage(),
+			// TODO this needs change in getCurrentPageIndex as well
+			//itemIndex = Math.min(pageIndex * this.getItemsPerPage(), this.getMaximumValidItemIndex()),
 			pageCount = this.getPageCount(),
 			deferred = new Deferred();
 
 		// already at target page index, visualize limit
 		if (pageIndex === currentPageIndex && force !== true) {
-			if (pageIndex === 0 || pageIndex === pageCount - 1) {
+			if (
+				(pageIndex === 0 || pageIndex === pageCount - 1)
+				&& this.getPageCount() > 1
+			) {
 				this._showLimit(itemIndex).done(function() {
 					deferred.resolve();
 				});

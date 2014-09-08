@@ -403,7 +403,7 @@ define([
 		if (targetElement !== null) {
 			this._startTargetElement = targetElement;
 
-			this._setupClickHandlers(targetElement);
+			this._disableClickHandlers(targetElement);
 		}
 
 		// notify the carousel that dragging has begun
@@ -561,7 +561,7 @@ define([
 
 		// restore the element click handler if drag stopped on the same element and was dragged very little
 		if (performClick) {
-			this._callClickHandlers(targetElement);
+			this._restoreClickHandlers(targetElement);
 
 			this._dragStartHoverItemIndex = null;
 
@@ -599,17 +599,33 @@ define([
 	/**
 	 * Disables normal click handler for given element.
 	 *
-	 * @method _setupClickHandlers
-	 * @param {DOMElement} element Element to disable click events on
+	 * @method _disableClickHandlers
+	 * @param {DOMElement} clickedElement Element to disable click events on
 	 * @private
 	 */
-	DragNavigator.prototype._setupClickHandlers = function(element) {
-		var $element = $(element),
-			disabledDataName = this._carousel.getConfig().cssPrefix + &#x27;click-disabled&#x27;,
-			isAlreadyDisabled = $element.data(disabledDataName);
+	DragNavigator.prototype._disableClickHandlers = function(clickedElement) {
+		var disabledDataName = this._carousel.getConfig().cssPrefix + &#x27;click-disabled&#x27;,
+			$clickedElement = $(clickedElement),
+			$closestLink = $clickedElement.closest(&#x27;A&#x27;),
+			$disableElement = $clickedElement,
+			isAlreadyDisabled,
+			mainWrapClass,
+			linkHasCarouselParent;
+
+		// disable the closest A if possible
+		if ($closestLink.length &gt; 0) {
+			mainWrapClass = &#x27;.&#x27; + this._carousel.getConfig().getClassName(&#x27;wrap&#x27;);
+			linkHasCarouselParent = $closestLink.closest(mainWrapClass).length &gt; 0;
+
+			if (linkHasCarouselParent) {
+				$disableElement = $closestLink;
+			}
+		}
+
+		isAlreadyDisabled = $disableElement.data(disabledDataName);
 
 		if (isAlreadyDisabled !== true) {
-			var currentEventHandlers = $._data(element, &#x27;events&#x27;),
+			var currentEventHandlers = $._data(clickedElement, &#x27;events&#x27;),
 				clickHandlerFunctions = [],
 				currentClickHandlers,
 				i;
@@ -628,51 +644,95 @@ define([
 				}
 
 				// store the original click handlers
-				$element.data(&#x27;original-click-handlers&#x27;, clickHandlerFunctions);
+				$disableElement.data(&#x27;original-click-handlers&#x27;, clickHandlerFunctions);
 
 				// remove the current click handlers and add the ignore handler
-				$element.off(&#x27;click&#x27;);
+				$disableElement.off(&#x27;click&#x27;);
 			}
 
 			// add an ignoring click handler
-			$element.on(&#x27;click&#x27;, this._ignoreEvent);
+			$disableElement.on(&#x27;click&#x27;, this._ignoreEvent);
 
-			$element.data(disabledDataName, true);
+			$disableElement.data(disabledDataName, true);
+
+			// mark it disabled to be easy to find for restoring
+			$disableElement.attr(&#x27;data-disabled&#x27;, &#x27;true&#x27;);
+
+			console.log(&#x27;disable&#x27;, $disableElement[0]);
 		}
 	};
 
 	/**
 	 * Calls the original click handlers for given element.
 	 *
-	 * @method _callClickHandlers
-	 * @param {DOMElement} element Element to disable click events on
+	 * @method _restoreClickHandlers
+	 * @param {DOMElement} clickedElement Element to disable click events on
 	 * @private
 	 */
-	DragNavigator.prototype._callClickHandlers = function(element) {
-		var $element = $(element),
+	DragNavigator.prototype._restoreClickHandlers = function(clickedElement) {
+		var disabledDataName = this._carousel.getConfig().cssPrefix + &#x27;click-disabled&#x27;,
+			$clickedElement = $(clickedElement),
+			$restoreElement = null,
+			$closestLink;
+
+		// find the disabled element
+		if ($clickedElement.attr(&#x27;data-disabled&#x27;) === &#x27;true&#x27;) {
+			$restoreElement = $clickedElement;
+		} else {
+			$closestLink = $clickedElement.closest(&#x27;A&#x27;);
+
+			if ($closestLink.length &gt; 0 &amp;&amp; $closestLink.attr(&#x27;data-disabled&#x27;) === &#x27;true&#x27;) {
+				$restoreElement = $closestLink;
+			}
+		}
+
+		// this should generally not happen
+		if ($restoreElement === null) {
+			return;
+		}
+
+		var originalClickHandlers = $restoreElement.data(&#x27;original-click-handlers&#x27;),
+			i;
+
+		// remove the ignore handler
+		$restoreElement.off(&#x27;click&#x27;);
+
+		// restore the old click handlers if present
+		if (Util.isArray(originalClickHandlers)) {
+			// restore the original click handlers
+			for (i = 0; i &lt; originalClickHandlers.length; i++) {
+				$restoreElement.on(&#x27;click&#x27;, originalClickHandlers[i].bind(clickedElement));
+			}
+		}
+
+		// remove the disabled state
+		$restoreElement.data(disabledDataName, false);
+		$restoreElement.attr(&#x27;data-disabled&#x27;, null);
+
+		/*var $clickedElement = $(clickedElement),
 			disabledDataName = this._carousel.getConfig().cssPrefix + &#x27;click-disabled&#x27;,
-			isDisabled = $element.data(disabledDataName);
+			isDisabled = $clickedElement.data(disabledDataName);
 
 		if (isDisabled === true) {
 			// fetch the original click handlers
-			var originalClickHandlers = $element.data(&#x27;original-click-handlers&#x27;),
+			var originalClickHandlers = $clickedElement.data(&#x27;original-click-handlers&#x27;),
 				i;
 
 			// remove the ignore handler
-			$element.off(&#x27;click&#x27;);
+			$clickedElement.off(&#x27;click&#x27;);
 
 			// restore the old click handlers if present
 			if (Util.isArray(originalClickHandlers)) {
 				// restore the original click handlers
 				for (i = 0; i &lt; originalClickHandlers.length; i++) {
-					$element.on(&#x27;click&#x27;, originalClickHandlers[i].bind(element));
+					$clickedElement.on(&#x27;click&#x27;, originalClickHandlers[i].bind(clickedElement));
 
 					//originalClickHandlers[i].call(element);
 				}
 			}
 
-			$element.data(disabledDataName, false);
-		}
+			$clickedElement.data(disabledDataName, false);
+		}*/
 	};
 
 	/**

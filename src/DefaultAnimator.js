@@ -198,7 +198,7 @@ define([
 	 *
 	 * @method onCarouselInitiated
 	 */
-	AbstractAnimator.prototype.onCarouselElementReady = function() {
+	DefaultAnimator.prototype.onCarouselElementReady = function() {
 		this._setupTransitionEndListener();
 	};
 

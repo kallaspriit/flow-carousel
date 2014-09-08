@@ -1156,7 +1156,7 @@ define('DragNavigator',[
 		if (targetElement !== null) {
 			this._startTargetElement = targetElement;
 
-			this._setupClickHandlers(targetElement);
+			this._disableClickHandlers(targetElement);
 		}
 
 		// notify the carousel that dragging has begun
@@ -1314,7 +1314,7 @@ define('DragNavigator',[
 
 		// restore the element click handler if drag stopped on the same element and was dragged very little
 		if (performClick) {
-			this._callClickHandlers(targetElement);
+			this._restoreClickHandlers(targetElement);
 
 			this._dragStartHoverItemIndex = null;
 
@@ -1352,17 +1352,33 @@ define('DragNavigator',[
 	/**
 	 * Disables normal click handler for given element.
 	 *
-	 * @method _setupClickHandlers
-	 * @param {DOMElement} element Element to disable click events on
+	 * @method _disableClickHandlers
+	 * @param {DOMElement} clickedElement Element to disable click events on
 	 * @private
 	 */
-	DragNavigator.prototype._setupClickHandlers = function(element) {
-		var $element = $(element),
-			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
-			isAlreadyDisabled = $element.data(disabledDataName);
+	DragNavigator.prototype._disableClickHandlers = function(clickedElement) {
+		var disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
+			$clickedElement = $(clickedElement),
+			$closestLink = $clickedElement.closest('A'),
+			$disableElement = $clickedElement,
+			isAlreadyDisabled,
+			mainWrapClass,
+			linkHasCarouselParent;
+
+		// disable the closest A if possible
+		if ($closestLink.length > 0) {
+			mainWrapClass = '.' + this._carousel.getConfig().getClassName('wrap');
+			linkHasCarouselParent = $closestLink.closest(mainWrapClass).length > 0;
+
+			if (linkHasCarouselParent) {
+				$disableElement = $closestLink;
+			}
+		}
+
+		isAlreadyDisabled = $disableElement.data(disabledDataName);
 
 		if (isAlreadyDisabled !== true) {
-			var currentEventHandlers = $._data(element, 'events'),
+			var currentEventHandlers = $._data(clickedElement, 'events'),
 				clickHandlerFunctions = [],
 				currentClickHandlers,
 				i;
@@ -1381,51 +1397,93 @@ define('DragNavigator',[
 				}
 
 				// store the original click handlers
-				$element.data('original-click-handlers', clickHandlerFunctions);
+				$disableElement.data('original-click-handlers', clickHandlerFunctions);
 
 				// remove the current click handlers and add the ignore handler
-				$element.off('click');
+				$disableElement.off('click');
 			}
 
 			// add an ignoring click handler
-			$element.on('click', this._ignoreEvent);
+			$disableElement.on('click', this._ignoreEvent);
 
-			$element.data(disabledDataName, true);
+			$disableElement.data(disabledDataName, true);
+
+			// mark it disabled to be easy to find for restoring
+			$disableElement.attr('data-disabled', 'true');
 		}
 	};
 
 	/**
 	 * Calls the original click handlers for given element.
 	 *
-	 * @method _callClickHandlers
-	 * @param {DOMElement} element Element to disable click events on
+	 * @method _restoreClickHandlers
+	 * @param {DOMElement} clickedElement Element to disable click events on
 	 * @private
 	 */
-	DragNavigator.prototype._callClickHandlers = function(element) {
-		var $element = $(element),
+	DragNavigator.prototype._restoreClickHandlers = function(clickedElement) {
+		var disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
+			$clickedElement = $(clickedElement),
+			$restoreElement = null,
+			$closestLink;
+
+		// find the disabled element
+		if ($clickedElement.attr('data-disabled') === 'true') {
+			$restoreElement = $clickedElement;
+		} else {
+			$closestLink = $clickedElement.closest('A');
+
+			if ($closestLink.length > 0 && $closestLink.attr('data-disabled') === 'true') {
+				$restoreElement = $closestLink;
+			}
+		}
+
+		// this should generally not happen
+		if ($restoreElement === null) {
+			return;
+		}
+
+		var originalClickHandlers = $restoreElement.data('original-click-handlers'),
+			i;
+
+		// remove the ignore handler
+		$restoreElement.off('click');
+
+		// restore the old click handlers if present
+		if (Util.isArray(originalClickHandlers)) {
+			// restore the original click handlers
+			for (i = 0; i < originalClickHandlers.length; i++) {
+				$restoreElement.on('click', originalClickHandlers[i].bind(clickedElement));
+			}
+		}
+
+		// remove the disabled state
+		$restoreElement.data(disabledDataName, false);
+		$restoreElement.attr('data-disabled', null);
+
+		/*var $clickedElement = $(clickedElement),
 			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
-			isDisabled = $element.data(disabledDataName);
+			isDisabled = $clickedElement.data(disabledDataName);
 
 		if (isDisabled === true) {
 			// fetch the original click handlers
-			var originalClickHandlers = $element.data('original-click-handlers'),
+			var originalClickHandlers = $clickedElement.data('original-click-handlers'),
 				i;
 
 			// remove the ignore handler
-			$element.off('click');
+			$clickedElement.off('click');
 
 			// restore the old click handlers if present
 			if (Util.isArray(originalClickHandlers)) {
 				// restore the original click handlers
 				for (i = 0; i < originalClickHandlers.length; i++) {
-					$element.on('click', originalClickHandlers[i].bind(element));
+					$clickedElement.on('click', originalClickHandlers[i].bind(clickedElement));
 
 					//originalClickHandlers[i].call(element);
 				}
 			}
 
-			$element.data(disabledDataName, false);
-		}
+			$clickedElement.data(disabledDataName, false);
+		}*/
 	};
 
 	/**
@@ -2946,7 +3004,7 @@ define('DefaultAnimator',[
 	 *
 	 * @method onCarouselInitiated
 	 */
-	AbstractAnimator.prototype.onCarouselElementReady = function() {
+	DefaultAnimator.prototype.onCarouselElementReady = function() {
 		this._setupTransitionEndListener();
 	};
 
@@ -4413,6 +4471,16 @@ define('FlowCarousel',[
 	};
 
 	/**
+	 * Returns the unique id and carousel index.
+	 *
+	 * @method getId
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getId = function() {
+		return this._id;
+	};
+
+	/**
 	 * Returns whether the carousel has been initiated.
 	 *
 	 * @method isInitiated
@@ -5061,12 +5129,17 @@ define('FlowCarousel',[
 
 		var currentPageIndex = this.getCurrentPageIndex(),
 			itemIndex = pageIndex * this.getItemsPerPage(),
+			// TODO this needs change in getCurrentPageIndex as well
+			//itemIndex = Math.min(pageIndex * this.getItemsPerPage(), this.getMaximumValidItemIndex()),
 			pageCount = this.getPageCount(),
 			deferred = new Deferred();
 
 		// already at target page index, visualize limit
 		if (pageIndex === currentPageIndex && force !== true) {
-			if (pageIndex === 0 || pageIndex === pageCount - 1) {
+			if (
+				(pageIndex === 0 || pageIndex === pageCount - 1)
+				&& this.getPageCount() > 1
+			) {
 				this._showLimit(itemIndex).done(function() {
 					deferred.resolve();
 				});

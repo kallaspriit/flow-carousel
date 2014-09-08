@@ -15,7 +15,10 @@
 	<h2>Basic horizontal carousel with default options</h2>
 	<div id="basic-carousel" class="carousel carousel-horizontal">
 		<div class="carousel-item carousel-item-odd image-or-link">
-			<a href="#test">0</a>
+			<a href="#test">
+				<img src="http://lorempixel.com/400/300/" style="width: 100%; height: 50%;">
+				0
+			</a>
 		</div>
 		<div class="carousel-item">1</div>
 		<div class="carousel-item carousel-item-odd">2</div>
@@ -373,14 +376,18 @@
 
 			//slideshowNavigatorInterval: 5000
 			navigators: {
-				slideshow: {
+				/*slideshow: {
 					enabled: true
-				},
+				},*/
 				interface: {
 					enabled: true
 				}
 			}
-		})
+		});
+
+		basicCarousel.on(FlowCarousel.Event.NAVIGATED_TO_ITEM, function() {
+			console.log('limits', basicCarousel.isFirstPage(), basicCarousel.isLastPage(), basicCarousel.getCurrentPageIndex());
+		});
 
 		/*.done(function() {
 			basicCarousel.navigateToPage(1).done(function() {

@@ -46,8 +46,8 @@ module.exports = function(config) {
         reporters: ['progress'],
 
 		// set to a real host if accessing from another machine
-		//hostname: 'localhost',
-		hostname: '192.168.1.69', // TODO restore the localhost
+		hostname: 'localhost',
+		//hostname: '192.168.1.69', // TODO restore the localhost
 
         // web server port
         port: 9876,

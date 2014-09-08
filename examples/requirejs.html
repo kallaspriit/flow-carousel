@@ -259,6 +259,70 @@
 		<button class="btn" data-action="change-height" data-target="#dynamic-carousel">Change elements height</button>
 	</div>
 
+	<h2>Carousel using ScrollAnimator</h2>
+	<div id="scroll-animator-carousel" class="carousel carousel-horizontal">
+		<div class="carousel-item carousel-item-odd image-or-link">
+			<a href="#test2">0</a>
+		</div>
+		<div class="carousel-item">1</div>
+		<div class="carousel-item carousel-item-odd">2</div>
+		<div class="carousel-item">3</div>
+		<div class="carousel-item carousel-item-odd">4</div>
+		<div class="carousel-item">5</div>
+		<div class="carousel-item carousel-item-odd">6</div>
+		<div class="carousel-item">7</div>
+		<div class="carousel-item carousel-item-odd">8</div>
+		<div class="carousel-item">9</div>
+		<div class="carousel-item carousel-item-odd">10</div>
+		<div class="carousel-item">11</div>
+		<div class="carousel-item carousel-item-odd">12</div>
+		<div class="carousel-item">13</div>
+		<div class="carousel-item carousel-item-odd">14</div>
+		<div class="carousel-item">15</div>
+	</div>
+	<div class="controls">
+		<button class="btn" data-action="previous-page" data-target="#scroll-animator-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#scroll-animator-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#scroll-animator-carousel">Next item</button>
+		<button class="btn" data-action="next-page" data-target="#scroll-animator-carousel">Next page</button>
+		-
+		<button class="btn" data-action="destroy" data-target="#scroll-animator-carousel">Destroy</button>
+		<button class="btn" data-action="create" data-target="#scroll-animator-carousel">Create</button>
+	</div>
+
+	<h2>Vertical ccarousel using ScrollAnimator</h2>
+	<div id="scroll-animator-vertical-carousel" class="carousel carousel-vertical">
+		<div class="carousel-item carousel-item-odd image-or-link">
+			<a href="#test2">0</a>
+		</div>
+		<div class="carousel-item">1</div>
+		<div class="carousel-item carousel-item-odd">2</div>
+		<div class="carousel-item">3</div>
+		<div class="carousel-item carousel-item-odd">4</div>
+		<div class="carousel-item">5</div>
+		<div class="carousel-item carousel-item-odd">6</div>
+		<div class="carousel-item">7</div>
+		<div class="carousel-item carousel-item-odd">8</div>
+		<div class="carousel-item">9</div>
+		<div class="carousel-item carousel-item-odd">10</div>
+		<div class="carousel-item">11</div>
+		<div class="carousel-item carousel-item-odd">12</div>
+		<div class="carousel-item">13</div>
+		<div class="carousel-item carousel-item-odd">14</div>
+		<div class="carousel-item">15</div>
+	</div>
+	<div class="controls">
+		<button class="btn" data-action="previous-page" data-target="#scroll-animator-vertical-carousel">Previous page</button>
+		<button class="btn" data-action="previous-item" data-target="#scroll-animator-vertical-carousel">Previous item</button>
+		-
+		<button class="btn" data-action="next-item" data-target="#scroll-animator-vertical-carousel">Next item</button>
+		<button class="btn" data-action="next-page" data-target="#scroll-animator-vertical-carousel">Next page</button>
+		-
+		<button class="btn" data-action="destroy" data-target="#scroll-animator-vertical-carousel">Destroy</button>
+		<button class="btn" data-action="create" data-target="#scroll-animator-vertical-carousel">Create</button>
+	</div>
+
 	<button id="reload-btn">Reload</button>
 
 	<script src="lib/require.js"></script>
@@ -267,14 +331,16 @@
 
 	// configure RequireJS
 	require.config({
-		baseUrl: '../src',
+		baseUrl: '../src'
 	});
 
 	// fetch the carousel component and run it
 	require([
-		'FlowCarousel'
+		'FlowCarousel',
+		'ScrollAnimator'
 	], function(
-		FlowCarousel
+		FlowCarousel,
+	    ScrollAnimator
 	) {
 		// test asynchronous data source
 		function CustomDataSource() {
@@ -338,6 +404,8 @@
 			asyncCarousel = new FlowCarousel(),
 			dynamicCarousel = new FlowCarousel(),
 			singleItemCarousel = new FlowCarousel(),
+			scrollAnimatorCarousel = new FlowCarousel(),
+			scrollAnimatorVerticalCarousel = new FlowCarousel(),
 			eventKey,
 			eventName;
 
@@ -475,6 +543,24 @@
 			sizeMode: FlowCarousel.Config.SizeMode.MATCH_LARGEST_ITEM,
 			//useResponsiveLayout: false,
 			//itemsPerPage: 1
+		});
+
+		scrollAnimatorCarousel.init('#scroll-animator-carousel', {
+			navigators: {
+				interface: {
+					enabled: true
+				}
+			},
+			animator: new ScrollAnimator(scrollAnimatorCarousel)
+		});
+		scrollAnimatorVerticalCarousel.init('#scroll-animator-vertical-carousel', {
+			orientation: FlowCarousel.Config.Orientation.VERTICAL,
+			navigators: {
+				interface: {
+					enabled: true
+				}
+			},
+			animator: new ScrollAnimator(scrollAnimatorVerticalCarousel)
 		});
 
 		// setup buttons

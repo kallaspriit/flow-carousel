@@ -16,6 +16,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "HtmlRenderer",
         "InterfaceNavigator",
         "KeyboardNavigator",
+        "ScrollAnimator",
         "SlideshowNavigator",
         "Util"
     ],

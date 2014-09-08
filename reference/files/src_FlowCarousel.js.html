@@ -71,6 +71,8 @@
             
                 <li><a href="../classes/KeyboardNavigator.html">KeyboardNavigator</a></li>
             
+                <li><a href="../classes/ScrollAnimator.html">ScrollAnimator</a></li>
+            
                 <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
@@ -876,6 +878,16 @@ define([
 
 		// decrement the livecount
 		FlowCarousel.liveCount--;
+	};
+
+	/**
+	 * Returns the unique id and carousel index.
+	 *
+	 * @method getId
+	 * @return {number}
+	 */
+	FlowCarousel.prototype.getId = function() {
+		return this._id;
 	};
 
 	/**

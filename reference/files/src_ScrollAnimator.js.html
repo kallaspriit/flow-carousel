@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\DefaultAnimator.js - FlowCarousel</title>
+    <title>src\ScrollAnimator.js - FlowCarousel</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -116,7 +116,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\DefaultAnimator.js</h1>
+                        <h1 class="file-heading">File: src\ScrollAnimator.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -124,9 +124,8 @@ define([
 	&#x27;jquery&#x27;,
 	&#x27;AbstractAnimator&#x27;,
 	&#x27;Config&#x27;,
-	&#x27;Util&#x27;,
 	&#x27;Deferred&#x27;
-], function($, AbstractAnimator, Config, Util, Deferred) {
+], function($, AbstractAnimator, Config, Deferred) {
 	&#x27;use strict&#x27;;
 
 	// requestAnimationFrame polyfill
@@ -167,37 +166,28 @@ define([
 	/**
 	 * Data source interface.
 	 *
-	 * @class DefaultAnimator
+	 * @class ScrollAnimator
 	 * @extends AbstractAnimator
 	 * @constructor
 	 * @param {FlowCarousel} carousel The carousel component
 	 */
-	function DefaultAnimator(carousel) {
+	function ScrollAnimator(carousel) {
 		AbstractAnimator.call(this, carousel);
 
+		this._animationSpeed = 200;
 		this._carousel = carousel;
-		this._activeDeferred = null;
-		this._transitionEndListenerCreated = false;
-		this._eventListeners = {
-			transitionEnd: this._onRawTransitionEnd.bind(this)
-		};
 	}
 
-	DefaultAnimator.prototype = Object.create(AbstractAnimator.prototype);
+	ScrollAnimator.prototype = Object.create(AbstractAnimator.prototype);
 
 	/**
-	 * Called by the carousel on destroy.
+	 * Called by the carousel once it&#x27;s structure has been initiated.
 	 *
-	 * @method destroy
+	 * @method onCarouselInitiated
 	 */
-	AbstractAnimator.prototype.destroy = function() {
-		var $scrollerWrap = $(this._carousel.getScrollerWrap());
-
-		// remove the transition end listener
-		$scrollerWrap.off(
-			&#x27;transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd&#x27;,
-			this._eventListeners.transitionEnd
-		);
+	ScrollAnimator.prototype.onCarouselElementReady = function() {
+		//add css class to indicate the type of this animator
+		$(this._carousel.getMainWrap()).addClass(this._carousel.getConfig().cssPrefix + &#x27;scroll-animator&#x27;);
 	};
 
 	/**
@@ -206,16 +196,14 @@ define([
 	 * @method getCurrentPosition
 	 * @return {number}
 	 */
-	DefaultAnimator.prototype.getCurrentPosition = function() {
-		var $scrollerWrap = $(this._carousel.getScrollerWrap()),
-			transformMatrix = $scrollerWrap.css(&#x27;transform&#x27;),
-			transformOffset = Util.parseTransformMatrix(transformMatrix),
+	ScrollAnimator.prototype.getCurrentPosition = function() {
+		var $scrollerWrap = $(this._carousel.getItemsWrap()),
 			orientation = this._carousel.getOrientation();
 
 		if (orientation === Config.Orientation.HORIZONTAL) {
-			return transformOffset.x;
+			return $scrollerWrap.scrollLeft() * -1;
 		} else {
-			return transformOffset.y;
+			return $scrollerWrap.scrollTop() * -1;
 		}
 	};
 
@@ -227,7 +215,7 @@ define([
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
+	ScrollAnimator.prototype.animateToItem = function(itemIndex, instant) {
 		var position = this._carousel.getItemPositionByIndex(itemIndex);
 
 		return this.animateToPosition(position, instant);
@@ -242,72 +230,61 @@ define([
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+	ScrollAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
 		instant = typeof instant === &#x27;boolean&#x27; ? instant : false;
 		noDeferred = typeof noDeferred === &#x27;boolean&#x27; ? noDeferred : false;
 
-		/* istanbul ignore if */
-		if (!this._transitionEndListenerCreated &amp;&amp; instant !== true) {
-			throw new Error(&#x27;Requested non-instant animation before transition end listener was created&#x27;);
-		}
-
 		var deferred = noDeferred ? null : new Deferred(),
-			orientation = this._carousel.getOrientation(),
-			$scrollerWrap = $(this._carousel.getScrollerWrap()),
-			animateTransformClass = this._carousel.getConfig().getClassName(&#x27;animateTransform&#x27;),
-			currentPosition,
-			translateCommand;
+			orientation = this._carousel.getOrientation();
 
 		// make sure the position is a full integer
-		position = Math.floor(position);
+		position = Math.floor(position) * -1;
 
-		// resolve existing deferred if exists
-		/* istanbul ignore if */
-		if (this._activeDeferred !== null) {
-			this._activeDeferred.resolve();
-			this._activeDeferred = null;
-		}
-
-		// don&#x27;t waste power on current position if not using deferred
-		if (noDeferred !== true) {
-			currentPosition = this.getCurrentPosition();
-		}
-
-		// the translate command is different for horizontal and vertical carousels
+		// decide to use scrollLeft or scrollTop based on carousel orientation
 		if (orientation === Config.Orientation.HORIZONTAL) {
-			translateCommand = &#x27;translate3d(&#x27; + position + &#x27;px,0,0)&#x27;;
+			this._animateToLeftPosition(position, instant).done(function(){
+				if (noDeferred !== true) {
+					deferred.resolve();
+				}
+			});
 		} else {
-			translateCommand = &#x27;translate3d(0,&#x27; + position + &#x27;px,0)&#x27;;
+			this._animateToTopPosition(position, instant).done(function(){
+				if (noDeferred !== true) {
+					deferred.resolve();
+				}
+			});
 		}
 
-		// add a class that enables transitioning transforms if instant is not required
-		if (instant === true &amp;&amp; $scrollerWrap.hasClass(animateTransformClass)) {
-			$scrollerWrap.removeClass(animateTransformClass);
-		} else if (instant === false &amp;&amp; !$scrollerWrap.hasClass(animateTransformClass)) {
-			$scrollerWrap.addClass(animateTransformClass);
+		if (noDeferred !== true) {
+			return deferred.promise();
 		}
+	};
 
-		// apply the translate, use requestAnimationFrame for smoother results
-		window.requestAnimationFrame(function () {
-			$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
-		});
+	/**
+	 * Animates the carousel to given absolute position from left.
+	 *
+	 * @method _animateToLeftPosition
+	 * @param {number} position Requested position
+	 * @param {boolean} instant Should the navigation be instantaneous and not use animation
+	 * @return {Deferred.Promise}
+	 * @private
+	 */
+	ScrollAnimator.prototype._animateToLeftPosition = function(position, instant) {
+		var $scrollerWrap = $(this._carousel.getItemsWrap()),
+			deferred = new Deferred();
 
-		//$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
-
-		// remove the deferred overhead where not required
-		if (noDeferred) {
-			return;
-		}
-
-		// if the position is same as current then resolve immediately
-		if (instant || (noDeferred !== true &amp;&amp; position === currentPosition)) {
-			deferred.resolve();
+		if (instant === true) {
+			// apply the scroll, use requestAnimationFrame for smoother results
+			window.requestAnimationFrame(function () {
+				//debugger
+				$scrollerWrap.scrollLeft(position);
+				deferred.resolve();
+			});
 		} else {
-			this._activeDeferred = new Deferred();
-
-			this._activeDeferred.done(function() {
-				this._activeDeferred = null;
-
+			//animate with jquery
+			$scrollerWrap.animate({
+				scrollLeft: position
+			}, this._animationSpeed, function() {
 				deferred.resolve();
 			}.bind(this));
 		}
@@ -316,58 +293,37 @@ define([
 	};
 
 	/**
-	 * Called by the carousel once it&#x27;s structure has been initiated.
+	 * Animates the carousel to given absolute position from top.
 	 *
-	 * @method onCarouselInitiated
-	 */
-	DefaultAnimator.prototype.onCarouselElementReady = function() {
-		this._setupTransitionEndListener();
-	};
-
-	/**
-	 * Starts listening for transition end event on the scroller wrap.
-	 *
-	 * @method _setupTransitionEndListener
+	 * @method _animateToTopPosition
+	 * @param {number} position Requested position
+	 * @param {boolean} instant Should the navigation be instantaneous and not use animation
+	 * @return {Deferred.Promise}
 	 * @private
 	 */
-	DefaultAnimator.prototype._setupTransitionEndListener = function() {
-		var $scrollerWrap = $(this._carousel.getScrollerWrap());
+	ScrollAnimator.prototype._animateToTopPosition = function(position, instant) {
+		var $scrollerWrap = $(this._carousel.getItemsWrap()),
+			deferred = new Deferred();
 
-		$scrollerWrap.on(
-			&#x27;transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd&#x27;,
-			this._eventListeners.transitionEnd
-		);
-
-		this._transitionEndListenerCreated = true;
-	};
-
-	/**
-	 * Called on transition end event.
-	 *
-	 * @method _onRawTransitionEnd
-	 * @param {Event} e Raw event
-	 * @private
-	 */
-	DefaultAnimator.prototype._onRawTransitionEnd = function(/*e*/) {
-		// resolve the active deferred if exists
-		this._resolveDeferred();
-	};
-
-	/**
-	 * Resolves currently active deferred if available and sets it to null.
-	 *
-	 * @method _resolveDeferred
-	 * @private
-	 */
-	DefaultAnimator.prototype._resolveDeferred = function() {
-		if (this._activeDeferred === null) {
-			return;
+		if (instant === true) {
+			// apply the scroll, use requestAnimationFrame for smoother results
+			window.requestAnimationFrame(function () {
+				$scrollerWrap.scrollTop(position);
+				deferred.resolve();
+			});
+		} else {
+			//animate with jquery
+			$scrollerWrap.animate({
+				scrollTop: position
+			}, this._animationSpeed, function() {
+				deferred.resolve();
+			}.bind(this));
 		}
 
-		this._activeDeferred.resolve();
+		return deferred.promise();
 	};
 
-	return DefaultAnimator;
+	return ScrollAnimator;
 });
     </pre>
 </div>

@@ -336,11 +336,9 @@
 
 	// fetch the carousel component and run it
 	require([
-		'FlowCarousel',
-		'ScrollAnimator'
+		'FlowCarousel'
 	], function(
-		FlowCarousel,
-	    ScrollAnimator
+		FlowCarousel
 	) {
 		// test asynchronous data source
 		function CustomDataSource() {
@@ -551,7 +549,7 @@
 					enabled: true
 				}
 			},
-			animator: new ScrollAnimator(scrollAnimatorCarousel)
+			animator: new FlowCarousel.ScrollAnimator(scrollAnimatorCarousel)
 		});
 		scrollAnimatorVerticalCarousel.init('#scroll-animator-vertical-carousel', {
 			orientation: FlowCarousel.Config.Orientation.VERTICAL,
@@ -560,7 +558,7 @@
 					enabled: true
 				}
 			},
-			animator: new ScrollAnimator(scrollAnimatorVerticalCarousel)
+			animator: new FlowCarousel.ScrollAnimator(scrollAnimatorVerticalCarousel)
 		});
 
 		// setup buttons

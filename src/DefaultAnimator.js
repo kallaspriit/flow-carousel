@@ -68,7 +68,7 @@ define([
 	 *
 	 * @method destroy
 	 */
-	AbstractAnimator.prototype.destroy = function() {
+	DefaultAnimator.prototype.destroy = function() {
 		var $scrollerWrap = $(this._carousel.getScrollerWrap());
 
 		// remove the transition end listener

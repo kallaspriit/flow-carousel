@@ -6,6 +6,7 @@ define([
 	'HtmlDataSource',
 	'AbstractAnimator',
 	'DefaultAnimator',
+	'ScrollAnimator',
 	'AbstractRenderer',
 	'HtmlRenderer',
 	'AbstractNavigator',
@@ -21,6 +22,7 @@ define([
 	HtmlDataSource,
 	AbstractAnimator,
 	DefaultAnimator,
+	ScrollAnimator,
 	AbstractRenderer,
 	HtmlRenderer,
 	AbstractNavigator,
@@ -470,6 +472,14 @@ define([
 	 * @type {Config}
 	 */
 	FlowCarousel.DefaultAnimator = DefaultAnimator;
+
+	/**
+	 * Reference to the {{#crossLink "ScrollAnimator"}}{{/crossLink}} class.
+	 *
+	 * @property ScrollAnimator
+	 * @type {Config}
+	 */
+	FlowCarousel.ScrollAnimator = ScrollAnimator;
 
 	/**
 	 * Reference to the {{#crossLink "AbstractNavigator"}}{{/crossLink}} class.

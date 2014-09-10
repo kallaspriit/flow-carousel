@@ -627,7 +627,7 @@ define([
 		isAlreadyDisabled = $disableElement.data(disabledDataName);
 
 		if (isAlreadyDisabled !== true) {
-			var currentEventHandlers = $._data(clickedElement, &#x27;events&#x27;),
+			var currentEventHandlers = $._data($disableElement[0], &#x27;events&#x27;),
 				clickHandlerFunctions = [],
 				currentClickHandlers,
 				i;

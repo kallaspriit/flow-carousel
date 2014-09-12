@@ -516,8 +516,10 @@ define([
 			maxLimit = -totalSize + itemCountOnLastPage * itemSize;
 
 		// create smooth limit at the edges applying the drag motion partially
-		if (newPosition &gt; minLimit || newPosition &lt; maxLimit) {
+		if (newPosition &gt; minLimit) {
 			applyPosition = (this._startCarouselPosition + deltaDragPosition) * edgeMultiplier;
+		} else if (newPosition &lt; maxLimit) {
+			applyPosition = this._startCarouselPosition + (deltaDragPosition * edgeMultiplier);
 		}
 
 		// use the animator to move to calculated position instantly

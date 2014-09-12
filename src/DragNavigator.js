@@ -38,6 +38,7 @@ define([
 		};
 		this._noActionThreshold = 15;
 		this._firstMoveEvent = true;
+		this._lastDragDirection = 1;
 
 		this.setMode(config.mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -317,13 +318,21 @@ define([
 		}
 
 		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startPosition;
+		var deltaDragPosition = position - this._startPosition,
+			moveDelta = this._lastPosition - position;
 			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
 			//currentWindowScrollTop = $(window).scrollTop(),
 			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
 
-		this._accumulatedMagnitude.main += Math.abs(this._lastPosition - position);
+		this._accumulatedMagnitude.main += Math.abs(moveDelta);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
+
+		// store the last drag direction
+		if (moveDelta > 0) {
+			this._lastDragDirection = -1;
+		} else {
+			this._lastDragDirection = 1;
+		}
 
 		// we need last move position in the _end() handler
 		this._lastPosition = position;
@@ -397,7 +406,6 @@ define([
 		var deltaDragPosition = this._lastPosition - this._startPosition,
 			deltaDragOppositePosition = this._lastOppositePosition - this._startOppositePosition,
 			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
-			direction = deltaDragPosition < 0 ? -1 : 1,
 			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
 			ignoreClickThreshold = this._config.ignoreClickThreshold,
 			performNavigation = Math.abs(deltaDragPosition) > 0,
@@ -411,13 +419,19 @@ define([
 			// navigate to closest item or page depending on selected mode
 			switch (this._mode) {
 				case DragNavigator.Mode.NAVIGATE_PAGE:
-					closestIndex = this._carousel.getClosestPageIndexAtPosition(currentPosition, direction);
+					closestIndex = this._carousel.getClosestPageIndexAtPosition(
+						currentPosition,
+						this._lastDragDirection
+					);
 
 					this._carousel.navigateToPage(closestIndex, false, true);
 				break;
 
 				case DragNavigator.Mode.NAVIGATE_ITEM:
-					closestIndex = this._carousel.getClosestItemIndexAtPosition(currentPosition, direction);
+					closestIndex = this._carousel.getClosestItemIndexAtPosition(
+						currentPosition,
+						this._lastDragDirection
+					);
 
 					this._carousel.navigateToItem(closestIndex, false, true);
 				break;
@@ -456,7 +470,7 @@ define([
 			this._lastPosition,
 			deltaDragPosition,
 			closestIndex,
-			direction,
+			this._lastDragDirection,
 			targetElement
 		);
 

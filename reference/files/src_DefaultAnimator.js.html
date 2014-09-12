@@ -178,6 +178,7 @@ define([
 		this._carousel = carousel;
 		this._activeDeferred = null;
 		this._transitionEndListenerCreated = false;
+		this._isUsingAnimatedTransform = false;
 		this._eventListeners = {
 			transitionEnd: this._onRawTransitionEnd.bind(this)
 		};
@@ -254,7 +255,7 @@ define([
 		var deferred = noDeferred ? null : new Deferred(),
 			orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
-			animateTransformClass = this._carousel.getConfig().getClassName(&#x27;animateTransform&#x27;),
+			//animateTransformClass = this._carousel.getConfig().getClassName(&#x27;animateTransform&#x27;),
 			currentPosition,
 			translateCommand;
 
@@ -281,16 +282,33 @@ define([
 		}
 
 		// add a class that enables transitioning transforms if instant is not required
-		if (instant === true &amp;&amp; $scrollerWrap.hasClass(animateTransformClass)) {
-			$scrollerWrap.removeClass(animateTransformClass);
-		} else if (instant === false &amp;&amp; !$scrollerWrap.hasClass(animateTransformClass)) {
-			$scrollerWrap.addClass(animateTransformClass);
+		if (instant === true &amp;&amp; this._isUsingAnimatedTransform) {
+			//$scrollerWrap.removeClass(animateTransformClass);
+
+			$scrollerWrap.css(&#x27;transition-duration&#x27;, &#x27;0ms&#x27;);
+			//$scrollerWrap[0].style.animationDuration = 0;
+			//$scrollerWrap[0].classList.remove(animateTransformClass)
+
+			this._isUsingAnimatedTransform = false;
+		} else if (instant === false &amp;&amp; !this._isUsingAnimatedTransform) {
+			//$scrollerWrap.addClass(animateTransformClass);
+			//$scrollerWrap[0].classList.add(animateTransformClass)
+
+			$scrollerWrap.css(&#x27;transition-duration&#x27;, &#x27;200ms&#x27;);
+			//$scrollerWrap[0].style.animationDuration = &#x27;200ms&#x27;;
+
+			this._isUsingAnimatedTransform = true;
 		}
 
-		// apply the translate, use requestAnimationFrame for smoother results
-		window.requestAnimationFrame(function () {
+		// for instant animations, set the transform at once, otherwise use animation frame
+		if (instant) {
 			$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
-		});
+		} else {
+			// apply the translate, use requestAnimationFrame for smoother results
+			window.requestAnimationFrame(function () {
+				$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
+			});
+		}
 
 		//$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
 

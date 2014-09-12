@@ -1209,7 +1209,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 66,
+            "line": 67,
             "description": "Called by the carousel on destroy.",
             "itemtype": "method",
             "name": "destroy",
@@ -1217,7 +1217,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 81,
+            "line": 82,
             "description": "Returns current absolute position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -1229,7 +1229,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 100,
+            "line": 101,
             "description": "Animates the carousel to given item index position.",
             "itemtype": "method",
             "name": "animateToItem",
@@ -1255,7 +1255,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 114,
+            "line": 115,
             "description": "Animates the carousel to given absolute position.",
             "itemtype": "method",
             "name": "animateToPosition",
@@ -1288,7 +1288,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 196,
+            "line": 214,
             "description": "Called by the carousel once it's structure has been initiated.",
             "itemtype": "method",
             "name": "onCarouselInitiated",
@@ -1296,7 +1296,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 205,
+            "line": 223,
             "description": "Starts listening for transition end event on the scroller wrap.",
             "itemtype": "method",
             "name": "_setupTransitionEndListener",
@@ -1306,7 +1306,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 222,
+            "line": 240,
             "description": "Called on transition end event.",
             "itemtype": "method",
             "name": "_onRawTransitionEnd",
@@ -1323,7 +1323,7 @@
         },
         {
             "file": "src\\DefaultAnimator.js",
-            "line": 234,
+            "line": 252,
             "description": "Resolves currently active deferred if available and sets it to null.",
             "itemtype": "method",
             "name": "_resolveDeferred",
@@ -1333,7 +1333,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 48,
+            "line": 49,
             "description": "List of supported navigation modes.",
             "itemtype": "property",
             "name": "Mode",
@@ -1354,7 +1354,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 61,
+            "line": 62,
             "description": "Returns current drag navigator mode.\n\nThe mode is either {{#crossLink \"DragNavigator/Mode/NAVIGATE_PAGE:property\"}}{{/crossLink}} or\n{{#crossLink \"DragNavigator/Mode/NAVIGATE_ITEM:property\"}}{{/crossLink}} meaning that the arrow keys change\neither the page or navigate one item at a time.",
             "itemtype": "method",
             "name": "setMode",
@@ -1369,7 +1369,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 79,
+            "line": 80,
             "description": "Returns current drag navigator mode.\n\nThe mode is either {{#crossLink \"DragNavigator/Mode/NAVIGATE_PAGE:property\"}}{{/crossLink}} or\n{{#crossLink \"DragNavigator/Mode/NAVIGATE_ITEM:property\"}}{{/crossLink}} meaning that the arrow keys change\neither the page or navigate one item at a time.",
             "itemtype": "method",
             "name": "getMode",
@@ -1381,7 +1381,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 93,
+            "line": 94,
             "description": "Called by the init to set up the navigator.",
             "itemtype": "method",
             "name": "_setup",
@@ -1391,7 +1391,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 113,
+            "line": 114,
             "description": "Called by the carousel on destroy.",
             "itemtype": "method",
             "name": "destroy",
@@ -1399,7 +1399,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 130,
+            "line": 131,
             "description": "Called on drag start event.",
             "itemtype": "method",
             "name": "_onRawStart",
@@ -1420,7 +1420,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 162,
+            "line": 163,
             "description": "Called on drag move event.",
             "itemtype": "method",
             "name": "_onRawMove",
@@ -1441,7 +1441,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 202,
+            "line": 203,
             "description": "Called on drag end event.",
             "itemtype": "method",
             "name": "_onRawEnd",
@@ -1462,7 +1462,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 239,
+            "line": 240,
             "description": "Called on main wrap drag start event.",
             "itemtype": "method",
             "name": "_onRawDragStart",
@@ -1479,7 +1479,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 251,
+            "line": 252,
             "description": "Begins the navigation.",
             "itemtype": "method",
             "name": "_begin",
@@ -1510,7 +1510,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 307,
+            "line": 313,
             "description": "Called on mouse/finger move.",
             "itemtype": "method",
             "name": "_move",
@@ -1536,7 +1536,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 382,
+            "line": 393,
             "description": "Called on gesture end.",
             "itemtype": "method",
             "name": "_end",
@@ -1564,7 +1564,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 487,
+            "line": 499,
             "description": "Disables normal click handler for given element.",
             "itemtype": "method",
             "name": "_disableClickHandlers",
@@ -1581,7 +1581,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 551,
+            "line": 563,
             "description": "Calls the original click handlers for given element.",
             "itemtype": "method",
             "name": "_restoreClickHandlers",
@@ -1598,7 +1598,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 624,
+            "line": 636,
             "description": "Ignores given jQuery event.\n\nTODO don't know how to unit-test this yet",
             "itemtype": "method",
             "name": "_ignoreEvent",

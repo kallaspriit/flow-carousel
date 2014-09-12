@@ -19,6 +19,7 @@ define([
 		this._mode = null;
 		this._active = false;
 		this._stoppedExistingAnimation = false;
+		this._startedDragging = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
@@ -287,6 +288,7 @@ define([
 			this._carousel.getAnimator().animateToPosition(this._startCarouselPosition, true, true);
 
 			this._stoppedExistingAnimation = true;
+			this._startedDragging = true;
 		}
 
 		// notify the carousel that dragging has begun
@@ -300,8 +302,12 @@ define([
 		// disable default functionality
 		//return false;
 
-		// do not disable scrolling the page from the carousel component
-		return true;
+		// do not let the event propagate if we stopped an existing animation
+		if (this._stoppedExistingAnimation) {
+			return false;
+		} else {
+			return true;
+		}
 	};
 
 	/**
@@ -345,11 +351,15 @@ define([
 		if (
 			this._accumulatedMagnitude.main > 0
 			&& this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite
+			&& !this._startedDragging
 		) {
 			this._end();
 
 			return true;
 		}
+
+		// we have started dragging, do not give up the control any more
+		this._startedDragging = true;
 
 		// if the first move event takes more than 200ms then Android Chrome cancels the scroll, avoid this by returning
 		// quickly on the first event
@@ -361,6 +371,7 @@ define([
 
 		// calculate the position
 		var newPosition = this._startCarouselPosition + deltaDragPosition,
+			applyPosition = newPosition,
 			itemSize = this._carousel.getItemSize(),
 			totalSize = this._carousel.getTotalSize(),
 			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
@@ -370,11 +381,11 @@ define([
 
 		// create smooth limit at the edges applying the drag motion partially
 		if (newPosition > minLimit || newPosition < maxLimit) {
-			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
+			applyPosition = (this._startCarouselPosition + deltaDragPosition) * edgeMultiplier;
 		}
 
 		// use the animator to move to calculated position instantly
-		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
+		this._carousel.getAnimator().animateToPosition(applyPosition, true, true);
 
 		return false;
 	};
@@ -470,6 +481,7 @@ define([
 		// reset
 		this._active = false;
 		this._stoppedExistingAnimation = false;
+		this._startedDragging = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;

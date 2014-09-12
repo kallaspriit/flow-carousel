@@ -18,23 +18,23 @@
     -ms-transform: translate3d(0, 0, 0);
     -o-transform: translate3d(0, 0, 0);
 
-    transition: height 200ms ease, width 200ms ease, opacity 500ms ease-in-out;
-	-webkit-transition:  height 200ms ease, width 200ms ease, opacity 500ms ease-in-out;
-	-moz-transition:  height 200ms ease, width 200ms ease, opacity 500ms ease-in-out;
-	-ms-transition:  height 200ms ease, width 200ms ease, opacity 500ms ease-in-out;
-	-o-transition:  height 200ms ease, width 200ms ease, opacity 500ms ease-in-out;
+    transition: height 400ms ease, width 400ms ease, opacity 500ms ease-in-out;
+	-webkit-transition:  height 400ms ease, width 400ms ease, opacity 500ms ease-in-out;
+	-moz-transition:  height 400ms ease, width 400ms ease, opacity 500ms ease-in-out;
+	-ms-transition:  height 400ms ease, width 400ms ease, opacity 500ms ease-in-out;
+	-o-transition:  height 400ms ease, width 400ms ease, opacity 500ms ease-in-out;
 
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 	-webkit-perspective: 1000;
 	perspective: 1000;
 }
-.flow-carousel-scroller.flow-carousel-animate-transform {
-    transition: height 200ms ease, width 200ms ease, transform 200ms ease, opacity 500ms ease-in-out;
-	-webkit-transition:  height 200ms ease, width 200ms ease, -webkit-transform 200ms ease, opacity 500ms ease-in-out;
-	-moz-transition:  height 200ms ease, width 200ms ease, -moz-transform 200ms ease, opacity 500ms ease-in-out;
-	-ms-transition:  height 200ms ease, width 200ms ease, -ms-transform 200ms ease, opacity 500ms ease-in-out;
-	-o-transition:  height 200ms ease, width 200ms ease, -o-transform 200ms ease, opacity 500ms ease-in-out;
+.flow-carousel-scroller {
+    transition: height 400ms ease, width 400ms ease, transform 400ms ease, opacity 500ms ease-in-out;
+	-webkit-transition:  height 400ms ease, width 400ms ease, -webkit-transform 400ms ease, opacity 500ms ease-in-out;
+	-moz-transition:  height 400ms ease, width 400ms ease, -moz-transform 400ms ease, opacity 500ms ease-in-out;
+	-ms-transition:  height 400ms ease, width 400ms ease, -ms-transform 400ms ease, opacity 500ms ease-in-out;
+	-o-transition:  height 400ms ease, width 400ms ease, -o-transform 400ms ease, opacity 500ms ease-in-out;
 }
 .flow-carousel-wrap.flow-carousel-horizontal {
 

@@ -892,6 +892,7 @@ define('DragNavigator',[
 		this._mode = null;
 		this._active = false;
 		this._stoppedExistingAnimation = false;
+		this._startedDragging = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
@@ -1160,6 +1161,7 @@ define('DragNavigator',[
 			this._carousel.getAnimator().animateToPosition(this._startCarouselPosition, true, true);
 
 			this._stoppedExistingAnimation = true;
+			this._startedDragging = true;
 		}
 
 		// notify the carousel that dragging has begun
@@ -1173,8 +1175,12 @@ define('DragNavigator',[
 		// disable default functionality
 		//return false;
 
-		// do not disable scrolling the page from the carousel component
-		return true;
+		// do not let the event propagate if we stopped an existing animation
+		if (this._stoppedExistingAnimation) {
+			return false;
+		} else {
+			return true;
+		}
 	};
 
 	/**
@@ -1218,11 +1224,15 @@ define('DragNavigator',[
 		if (
 			this._accumulatedMagnitude.main > 0
 			&& this._accumulatedMagnitude.main < this._accumulatedMagnitude.opposite
+			&& !this._startedDragging
 		) {
 			this._end();
 
 			return true;
 		}
+
+		// we have started dragging, do not give up the control any more
+		this._startedDragging = true;
 
 		// if the first move event takes more than 200ms then Android Chrome cancels the scroll, avoid this by returning
 		// quickly on the first event
@@ -1234,6 +1244,7 @@ define('DragNavigator',[
 
 		// calculate the position
 		var newPosition = this._startCarouselPosition + deltaDragPosition,
+			applyPosition = newPosition,
 			itemSize = this._carousel.getItemSize(),
 			totalSize = this._carousel.getTotalSize(),
 			itemCountOnLastPage = this._carousel.getItemCountOnLastPage(),
@@ -1243,11 +1254,11 @@ define('DragNavigator',[
 
 		// create smooth limit at the edges applying the drag motion partially
 		if (newPosition > minLimit || newPosition < maxLimit) {
-			newPosition = this._startCarouselPosition + deltaDragPosition * edgeMultiplier;
+			applyPosition = (this._startCarouselPosition + deltaDragPosition) * edgeMultiplier;
 		}
 
 		// use the animator to move to calculated position instantly
-		this._carousel.getAnimator().animateToPosition(newPosition, true, true);
+		this._carousel.getAnimator().animateToPosition(applyPosition, true, true);
 
 		return false;
 	};
@@ -1343,6 +1354,7 @@ define('DragNavigator',[
 		// reset
 		this._active = false;
 		this._stoppedExistingAnimation = false;
+		this._startedDragging = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
@@ -2870,6 +2882,7 @@ define('DefaultAnimator',[
 		this._carousel = carousel;
 		this._activeDeferred = null;
 		this._transitionEndListenerCreated = false;
+		this._isUsingAnimatedTransform = false;
 		this._eventListeners = {
 			transitionEnd: this._onRawTransitionEnd.bind(this)
 		};
@@ -2946,7 +2959,7 @@ define('DefaultAnimator',[
 		var deferred = noDeferred ? null : new Deferred(),
 			orientation = this._carousel.getOrientation(),
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
-			animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
+			//animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
 			translateCommand;
 
@@ -2973,16 +2986,33 @@ define('DefaultAnimator',[
 		}
 
 		// add a class that enables transitioning transforms if instant is not required
-		if (instant === true && $scrollerWrap.hasClass(animateTransformClass)) {
-			$scrollerWrap.removeClass(animateTransformClass);
-		} else if (instant === false && !$scrollerWrap.hasClass(animateTransformClass)) {
-			$scrollerWrap.addClass(animateTransformClass);
+		if (instant === true && this._isUsingAnimatedTransform) {
+			//$scrollerWrap.removeClass(animateTransformClass);
+
+			$scrollerWrap.css('transition-duration', '0ms');
+			//$scrollerWrap[0].style.animationDuration = 0;
+			//$scrollerWrap[0].classList.remove(animateTransformClass)
+
+			this._isUsingAnimatedTransform = false;
+		} else if (instant === false && !this._isUsingAnimatedTransform) {
+			//$scrollerWrap.addClass(animateTransformClass);
+			//$scrollerWrap[0].classList.add(animateTransformClass)
+
+			$scrollerWrap.css('transition-duration', '200ms');
+			//$scrollerWrap[0].style.animationDuration = '200ms';
+
+			this._isUsingAnimatedTransform = true;
 		}
 
-		// apply the translate, use requestAnimationFrame for smoother results
-		window.requestAnimationFrame(function () {
+		// for instant animations, set the transform at once, otherwise use animation frame
+		if (instant) {
 			$scrollerWrap.css('transform', translateCommand);
-		});
+		} else {
+			// apply the translate, use requestAnimationFrame for smoother results
+			window.requestAnimationFrame(function () {
+				$scrollerWrap.css('transform', translateCommand);
+			});
+		}
 
 		//$scrollerWrap.css('transform', translateCommand);
 

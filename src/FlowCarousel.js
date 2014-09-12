@@ -1300,9 +1300,10 @@ define([
 	 * @param {number} itemIndex Item index to navigate to
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [force=false] Force the animation even if we think we're already at given item index
+	 * @param {number} [animationSpeed] Optional animation speed in pixels per millisecond
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant, force) {
+	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant, force, animationSpeed) {
 		instant = typeof instant === 'boolean' ? instant : false;
 		force = typeof force === 'boolean' ? force : false;
 
@@ -1352,7 +1353,7 @@ define([
 			this._targetItemIndex = itemIndex;
 
 			// start animating to given item, this is an asynchronous process
-			this._animator.animateToItem(itemIndex, instant).done(function() {
+			this._animator.animateToItem(itemIndex, instant, animationSpeed).done(function() {
 				deferred.resolve();
 			});
 
@@ -1421,8 +1422,9 @@ define([
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [force=false] Force the animation even if we think we're already at given item index
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 * @param {number} [animationSpeed] Optional animation speed in pixels per millisecond
 	 */
-	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force) {
+	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force, animationSpeed) {
 		instant = typeof instant === 'boolean' ? instant : false;
 
 		var currentPageIndex = this.getCurrentPageIndex(),
@@ -1452,7 +1454,7 @@ define([
 
 		this.emit(FlowCarousel.Event.NAVIGATING_TO_PAGE, pageIndex, instant);
 
-		this.navigateToItem(itemIndex, instant, force).done(function() {
+		this.navigateToItem(itemIndex, instant, force, animationSpeed).done(function() {
 			deferred.resolve();
 		});
 

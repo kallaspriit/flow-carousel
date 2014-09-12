@@ -893,14 +893,17 @@ define('DragNavigator',[
 		this._active = false;
 		this._stoppedExistingAnimation = false;
 		this._startedDragging = false;
-		this._startPosition = null;
+		this._startDragPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
 		this._startHoverItemIndex = null;
 		this._startTargetElement = null;
 		this._startWindowScrollTop = null;
-		this._lastPosition = null;
+		this._lastDragPosition = null;
 		this._lastOppositePosition = null;
+		this._lastMoveTime = null;
+		this._lastMoveDeltaTime = null;
+		this._lastDeltaDragPosition = null;
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
@@ -1126,20 +1129,21 @@ define('DragNavigator',[
 	 * Begins the navigation.
 	 *
 	 * @method _begin
-	 * @param {number} position Drag position
+	 * @param {number} dragPosition Drag position
 	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
 	 * @param {DOMElement} targetElement The element that was under the cursor when drag started
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
-	DragNavigator.prototype._begin = function(position, oppositePosition, targetElement) {
+	DragNavigator.prototype._begin = function(dragPosition, oppositePosition, targetElement) {
 		targetElement = targetElement || null;
 
 		this._active = true;
-		this._startPosition = position;
+		this._startDragPosition = dragPosition;
 		this._startOppositePosition = oppositePosition;
-		this._lastPosition = position; // it's possible that the move event never occurs so set it here alrady
+		this._lastDragPosition = dragPosition; // it's possible that the move event never occurs so set it here alrady
 		this._lastOppositePosition = oppositePosition; // same for this
+		this._lastMoveTime = (new Date()).getTime();
 		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
 		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
 		this._startWindowScrollTop = $(window).scrollTop();
@@ -1166,7 +1170,7 @@ define('DragNavigator',[
 
 		// notify the carousel that dragging has begun
 		this._carousel._onDragBegin(
-			this._startPosition,
+			this._startDragPosition,
 			this._startOppositePosition,
 			this._startCarouselPosition,
 			this._startWindowScrollTop
@@ -1187,26 +1191,35 @@ define('DragNavigator',[
 	 * Called on mouse/finger move.
 	 *
 	 * @method _move
-	 * @param {number} position Drag position
+	 * @param {number} dragPosition Drag position
 	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
-	DragNavigator.prototype._move = function(position, oppositePosition) {
+	DragNavigator.prototype._move = function(dragPosition, oppositePosition) {
 		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}
 
 		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startPosition,
-			moveDelta = this._lastPosition - position;
+		var deltaDragPosition = dragPosition - this._startDragPosition,
+			moveDelta = this._lastDragPosition - dragPosition,
+			currentTime = (new Date()).getTime();
 			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
 			//currentWindowScrollTop = $(window).scrollTop(),
 			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
 
 		this._accumulatedMagnitude.main += Math.abs(moveDelta);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
+
+		if (this._lastMoveTime !== null) {
+			this._lastMoveDeltaTime = currentTime - this._lastMoveTime;
+		}
+
+		if (this._lastDragPosition !== null) {
+			this._lastDeltaDragPosition = dragPosition - this._lastDragPosition;
+		}
 
 		// store the last drag direction
 		if (moveDelta > 0) {
@@ -1216,8 +1229,9 @@ define('DragNavigator',[
 		}
 
 		// we need last move position in the _end() handler
-		this._lastPosition = position;
+		this._lastDragPosition = dragPosition;
 		this._lastOppositePosition = oppositePosition;
+		this._lastMoveTime = currentTime;
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
@@ -1280,12 +1294,14 @@ define('DragNavigator',[
 
 		isTouchEvent = typeof isTouchEvent === 'boolean' ? isTouchEvent : false;
 
-		var deltaDragPosition = this._lastPosition - this._startPosition,
+		var currentPosition = this._carousel.getAnimator().getCurrentPosition(),
+			totalDeltaDragPosition = this._lastDragPosition - this._startDragPosition,
 			deltaDragOppositePosition = this._lastOppositePosition - this._startOppositePosition,
-			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
-			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
+			dragMagnitude = Math.sqrt(Math.pow(totalDeltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
 			ignoreClickThreshold = this._config.ignoreClickThreshold,
-			performNavigation = Math.abs(deltaDragPosition) > 0 || this._stoppedExistingAnimation,
+			performNavigation = Math.abs(totalDeltaDragPosition) > 0 || this._stoppedExistingAnimation,
+			deltaDragPositionMagnitude = Math.abs(this._lastDeltaDragPosition),
+			dragSpeedPixelsPerMillisecond = deltaDragPositionMagnitude / this._lastMoveDeltaTime,
 			propagate = false,
 			performClick,
 			closestIndex,
@@ -1301,7 +1317,7 @@ define('DragNavigator',[
 						this._lastDragDirection
 					);
 
-					this._carousel.navigateToPage(closestIndex, false, true);
+					this._carousel.navigateToPage(closestIndex, false, true, dragSpeedPixelsPerMillisecond);
 				break;
 
 				case DragNavigator.Mode.NAVIGATE_ITEM:
@@ -1310,7 +1326,7 @@ define('DragNavigator',[
 						this._lastDragDirection
 					);
 
-					this._carousel.navigateToItem(closestIndex, false, true);
+					this._carousel.navigateToItem(closestIndex, false, true, dragSpeedPixelsPerMillisecond);
 				break;
 			}
 		}
@@ -1343,9 +1359,9 @@ define('DragNavigator',[
 		// notify the carousel that dragging has begun
 		this._carousel._onDragEnd(
 			this._mode,
-			this._startPosition,
-			this._lastPosition,
-			deltaDragPosition,
+			this._startDragPosition,
+			this._lastDragPosition,
+			totalDeltaDragPosition,
 			closestIndex,
 			this._lastDragDirection,
 			targetElement
@@ -1355,11 +1371,14 @@ define('DragNavigator',[
 		this._active = false;
 		this._stoppedExistingAnimation = false;
 		this._startedDragging = false;
-		this._startPosition = null;
+		this._startDragPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
 		this._startWindowScrollTop = null;
-		this._lastPosition = null;
+		this._lastDragPosition = null;
+		this._lastMoveTime = null;
+		this._lastMoveDeltaTime = null;
+		this._lastDeltaDragPosition = null;
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
@@ -2301,6 +2320,20 @@ define('Config',[
 		};
 
 		/**
+		 * Default animator configuration.
+		 *
+		 * @property defaultAnimator
+		 * @param {number} defaultAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
+		 * @param {number} defaultAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
+		 * @param {number} defaultAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
+		 */
+		this.defaultAnimator = {
+			defaultAnimationSpeed: 4,
+			minAnimationSpeed: 1,
+			maxAnimationSpeed: 10
+		};
+
+		/**
 		 * The css classes prefix to use.
 		 *
 		 * The same prefix is also used when assigning custom carousel-specific data to the element.
@@ -2930,12 +2963,13 @@ define('DefaultAnimator',[
 	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {number} [animationSpeed] Optional animation speed in pixels per millisecond
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
+	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant, animationSpeed) {
 		var position = this._carousel.getItemPositionByIndex(itemIndex);
 
-		return this.animateToPosition(position, instant);
+		return this.animateToPosition(position, instant, false, animationSpeed);
 	};
 
 	/**
@@ -2945,11 +2979,18 @@ define('DefaultAnimator',[
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
+	 * @param {number} [animationSpeed=2] Animation speed in pixels per millisecond
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred, animationSpeed) {
+		var config = this._carousel.getConfig().defaultAnimator;
+
 		instant = typeof instant === 'boolean' ? instant : false;
 		noDeferred = typeof noDeferred === 'boolean' ? noDeferred : false;
+		animationSpeed = typeof animationSpeed === 'number' ? animationSpeed : config.defaultAnimationSpeed;
+
+		// limit the animation speed to configured range
+		animationSpeed = Math.min(Math.max(animationSpeed, config.minAnimationSpeed), config.maxAnimationSpeed);
 
 		/* istanbul ignore if */
 		if (!this._transitionEndListenerCreated && instant !== true) {
@@ -2961,7 +3002,9 @@ define('DefaultAnimator',[
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			//animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
-			translateCommand;
+			deltaPosition,
+			translateCommand,
+			animationDuration;
 
 		// make sure the position is a full integer
 		position = Math.floor(position);
@@ -2976,6 +3019,7 @@ define('DefaultAnimator',[
 		// don't waste power on current position if not using deferred
 		if (noDeferred !== true) {
 			currentPosition = this.getCurrentPosition();
+			deltaPosition = position - currentPosition;
 		}
 
 		// the translate command is different for horizontal and vertical carousels
@@ -2994,12 +3038,16 @@ define('DefaultAnimator',[
 			//$scrollerWrap[0].classList.remove(animateTransformClass)
 
 			this._isUsingAnimatedTransform = false;
-		} else if (instant === false && !this._isUsingAnimatedTransform) {
+		} else if (instant === false/* && !this._isUsingAnimatedTransform*/) {
 			//$scrollerWrap.addClass(animateTransformClass);
 			//$scrollerWrap[0].classList.add(animateTransformClass)
 
-			$scrollerWrap.css('transition-duration', '200ms');
+			//$scrollerWrap.css('transition-duration', '200ms');
 			//$scrollerWrap[0].style.animationDuration = '200ms';
+
+			animationDuration = Math.abs(deltaPosition) / animationSpeed;
+
+			$scrollerWrap.css('transition-duration', animationDuration + 'ms');
 
 			this._isUsingAnimatedTransform = true;
 		}
@@ -5255,9 +5303,10 @@ define('FlowCarousel',[
 	 * @param {number} itemIndex Item index to navigate to
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [force=false] Force the animation even if we think we're already at given item index
+	 * @param {number} [animationSpeed] Optional animation speed in pixels per millisecond
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
 	 */
-	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant, force) {
+	FlowCarousel.prototype.navigateToItem = function(itemIndex, instant, force, animationSpeed) {
 		instant = typeof instant === 'boolean' ? instant : false;
 		force = typeof force === 'boolean' ? force : false;
 
@@ -5307,7 +5356,7 @@ define('FlowCarousel',[
 			this._targetItemIndex = itemIndex;
 
 			// start animating to given item, this is an asynchronous process
-			this._animator.animateToItem(itemIndex, instant).done(function() {
+			this._animator.animateToItem(itemIndex, instant, animationSpeed).done(function() {
 				deferred.resolve();
 			});
 
@@ -5376,8 +5425,9 @@ define('FlowCarousel',[
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [force=false] Force the animation even if we think we're already at given item index
 	 * @return {Deferred.Promise} Deferred promise that will be resolved once the animation completes
+	 * @param {number} [animationSpeed] Optional animation speed in pixels per millisecond
 	 */
-	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force) {
+	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force, animationSpeed) {
 		instant = typeof instant === 'boolean' ? instant : false;
 
 		var currentPageIndex = this.getCurrentPageIndex(),
@@ -5407,7 +5457,7 @@ define('FlowCarousel',[
 
 		this.emit(FlowCarousel.Event.NAVIGATING_TO_PAGE, pageIndex, instant);
 
-		this.navigateToItem(itemIndex, instant, force).done(function() {
+		this.navigateToItem(itemIndex, instant, force, animationSpeed).done(function() {
 			deferred.resolve();
 		});
 

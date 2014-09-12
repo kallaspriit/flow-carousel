@@ -20,14 +20,17 @@ define([
 		this._active = false;
 		this._stoppedExistingAnimation = false;
 		this._startedDragging = false;
-		this._startPosition = null;
+		this._startDragPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
 		this._startHoverItemIndex = null;
 		this._startTargetElement = null;
 		this._startWindowScrollTop = null;
-		this._lastPosition = null;
+		this._lastDragPosition = null;
 		this._lastOppositePosition = null;
+		this._lastMoveTime = null;
+		this._lastMoveDeltaTime = null;
+		this._lastDeltaDragPosition = null;
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
@@ -253,20 +256,21 @@ define([
 	 * Begins the navigation.
 	 *
 	 * @method _begin
-	 * @param {number} position Drag position
+	 * @param {number} dragPosition Drag position
 	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
 	 * @param {DOMElement} targetElement The element that was under the cursor when drag started
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
-	DragNavigator.prototype._begin = function(position, oppositePosition, targetElement) {
+	DragNavigator.prototype._begin = function(dragPosition, oppositePosition, targetElement) {
 		targetElement = targetElement || null;
 
 		this._active = true;
-		this._startPosition = position;
+		this._startDragPosition = dragPosition;
 		this._startOppositePosition = oppositePosition;
-		this._lastPosition = position; // it's possible that the move event never occurs so set it here alrady
+		this._lastDragPosition = dragPosition; // it's possible that the move event never occurs so set it here alrady
 		this._lastOppositePosition = oppositePosition; // same for this
+		this._lastMoveTime = (new Date()).getTime();
 		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
 		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
 		this._startWindowScrollTop = $(window).scrollTop();
@@ -293,7 +297,7 @@ define([
 
 		// notify the carousel that dragging has begun
 		this._carousel._onDragBegin(
-			this._startPosition,
+			this._startDragPosition,
 			this._startOppositePosition,
 			this._startCarouselPosition,
 			this._startWindowScrollTop
@@ -314,26 +318,35 @@ define([
 	 * Called on mouse/finger move.
 	 *
 	 * @method _move
-	 * @param {number} position Drag position
+	 * @param {number} dragPosition Drag position
 	 * @param {number} oppositePosition Drag opposite position (y for horizontal, x for vertical)
 	 * @return {boolean} Should the event propagate
 	 * @private
 	 */
-	DragNavigator.prototype._move = function(position, oppositePosition) {
+	DragNavigator.prototype._move = function(dragPosition, oppositePosition) {
 		/* istanbul ignore if */
 		if (!this._active) {
 			return true;
 		}
 
 		// compare motion in the carousel and the opposite direction
-		var deltaDragPosition = position - this._startPosition,
-			moveDelta = this._lastPosition - position;
+		var deltaDragPosition = dragPosition - this._startDragPosition,
+			moveDelta = this._lastDragPosition - dragPosition,
+			currentTime = (new Date()).getTime();
 			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
 			//currentWindowScrollTop = $(window).scrollTop(),
 			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
 
 		this._accumulatedMagnitude.main += Math.abs(moveDelta);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
+
+		if (this._lastMoveTime !== null) {
+			this._lastMoveDeltaTime = currentTime - this._lastMoveTime;
+		}
+
+		if (this._lastDragPosition !== null) {
+			this._lastDeltaDragPosition = dragPosition - this._lastDragPosition;
+		}
 
 		// store the last drag direction
 		if (moveDelta > 0) {
@@ -343,8 +356,9 @@ define([
 		}
 
 		// we need last move position in the _end() handler
-		this._lastPosition = position;
+		this._lastDragPosition = dragPosition;
 		this._lastOppositePosition = oppositePosition;
+		this._lastMoveTime = currentTime;
 
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
@@ -407,12 +421,14 @@ define([
 
 		isTouchEvent = typeof isTouchEvent === 'boolean' ? isTouchEvent : false;
 
-		var deltaDragPosition = this._lastPosition - this._startPosition,
+		var currentPosition = this._carousel.getAnimator().getCurrentPosition(),
+			totalDeltaDragPosition = this._lastDragPosition - this._startDragPosition,
 			deltaDragOppositePosition = this._lastOppositePosition - this._startOppositePosition,
-			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
-			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
+			dragMagnitude = Math.sqrt(Math.pow(totalDeltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
 			ignoreClickThreshold = this._config.ignoreClickThreshold,
-			performNavigation = Math.abs(deltaDragPosition) > 0 || this._stoppedExistingAnimation,
+			performNavigation = Math.abs(totalDeltaDragPosition) > 0 || this._stoppedExistingAnimation,
+			deltaDragPositionMagnitude = Math.abs(this._lastDeltaDragPosition),
+			dragSpeedPixelsPerMillisecond = deltaDragPositionMagnitude / this._lastMoveDeltaTime,
 			propagate = false,
 			performClick,
 			closestIndex,
@@ -428,7 +444,7 @@ define([
 						this._lastDragDirection
 					);
 
-					this._carousel.navigateToPage(closestIndex, false, true);
+					this._carousel.navigateToPage(closestIndex, false, true, dragSpeedPixelsPerMillisecond);
 				break;
 
 				case DragNavigator.Mode.NAVIGATE_ITEM:
@@ -437,7 +453,7 @@ define([
 						this._lastDragDirection
 					);
 
-					this._carousel.navigateToItem(closestIndex, false, true);
+					this._carousel.navigateToItem(closestIndex, false, true, dragSpeedPixelsPerMillisecond);
 				break;
 			}
 		}
@@ -470,9 +486,9 @@ define([
 		// notify the carousel that dragging has begun
 		this._carousel._onDragEnd(
 			this._mode,
-			this._startPosition,
-			this._lastPosition,
-			deltaDragPosition,
+			this._startDragPosition,
+			this._lastDragPosition,
+			totalDeltaDragPosition,
 			closestIndex,
 			this._lastDragDirection,
 			targetElement
@@ -482,11 +498,14 @@ define([
 		this._active = false;
 		this._stoppedExistingAnimation = false;
 		this._startedDragging = false;
-		this._startPosition = null;
+		this._startDragPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
 		this._startWindowScrollTop = null;
-		this._lastPosition = null;
+		this._lastDragPosition = null;
+		this._lastMoveTime = null;
+		this._lastMoveDeltaTime = null;
+		this._lastDeltaDragPosition = null;
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0

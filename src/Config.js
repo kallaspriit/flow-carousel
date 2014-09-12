@@ -230,6 +230,20 @@ define([
 		};
 
 		/**
+		 * Default animator configuration.
+		 *
+		 * @property defaultAnimator
+		 * @param {number} defaultAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
+		 * @param {number} defaultAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
+		 * @param {number} defaultAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
+		 */
+		this.defaultAnimator = {
+			defaultAnimationSpeed: 4,
+			minAnimationSpeed: 1,
+			maxAnimationSpeed: 10
+		};
+
+		/**
 		 * The css classes prefix to use.
 		 *
 		 * The same prefix is also used when assigning custom carousel-specific data to the element.

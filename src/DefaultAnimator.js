@@ -104,12 +104,13 @@ define([
 	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {number} [animationSpeed] Optional animation speed in pixels per millisecond
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant) {
+	DefaultAnimator.prototype.animateToItem = function(itemIndex, instant, animationSpeed) {
 		var position = this._carousel.getItemPositionByIndex(itemIndex);
 
-		return this.animateToPosition(position, instant);
+		return this.animateToPosition(position, instant, false, animationSpeed);
 	};
 
 	/**
@@ -119,11 +120,18 @@ define([
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
+	 * @param {number} [animationSpeed=2] Animation speed in pixels per millisecond
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred, animationSpeed) {
+		var config = this._carousel.getConfig().defaultAnimator;
+
 		instant = typeof instant === 'boolean' ? instant : false;
 		noDeferred = typeof noDeferred === 'boolean' ? noDeferred : false;
+		animationSpeed = typeof animationSpeed === 'number' ? animationSpeed : config.defaultAnimationSpeed;
+
+		// limit the animation speed to configured range
+		animationSpeed = Math.min(Math.max(animationSpeed, config.minAnimationSpeed), config.maxAnimationSpeed);
 
 		/* istanbul ignore if */
 		if (!this._transitionEndListenerCreated && instant !== true) {
@@ -135,7 +143,9 @@ define([
 			$scrollerWrap = $(this._carousel.getScrollerWrap()),
 			//animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
-			translateCommand;
+			deltaPosition,
+			translateCommand,
+			animationDuration;
 
 		// make sure the position is a full integer
 		position = Math.floor(position);
@@ -150,6 +160,7 @@ define([
 		// don't waste power on current position if not using deferred
 		if (noDeferred !== true) {
 			currentPosition = this.getCurrentPosition();
+			deltaPosition = position - currentPosition;
 		}
 
 		// the translate command is different for horizontal and vertical carousels
@@ -168,12 +179,16 @@ define([
 			//$scrollerWrap[0].classList.remove(animateTransformClass)
 
 			this._isUsingAnimatedTransform = false;
-		} else if (instant === false && !this._isUsingAnimatedTransform) {
+		} else if (instant === false/* && !this._isUsingAnimatedTransform*/) {
 			//$scrollerWrap.addClass(animateTransformClass);
 			//$scrollerWrap[0].classList.add(animateTransformClass)
 
-			$scrollerWrap.css('transition-duration', '200ms');
+			//$scrollerWrap.css('transition-duration', '200ms');
 			//$scrollerWrap[0].style.animationDuration = '200ms';
+
+			animationDuration = Math.abs(deltaPosition) / animationSpeed;
+
+			$scrollerWrap.css('transition-duration', animationDuration + 'ms');
 
 			this._isUsingAnimatedTransform = true;
 		}

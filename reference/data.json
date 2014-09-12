@@ -1510,7 +1510,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 305,
+            "line": 307,
             "description": "Called on mouse/finger move.",
             "itemtype": "method",
             "name": "_move",
@@ -1536,7 +1536,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 389,
+            "line": 382,
             "description": "Called on gesture end.",
             "itemtype": "method",
             "name": "_end",
@@ -1564,7 +1564,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 493,
+            "line": 487,
             "description": "Disables normal click handler for given element.",
             "itemtype": "method",
             "name": "_disableClickHandlers",
@@ -1581,7 +1581,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 557,
+            "line": 551,
             "description": "Calls the original click handlers for given element.",
             "itemtype": "method",
             "name": "_restoreClickHandlers",
@@ -1598,7 +1598,7 @@
         },
         {
             "file": "src\\DragNavigator.js",
-            "line": 630,
+            "line": 624,
             "description": "Ignores given jQuery event.\n\nTODO don't know how to unit-test this yet",
             "itemtype": "method",
             "name": "_ignoreEvent",

@@ -18,6 +18,7 @@ define([
 		this._config = config;
 		this._mode = null;
 		this._active = false;
+		this._stoppedExistingAnimation = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;
@@ -36,7 +37,6 @@ define([
 			end: this._onRawEnd.bind(this),
 			dragStart: this._onRawDragStart.bind(this)
 		};
-		this._noActionThreshold = 15;
 		this._firstMoveEvent = true;
 		this._lastDragDirection = 1;
 
@@ -261,11 +261,6 @@ define([
 	DragNavigator.prototype._begin = function(position, oppositePosition, targetElement) {
 		targetElement = targetElement || null;
 
-		// don't allow dragging when already animating
-		if (this._carousel.isAnimating()) {
-			return true;
-		}
-
 		this._active = true;
 		this._startPosition = position;
 		this._startOppositePosition = oppositePosition;
@@ -285,6 +280,13 @@ define([
 			this._startTargetElement = targetElement;
 
 			this._disableClickHandlers(targetElement);
+		}
+
+		// if already animating then stop the animation at current position
+		if (this._carousel.isAnimating()) {
+			this._carousel.getAnimator().animateToPosition(this._startCarouselPosition, true, true);
+
+			this._stoppedExistingAnimation = true;
 		}
 
 		// notify the carousel that dragging has begun
@@ -338,15 +340,6 @@ define([
 		this._lastPosition = position;
 		this._lastOppositePosition = oppositePosition;
 
-		// if the drag delta is very small then do nothing not to quit or start moving too soon
-		// TODO this deadband can not be done on android: https://code.google.com/p/chromium/issues/detail?id=240735
-		/*if (this._accumulatedMagnitude.main < this._noActionThreshold) {
-			// emulate manual scrolling
-			//$(window).scrollTop(this._startWindowScrollTop - windowScrollTopDifference - deltaDragOppositePosition);
-
-			return false;
-		}*/
-
 		// if the carousel is dragged more in the opposite direction then cancel and propagate
 		// this allows drag-navigating the page from carousel elements even if dead-band is exceeded
 		if (
@@ -359,7 +352,7 @@ define([
 		}
 
 		// if the first move event takes more than 200ms then Android Chrome cancels the scroll, avoid this by returning
-		// quikcly on the first event
+		// quickly on the first event
 		if (this._firstMoveEvent) {
 			this._firstMoveEvent = false;
 
@@ -408,7 +401,7 @@ define([
 			dragMagnitude = Math.sqrt(Math.pow(deltaDragPosition, 2) + Math.pow(deltaDragOppositePosition, 2)),
 			currentPosition = this._carousel.getAnimator().getCurrentPosition(),
 			ignoreClickThreshold = this._config.ignoreClickThreshold,
-			performNavigation = Math.abs(deltaDragPosition) > 0,
+			performNavigation = Math.abs(deltaDragPosition) > 0 || this._stoppedExistingAnimation,
 			propagate = false,
 			performClick,
 			closestIndex,
@@ -476,6 +469,7 @@ define([
 
 		// reset
 		this._active = false;
+		this._stoppedExistingAnimation = false;
 		this._startPosition = null;
 		this._startOppositePosition = null;
 		this._startCarouselPosition = null;

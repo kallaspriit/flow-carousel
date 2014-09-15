@@ -3111,7 +3111,7 @@ define('DefaultAnimator',[
 
 			// calculate animation duration from speed and delta position if not set manually
 			if (typeof animationDuration !== 'number') {
-				animationDuration = Math.abs(deltaPosition) / animationSpeed;
+				animationDuration = Math.round(Math.abs(deltaPosition) / animationSpeed);
 			}
 
 			$scrollerWrap.css('transition-duration', animationDuration + 'ms');

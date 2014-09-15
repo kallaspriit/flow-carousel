@@ -470,10 +470,10 @@ define([
 			this._lastDeltaDragPosition = dragPosition - this._lastDragPosition;
 		}
 
-		// store the last drag direction
+		// store the last drag direction, don&#x27;t change if if no move delta detected
 		if (moveDelta &gt; 0) {
 			this._lastDragDirection = -1;
-		} else {
+		} else if (moveDelta &lt; 0) {
 			this._lastDragDirection = 1;
 		}
 

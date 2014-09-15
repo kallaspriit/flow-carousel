@@ -133,6 +133,33 @@ define([
 		this.centerStartItemIndex = false;
 
 		/**
+		 * Should items that are navigated out of the rendering range given by
+		 * {{#crossLink "Config/getRenderRange"}}{{/crossLink}} be removed.
+		 *
+		 * This ensures that there are never too many elements in the DOM but when navigating back to these items, they
+		 * have to be re-generated.
+		 *
+		 * Set this to true to always remove out of range items, false to never remove them and null to let the
+		 * carousel decide based on the number of items.
+		 *
+		 * @default removeOutOfRangeItems
+		 * @type {boolean|null}
+		 * @default null
+		 */
+		this.removeOutOfRangeItems = null;
+
+		/**
+		 * If {{#crossLink "Config/removeOutOfRangeItems:property"}}{{/crossLink}} is not set to a boolean value then
+		 * this value is used to decide whether to remove out of range items or not so if the number of items in the
+		 * dataset is smaller then this, out of range items are not destroyed.
+		 *
+		 * @property removeOutOfRangeItemsThreshold
+		 * @type {number}
+		 * @default 30
+		 */
+		this.removeOutOfRangeItemsThreshold = 30;
+
+		/**
 		 * List of default responsive layout breakpoint.
 		 *
 		 * The list should be ordered from the smallest size to the largest.
@@ -241,6 +268,21 @@ define([
 			defaultAnimationSpeed: 4,
 			minAnimationSpeed: 1,
 			maxAnimationSpeed: 10
+		};
+
+		/**
+		 * Configuration for the animation shown when user tries to navigate past the first or last item.
+		 *
+		 * @property limitAnimation
+		 * @type {object}
+		 * @param {boolean} limitAnimation.enabled Should the limit animation be shown
+		 * @param {number} limitAnimation.movePixels How many pixels to animate past the end
+		 * @param {number} limitAnimation.moveDuration Duration of the animation
+		 */
+		this.limitAnimation = {
+			enabled: true,
+			movePixels: 30,
+			moveDuration: 150
 		};
 
 		/**

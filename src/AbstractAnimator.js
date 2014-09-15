@@ -40,14 +40,25 @@ define([
 	/**
 	 * Animates the carousel to given absolute position.
 	 *
+	 * One can set either a custom animation speed in pixels per millisecond or custom animation duration in
+	 * milliseconds. If animation duration is set then animation speed is ignored.
+	 *
 	 * @method animateToPosition
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
+	 * @param {number} [animationSpeed] Animation speed in pixels per millisecond
+	 * @param {number} [animationDuration] Optional animation duration in milliseconds
 	 * @return {Deferred.Promise}
 	 */
-	AbstractAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
-		void(position, instant, noDeferred);
+	AbstractAnimator.prototype.animateToPosition = function(
+		position,
+		instant,
+		noDeferred,
+		animationSpeed,
+		animationDuration
+	) {
+		void(position, instant, noDeferred, animationSpeed, animationDuration);
 
 		throw new Error('Not implemented');
 	};

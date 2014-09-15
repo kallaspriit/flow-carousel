@@ -2023,30 +2023,32 @@ define([
 		this._renderedPlaceholderIndexes = filteredPlaceholderItemIndexes;
 
 		// destroy rendered items out of the render range
-		for (i = 0; i < this._renderedItemIndexes.length; i++) {
-			itemIndex = this._renderedItemIndexes[i];
+		if (this._shouldDestroyInvalidItems()) {
+			for (i = 0; i < this._renderedItemIndexes.length; i++) {
+				itemIndex = this._renderedItemIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex > renderRange.end) {
-				itemElement = this.getItemElementByIndex(itemIndex);
+				if (itemIndex < renderRange.start || itemIndex > renderRange.end) {
+					itemElement = this.getItemElementByIndex(itemIndex);
 
-				/* istanbul ignore if */
-				if (itemElement === null) {
-					throw new Error('Item element at index #' + itemIndex + ' not found, this should not happen');
+					/* istanbul ignore if */
+					if (itemElement === null) {
+						throw new Error('Item element at index #' + itemIndex + ' not found, this should not happen');
+					}
+
+					this._destroyItem(itemElement, itemIndex);
+
+					destroyedItemIndexes.push(itemIndex);
+				} else {
+					filteredRenderedItemIndexes.push(itemIndex);
 				}
-
-				this._destroyItem(itemElement, itemIndex);
-
-				destroyedItemIndexes.push(itemIndex);
-			} else {
-				filteredRenderedItemIndexes.push(itemIndex);
 			}
+
+			this._renderedItemIndexes = filteredRenderedItemIndexes;
 		}
 
 		if (destroyedItemIndexes.length > 0) {
 			this.emit(FlowCarousel.Event.DESTROYED_ITEMS, destroyedItemIndexes);
 		}
-
-		this._renderedItemIndexes = filteredRenderedItemIndexes;
 	};
 
 	/**
@@ -2678,12 +2680,15 @@ define([
 	 */
 	FlowCarousel.prototype._showLimit = function(itemIndex) {
 		var deferred = new Deferred(),
-			limitPixels = 30,
+			enabled = this._config.limitAnimation.enabled,
+			limitPixels = this._config.limitAnimation.movePixels,
+			limitAnimationDuration = this._config.limitAnimation.moveDuration,
 			limitItemPosition,
 			limitDir,
 			limitMovePosition;
 
-		if (this._isAnimating) {
+		// do nothing if already animating or the limit animation has been disabled
+		if (this._isAnimating || !enabled) {
 			deferred.resolve();
 		} else {
 			if (itemIndex === 0) {
@@ -2699,8 +2704,20 @@ define([
 
 			this._isAnimating = true;
 
-			this._animator.animateToPosition(limitMovePosition).done(function () {
-				this._animator.animateToPosition(limitItemPosition).done(function () {
+			this._animator.animateToPosition(
+				limitMovePosition,
+				false,
+				false,
+				0,
+				limitAnimationDuration
+			).done(function () {
+				this._animator.animateToPosition(
+					limitItemPosition,
+					false,
+					false,
+					0,
+					limitAnimationDuration
+				).done(function () {
 					this._isAnimating = false;
 
 					deferred.resolve();
@@ -2853,6 +2870,26 @@ define([
 		return orientation === Config.Orientation.HORIZONTAL
 			? Config.Orientation.VERTICAL
 			: Config.Orientation.HORIZONTAL;
+	};
+
+	/**
+	 * Returns whether items out of the render range should be destroyed.
+	 *
+	 * @method _shouldDestroyInvalidItems
+	 * @return {boolean}
+	 * @private
+	 */
+	FlowCarousel.prototype._shouldDestroyInvalidItems = function() {
+		// return the config option if this has been chosen explicitly
+		if (typeof this._config.removeOutOfRangeItems) {
+			return this._config.removeOutOfRangeItems;
+		}
+
+		if (this.getItemCount() > this._config.removeOutOfRangeItemsThreshold) {
+			return true;
+		} else {
+			return false;
+		}
 	};
 
 	/**

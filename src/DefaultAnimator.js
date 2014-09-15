@@ -56,7 +56,7 @@ define([
 		this._carousel = carousel;
 		this._activeDeferred = null;
 		this._transitionEndListenerCreated = false;
-		this._isUsingAnimatedTransform = false;
+		this._isUsingAnimatedTransform = true;
 		this._eventListeners = {
 			transitionEnd: this._onRawTransitionEnd.bind(this)
 		};
@@ -116,14 +116,24 @@ define([
 	/**
 	 * Animates the carousel to given absolute position.
 	 *
+	 * One can set either a custom animation speed in pixels per millisecond or custom animation duration in
+	 * milliseconds. If animation duration is set then animation speed is ignored.
+	 *
 	 * @method animateToPosition
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
-	 * @param {number} [animationSpeed=2] Animation speed in pixels per millisecond
+	 * @param {number} [animationSpeed=2] Optional animation speed in pixels per millisecond
+	 * @param {number} [animationDuration] Optional animation duration in milliseconds
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred, animationSpeed) {
+	DefaultAnimator.prototype.animateToPosition = function(
+		position,
+		instant,
+		noDeferred,
+		animationSpeed,
+		animationDuration
+	) {
 		var config = this._carousel.getConfig().defaultAnimator;
 
 		instant = typeof instant === 'boolean' ? instant : false;
@@ -144,8 +154,7 @@ define([
 			//animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
 			deltaPosition,
-			translateCommand,
-			animationDuration;
+			translateCommand;
 
 		// make sure the position is a full integer
 		position = Math.floor(position);
@@ -186,7 +195,10 @@ define([
 			//$scrollerWrap.css('transition-duration', '200ms');
 			//$scrollerWrap[0].style.animationDuration = '200ms';
 
-			animationDuration = Math.abs(deltaPosition) / animationSpeed;
+			// calculate animation duration from speed and delta position if not set manually
+			if (typeof animationDuration !== 'number') {
+				animationDuration = Math.abs(deltaPosition) / animationSpeed;
+			}
 
 			$scrollerWrap.css('transition-duration', animationDuration + 'ms');
 

@@ -1221,10 +1221,10 @@ define('DragNavigator',[
 			this._lastDeltaDragPosition = dragPosition - this._lastDragPosition;
 		}
 
-		// store the last drag direction
+		// store the last drag direction, don't change if if no move delta detected
 		if (moveDelta > 0) {
 			this._lastDragDirection = -1;
-		} else {
+		} else if (moveDelta < 0) {
 			this._lastDragDirection = 1;
 		}
 
@@ -2225,6 +2225,33 @@ define('Config',[
 		this.centerStartItemIndex = false;
 
 		/**
+		 * Should items that are navigated out of the rendering range given by
+		 * {{#crossLink "Config/getRenderRange"}}{{/crossLink}} be removed.
+		 *
+		 * This ensures that there are never too many elements in the DOM but when navigating back to these items, they
+		 * have to be re-generated.
+		 *
+		 * Set this to true to always remove out of range items, false to never remove them and null to let the
+		 * carousel decide based on the number of items.
+		 *
+		 * @default removeOutOfRangeItems
+		 * @type {boolean|null}
+		 * @default null
+		 */
+		this.removeOutOfRangeItems = null;
+
+		/**
+		 * If {{#crossLink "Config/removeOutOfRangeItems:property"}}{{/crossLink}} is not set to a boolean value then
+		 * this value is used to decide whether to remove out of range items or not so if the number of items in the
+		 * dataset is smaller then this, out of range items are not destroyed.
+		 *
+		 * @property removeOutOfRangeItemsThreshold
+		 * @type {number}
+		 * @default 30
+		 */
+		this.removeOutOfRangeItemsThreshold = 30;
+
+		/**
 		 * List of default responsive layout breakpoint.
 		 *
 		 * The list should be ordered from the smallest size to the largest.
@@ -2333,6 +2360,21 @@ define('Config',[
 			defaultAnimationSpeed: 4,
 			minAnimationSpeed: 1,
 			maxAnimationSpeed: 10
+		};
+
+		/**
+		 * Configuration for the animation shown when user tries to navigate past the first or last item.
+		 *
+		 * @property limitAnimation
+		 * @type {object}
+		 * @param {boolean} limitAnimation.enabled Should the limit animation be shown
+		 * @param {number} limitAnimation.movePixels How many pixels to animate past the end
+		 * @param {number} limitAnimation.moveDuration Duration of the animation
+		 */
+		this.limitAnimation = {
+			enabled: true,
+			movePixels: 30,
+			moveDuration: 150
 		};
 
 		/**
@@ -2827,14 +2869,25 @@ define('AbstractAnimator',[
 	/**
 	 * Animates the carousel to given absolute position.
 	 *
+	 * One can set either a custom animation speed in pixels per millisecond or custom animation duration in
+	 * milliseconds. If animation duration is set then animation speed is ignored.
+	 *
 	 * @method animateToPosition
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
+	 * @param {number} [animationSpeed] Animation speed in pixels per millisecond
+	 * @param {number} [animationDuration] Optional animation duration in milliseconds
 	 * @return {Deferred.Promise}
 	 */
-	AbstractAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
-		void(position, instant, noDeferred);
+	AbstractAnimator.prototype.animateToPosition = function(
+		position,
+		instant,
+		noDeferred,
+		animationSpeed,
+		animationDuration
+	) {
+		void(position, instant, noDeferred, animationSpeed, animationDuration);
 
 		throw new Error('Not implemented');
 	};
@@ -2917,7 +2970,7 @@ define('DefaultAnimator',[
 		this._carousel = carousel;
 		this._activeDeferred = null;
 		this._transitionEndListenerCreated = false;
-		this._isUsingAnimatedTransform = false;
+		this._isUsingAnimatedTransform = true;
 		this._eventListeners = {
 			transitionEnd: this._onRawTransitionEnd.bind(this)
 		};
@@ -2977,14 +3030,24 @@ define('DefaultAnimator',[
 	/**
 	 * Animates the carousel to given absolute position.
 	 *
+	 * One can set either a custom animation speed in pixels per millisecond or custom animation duration in
+	 * milliseconds. If animation duration is set then animation speed is ignored.
+	 *
 	 * @method animateToPosition
 	 * @param {number} position Requested position
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
 	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
-	 * @param {number} [animationSpeed=2] Animation speed in pixels per millisecond
+	 * @param {number} [animationSpeed=2] Optional animation speed in pixels per millisecond
+	 * @param {number} [animationDuration] Optional animation duration in milliseconds
 	 * @return {Deferred.Promise}
 	 */
-	DefaultAnimator.prototype.animateToPosition = function(position, instant, noDeferred, animationSpeed) {
+	DefaultAnimator.prototype.animateToPosition = function(
+		position,
+		instant,
+		noDeferred,
+		animationSpeed,
+		animationDuration
+	) {
 		var config = this._carousel.getConfig().defaultAnimator;
 
 		instant = typeof instant === 'boolean' ? instant : false;
@@ -3005,8 +3068,7 @@ define('DefaultAnimator',[
 			//animateTransformClass = this._carousel.getConfig().getClassName('animateTransform'),
 			currentPosition,
 			deltaPosition,
-			translateCommand,
-			animationDuration;
+			translateCommand;
 
 		// make sure the position is a full integer
 		position = Math.floor(position);
@@ -3047,7 +3109,10 @@ define('DefaultAnimator',[
 			//$scrollerWrap.css('transition-duration', '200ms');
 			//$scrollerWrap[0].style.animationDuration = '200ms';
 
-			animationDuration = Math.abs(deltaPosition) / animationSpeed;
+			// calculate animation duration from speed and delta position if not set manually
+			if (typeof animationDuration !== 'number') {
+				animationDuration = Math.abs(deltaPosition) / animationSpeed;
+			}
 
 			$scrollerWrap.css('transition-duration', animationDuration + 'ms');
 
@@ -6028,30 +6093,32 @@ define('FlowCarousel',[
 		this._renderedPlaceholderIndexes = filteredPlaceholderItemIndexes;
 
 		// destroy rendered items out of the render range
-		for (i = 0; i < this._renderedItemIndexes.length; i++) {
-			itemIndex = this._renderedItemIndexes[i];
+		if (this._shouldDestroyInvalidItems()) {
+			for (i = 0; i < this._renderedItemIndexes.length; i++) {
+				itemIndex = this._renderedItemIndexes[i];
 
-			if (itemIndex < renderRange.start || itemIndex > renderRange.end) {
-				itemElement = this.getItemElementByIndex(itemIndex);
+				if (itemIndex < renderRange.start || itemIndex > renderRange.end) {
+					itemElement = this.getItemElementByIndex(itemIndex);
 
-				/* istanbul ignore if */
-				if (itemElement === null) {
-					throw new Error('Item element at index #' + itemIndex + ' not found, this should not happen');
+					/* istanbul ignore if */
+					if (itemElement === null) {
+						throw new Error('Item element at index #' + itemIndex + ' not found, this should not happen');
+					}
+
+					this._destroyItem(itemElement, itemIndex);
+
+					destroyedItemIndexes.push(itemIndex);
+				} else {
+					filteredRenderedItemIndexes.push(itemIndex);
 				}
-
-				this._destroyItem(itemElement, itemIndex);
-
-				destroyedItemIndexes.push(itemIndex);
-			} else {
-				filteredRenderedItemIndexes.push(itemIndex);
 			}
+
+			this._renderedItemIndexes = filteredRenderedItemIndexes;
 		}
 
 		if (destroyedItemIndexes.length > 0) {
 			this.emit(FlowCarousel.Event.DESTROYED_ITEMS, destroyedItemIndexes);
 		}
-
-		this._renderedItemIndexes = filteredRenderedItemIndexes;
 	};
 
 	/**
@@ -6683,12 +6750,15 @@ define('FlowCarousel',[
 	 */
 	FlowCarousel.prototype._showLimit = function(itemIndex) {
 		var deferred = new Deferred(),
-			limitPixels = 30,
+			enabled = this._config.limitAnimation.enabled,
+			limitPixels = this._config.limitAnimation.movePixels,
+			limitAnimationDuration = this._config.limitAnimation.moveDuration,
 			limitItemPosition,
 			limitDir,
 			limitMovePosition;
 
-		if (this._isAnimating) {
+		// do nothing if already animating or the limit animation has been disabled
+		if (this._isAnimating || !enabled) {
 			deferred.resolve();
 		} else {
 			if (itemIndex === 0) {
@@ -6704,8 +6774,20 @@ define('FlowCarousel',[
 
 			this._isAnimating = true;
 
-			this._animator.animateToPosition(limitMovePosition).done(function () {
-				this._animator.animateToPosition(limitItemPosition).done(function () {
+			this._animator.animateToPosition(
+				limitMovePosition,
+				false,
+				false,
+				0,
+				limitAnimationDuration
+			).done(function () {
+				this._animator.animateToPosition(
+					limitItemPosition,
+					false,
+					false,
+					0,
+					limitAnimationDuration
+				).done(function () {
 					this._isAnimating = false;
 
 					deferred.resolve();
@@ -6858,6 +6940,26 @@ define('FlowCarousel',[
 		return orientation === Config.Orientation.HORIZONTAL
 			? Config.Orientation.VERTICAL
 			: Config.Orientation.HORIZONTAL;
+	};
+
+	/**
+	 * Returns whether items out of the render range should be destroyed.
+	 *
+	 * @method _shouldDestroyInvalidItems
+	 * @return {boolean}
+	 * @private
+	 */
+	FlowCarousel.prototype._shouldDestroyInvalidItems = function() {
+		// return the config option if this has been chosen explicitly
+		if (typeof this._config.removeOutOfRangeItems) {
+			return this._config.removeOutOfRangeItems;
+		}
+
+		if (this.getItemCount() > this._config.removeOutOfRangeItemsThreshold) {
+			return true;
+		} else {
+			return false;
+		}
 	};
 
 	/**

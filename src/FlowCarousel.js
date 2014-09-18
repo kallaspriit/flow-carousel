@@ -664,7 +664,7 @@ define([
 
 		this.emit(FlowCarousel.Event.INITIATED);
 
-		this._validateItemsToRender().done(function() {
+		this._validateItemsToRender(true).done(function() {
 			this.validateSize();
 
 			deferred.resolve();
@@ -1124,16 +1124,17 @@ define([
 	 *
 	 * @method getRenderRange
 	 * @param {number} [itemIndex=this._currentItemIndex] Optional item index to use, defaults to current
+	 * @param {boolean} [firstRender=false] Should this be considered first render
 	 * @return {object} Render range with start and end keys
 	 * @private
 	 */
-	FlowCarousel.prototype.getRenderRange = function(itemIndex) {
+	FlowCarousel.prototype.getRenderRange = function(itemIndex, firstRender) {
 		itemIndex = itemIndex || this._currentItemIndex;
 
 		var itemsPerPage = this.getItemsPerPage(),
 			itemCount = this._dataSource.getItemCount();
 
-		return this._config.getRenderRange(itemIndex, itemsPerPage, itemCount);
+		return this._config.getRenderRange(itemIndex, itemsPerPage, itemCount, firstRender);
 	};
 
 	/**
@@ -1973,11 +1974,14 @@ define([
 	 * Validates whether all the required items have been rendered and initiates rendering them if not.
 	 *
 	 * @method _validateItemsToRender
+	 * @param {boolean} [firstRender=false] Should this be considered first render
 	 * @return {Deferred.Promise}
 	 * @private
 	 */
-	FlowCarousel.prototype._validateItemsToRender = function() {
-		var renderRange = this.getRenderRange();
+	FlowCarousel.prototype._validateItemsToRender = function(firstRender) {
+		firstRender = typeof firstRender === 'boolean' ? firstRender : false;
+
+		var renderRange = this.getRenderRange(this._currentItemIndex, firstRender);
 
 		return this._renderItemRange(renderRange.start, renderRange.end);
 	};
@@ -2132,6 +2136,7 @@ define([
 			loadingClassName = this._config.getClassName('loading'),
 			renderedRange = this.getRenderedRange(),
 			dir = renderedRange === null || startIndex >= renderedRange.start ? 1 : -1,
+			itemCount = this.getItemCount(),
 			loadRange;
 
 		// don't render anything if already rendered same range
@@ -2158,6 +2163,13 @@ define([
 					end: Math.min(endIndex, renderedRange.start - 1)
 				};
 			}
+		}
+
+		// do nothing if calculated start range is larger then item count
+		if (loadRange.start > itemCount - 1) {
+			deferred.resolve();
+
+			return deferred.promise();
 		}
 
 		// for asyncronous data source add the loading class to the main wrap for the duration of the async request
@@ -2229,7 +2241,6 @@ define([
 	 */
 	FlowCarousel.prototype._renderItems = function(items, startIndex) {
 		var deferred = new Deferred(),
-			renderRange = this.getRenderRange(),
 			renderingClassName = this._config.getClassName('rendering'),
 			endIndex = startIndex + items.length - 1,
 			promises = [],
@@ -2237,8 +2248,6 @@ define([
 			itemIndex,
 			item,
 			promise,
-			existingElement,
-			existingElementPos,
 			i;
 
 		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
@@ -2252,25 +2261,6 @@ define([
 		for (i = 0; i < items.length; i++) {
 			item = items[i];
 			itemIndex = startIndex + i;
-			outOfRange = itemIndex < renderRange.start || itemIndex > renderRange.end;
-
-			/* istanbul ignore if */
-			if (outOfRange) {
-				existingElement = this._itemIndexToElementMap[itemIndex];
-
-				if (typeof existingElement !== 'undefined') {
-					this._renderer.destroyItem(existingElement);
-
-					this._removeItemIndexToElement(itemIndex);
-
-					// remove the item from the placeholder item indexes list if exists
-					existingElementPos = this._renderedPlaceholderIndexes.indexOf(itemIndex);
-
-					if (existingElementPos !== -1) {
-						this._renderedPlaceholderIndexes.splice(existingElementPos, 1);
-					}
-				}
-			}
 
 			// only render the item if it's not already rendered and it's not out of current render range
 			/* istanbul ignore else */
@@ -2349,9 +2339,8 @@ define([
 				if (placeholderPos !== -1 && typeof this._itemIndexToElementMap[itemIndex] !== 'undefined') {
 					placeholderElement = this._itemIndexToElementMap[itemIndex];
 
-					this._renderer.destroyItem(placeholderElement);
+					this._destroyItem(placeholderElement, itemIndex);
 
-					this._removeItemIndexToElement(itemIndex);
 					this._renderedPlaceholderIndexes.splice(placeholderPos, 1);
 				}
 
@@ -2536,14 +2525,27 @@ define([
 				FlowCarousel.SizeMode.OUTER
 			);
 
-		// set the scroller to largest child size if it was possible to determine
-		if (largestChildSize > 0 && largestChildSize !== this._lastLargestChildSize) {
-			$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
+		if (largestChildSize > 0) {
+			// set the scroller to largest child size if it was possible to determine
+			if (largestChildSize !== this._lastLargestChildSize) {
+				$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
 
-			this._lastLargestChildSize = largestChildSize;
+				this._lastLargestChildSize = largestChildSize;
 
-			return true;
-		}
+				return true;
+			}
+		}/* else {
+			// failed to determine largest child size, try again
+			window.setTimeout(function() {
+				if (!this.isInitiated()) {
+					return;
+				}
+
+				console.log('try again');
+
+				this.validateSize();
+			}.bind(this), 100);
+		}*/
 
 		return false;
 	};
@@ -2598,7 +2600,7 @@ define([
 
 		$scrollerWrap
 			.empty()
-			.attr('style', null)
+			//.attr('style', null)
 			.data(this._config.cssPrefix + 'last-size', null);
 
 		this._itemIndexToElementMap = {};
@@ -2881,7 +2883,7 @@ define([
 	 */
 	FlowCarousel.prototype._shouldDestroyInvalidItems = function() {
 		// return the config option if this has been chosen explicitly
-		if (typeof this._config.removeOutOfRangeItems) {
+		if (typeof this._config.removeOutOfRangeItems === 'boolean') {
 			return this._config.removeOutOfRangeItems;
 		}
 

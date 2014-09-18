@@ -594,12 +594,13 @@ define('Util',[
 				result;
 
 			/* istanbul ignore next */
-			/*if (matrix === 'none') {
+			// handle missing matrix
+			if (matrix === 'none' || matrix === '') {
 				return {
 					x: 0,
 					y: 0
 				};
-			}*/
+			}
 
 			// TODO remove the istanbul ignore once karma coverage fixes not counting these lines
 			/* istanbul ignore next */
@@ -916,6 +917,7 @@ define('DragNavigator',[
 		};
 		this._firstMoveEvent = true;
 		this._lastDragDirection = 1;
+		this._disabledElements = [];
 
 		this.setMode(config.mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -1387,6 +1389,13 @@ define('DragNavigator',[
 		};
 		this._firstMoveEvent = true;
 
+		// restore all disabled elements in next frame
+		window.setTimeout(function() {
+			while (this._disabledElements.length > 0) {
+				this._restoreClickHandlers(this._disabledElements.pop());
+			}
+		}.bind(this), 0);
+
 		return propagate;
 	};
 
@@ -1451,6 +1460,8 @@ define('DragNavigator',[
 
 			// mark it disabled to be easy to find for restoring
 			$disableElement.attr('data-disabled', 'true');
+
+			this._disabledElements.push(clickedElement);
 		}
 	};
 
@@ -2483,17 +2494,29 @@ define('Config',[
 		 *
 		 * By default returns one page before the current page and one after but one may choose to override it.
 		 *
+		 * One can use the firstRender parameter to for example render more items during the first render so no new
+		 * rendering is triggered if the user only moves for a few pages.
+		 *
 		 * @method getRenderRange
 		 * @param {number} currentItemIndex Currently scrolled position index
 		 * @param {number} itemsPerPage How many items are shown on a page
 		 * @param {number} itemCount How many items there are in total
+		 * @param {boolean} firstRender This parameter is true for the very first render
 		 * @return {object} Render range with start and end keys
 		 * @private
 		 */
-		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount) {
+		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount, firstRender) {
+			var pagesBefore = 1,
+				pagesAfter = 1;
+
+			// render more pages on the first render
+			if (firstRender && this.removeOutOfRangeItems !== true) {
+				pagesBefore = pagesAfter = 3;
+			}
+
 			return {
-				start: Math.max(currentItemIndex - itemsPerPage, 0),
-				end: Math.min(currentItemIndex + itemsPerPage * 2 - 1, itemCount - 1)
+				start: Math.max(currentItemIndex - itemsPerPage * pagesBefore, 0),
+				end: Math.min(currentItemIndex + itemsPerPage * (pagesAfter + 1) - 1, itemCount - 1)
 			};
 		};
 	}
@@ -3095,20 +3118,10 @@ define('DefaultAnimator',[
 
 		// add a class that enables transitioning transforms if instant is not required
 		if (instant === true && this._isUsingAnimatedTransform) {
-			//$scrollerWrap.removeClass(animateTransformClass);
-
 			$scrollerWrap.css('transition-duration', '0ms');
-			//$scrollerWrap[0].style.animationDuration = 0;
-			//$scrollerWrap[0].classList.remove(animateTransformClass)
 
 			this._isUsingAnimatedTransform = false;
 		} else if (instant === false/* && !this._isUsingAnimatedTransform*/) {
-			//$scrollerWrap.addClass(animateTransformClass);
-			//$scrollerWrap[0].classList.add(animateTransformClass)
-
-			//$scrollerWrap.css('transition-duration', '200ms');
-			//$scrollerWrap[0].style.animationDuration = '200ms';
-
 			// calculate animation duration from speed and delta position if not set manually
 			if (typeof animationDuration !== 'number') {
 				animationDuration = Math.round(Math.abs(deltaPosition) / animationSpeed);
@@ -3128,8 +3141,6 @@ define('DefaultAnimator',[
 				$scrollerWrap.css('transform', translateCommand);
 			});
 		}
-
-		//$scrollerWrap.css('transform', translateCommand);
 
 		// remove the deferred overhead where not required
 		if (noDeferred) {
@@ -4734,7 +4745,7 @@ define('FlowCarousel',[
 
 		this.emit(FlowCarousel.Event.INITIATED);
 
-		this._validateItemsToRender().done(function() {
+		this._validateItemsToRender(true).done(function() {
 			this.validateSize();
 
 			deferred.resolve();
@@ -5194,16 +5205,17 @@ define('FlowCarousel',[
 	 *
 	 * @method getRenderRange
 	 * @param {number} [itemIndex=this._currentItemIndex] Optional item index to use, defaults to current
+	 * @param {boolean} [firstRender=false] Should this be considered first render
 	 * @return {object} Render range with start and end keys
 	 * @private
 	 */
-	FlowCarousel.prototype.getRenderRange = function(itemIndex) {
+	FlowCarousel.prototype.getRenderRange = function(itemIndex, firstRender) {
 		itemIndex = itemIndex || this._currentItemIndex;
 
 		var itemsPerPage = this.getItemsPerPage(),
 			itemCount = this._dataSource.getItemCount();
 
-		return this._config.getRenderRange(itemIndex, itemsPerPage, itemCount);
+		return this._config.getRenderRange(itemIndex, itemsPerPage, itemCount, firstRender);
 	};
 
 	/**
@@ -6043,11 +6055,14 @@ define('FlowCarousel',[
 	 * Validates whether all the required items have been rendered and initiates rendering them if not.
 	 *
 	 * @method _validateItemsToRender
+	 * @param {boolean} [firstRender=false] Should this be considered first render
 	 * @return {Deferred.Promise}
 	 * @private
 	 */
-	FlowCarousel.prototype._validateItemsToRender = function() {
-		var renderRange = this.getRenderRange();
+	FlowCarousel.prototype._validateItemsToRender = function(firstRender) {
+		firstRender = typeof firstRender === 'boolean' ? firstRender : false;
+
+		var renderRange = this.getRenderRange(this._currentItemIndex, firstRender);
 
 		return this._renderItemRange(renderRange.start, renderRange.end);
 	};
@@ -6202,6 +6217,7 @@ define('FlowCarousel',[
 			loadingClassName = this._config.getClassName('loading'),
 			renderedRange = this.getRenderedRange(),
 			dir = renderedRange === null || startIndex >= renderedRange.start ? 1 : -1,
+			itemCount = this.getItemCount(),
 			loadRange;
 
 		// don't render anything if already rendered same range
@@ -6228,6 +6244,13 @@ define('FlowCarousel',[
 					end: Math.min(endIndex, renderedRange.start - 1)
 				};
 			}
+		}
+
+		// do nothing if calculated start range is larger then item count
+		if (loadRange.start > itemCount - 1) {
+			deferred.resolve();
+
+			return deferred.promise();
 		}
 
 		// for asyncronous data source add the loading class to the main wrap for the duration of the async request
@@ -6299,7 +6322,6 @@ define('FlowCarousel',[
 	 */
 	FlowCarousel.prototype._renderItems = function(items, startIndex) {
 		var deferred = new Deferred(),
-			renderRange = this.getRenderRange(),
 			renderingClassName = this._config.getClassName('rendering'),
 			endIndex = startIndex + items.length - 1,
 			promises = [],
@@ -6307,8 +6329,6 @@ define('FlowCarousel',[
 			itemIndex,
 			item,
 			promise,
-			existingElement,
-			existingElementPos,
 			i;
 
 		// it is possible that the carousel HTML element gets removed from DOM while the async request completes
@@ -6322,25 +6342,6 @@ define('FlowCarousel',[
 		for (i = 0; i < items.length; i++) {
 			item = items[i];
 			itemIndex = startIndex + i;
-			outOfRange = itemIndex < renderRange.start || itemIndex > renderRange.end;
-
-			/* istanbul ignore if */
-			if (outOfRange) {
-				existingElement = this._itemIndexToElementMap[itemIndex];
-
-				if (typeof existingElement !== 'undefined') {
-					this._renderer.destroyItem(existingElement);
-
-					this._removeItemIndexToElement(itemIndex);
-
-					// remove the item from the placeholder item indexes list if exists
-					existingElementPos = this._renderedPlaceholderIndexes.indexOf(itemIndex);
-
-					if (existingElementPos !== -1) {
-						this._renderedPlaceholderIndexes.splice(existingElementPos, 1);
-					}
-				}
-			}
 
 			// only render the item if it's not already rendered and it's not out of current render range
 			/* istanbul ignore else */
@@ -6419,9 +6420,8 @@ define('FlowCarousel',[
 				if (placeholderPos !== -1 && typeof this._itemIndexToElementMap[itemIndex] !== 'undefined') {
 					placeholderElement = this._itemIndexToElementMap[itemIndex];
 
-					this._renderer.destroyItem(placeholderElement);
+					this._destroyItem(placeholderElement, itemIndex);
 
-					this._removeItemIndexToElement(itemIndex);
 					this._renderedPlaceholderIndexes.splice(placeholderPos, 1);
 				}
 
@@ -6606,14 +6606,27 @@ define('FlowCarousel',[
 				FlowCarousel.SizeMode.OUTER
 			);
 
-		// set the scroller to largest child size if it was possible to determine
-		if (largestChildSize > 0 && largestChildSize !== this._lastLargestChildSize) {
-			$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
+		if (largestChildSize > 0) {
+			// set the scroller to largest child size if it was possible to determine
+			if (largestChildSize !== this._lastLargestChildSize) {
+				$(this._scrollerWrap).css(sizeProp, Math.ceil(largestChildSize) + 'px');
 
-			this._lastLargestChildSize = largestChildSize;
+				this._lastLargestChildSize = largestChildSize;
 
-			return true;
-		}
+				return true;
+			}
+		}/* else {
+			// failed to determine largest child size, try again
+			window.setTimeout(function() {
+				if (!this.isInitiated()) {
+					return;
+				}
+
+				console.log('try again');
+
+				this.validateSize();
+			}.bind(this), 100);
+		}*/
 
 		return false;
 	};
@@ -6668,7 +6681,7 @@ define('FlowCarousel',[
 
 		$scrollerWrap
 			.empty()
-			.attr('style', null)
+			//.attr('style', null)
 			.data(this._config.cssPrefix + 'last-size', null);
 
 		this._itemIndexToElementMap = {};
@@ -6951,7 +6964,7 @@ define('FlowCarousel',[
 	 */
 	FlowCarousel.prototype._shouldDestroyInvalidItems = function() {
 		// return the config option if this has been chosen explicitly
-		if (typeof this._config.removeOutOfRangeItems) {
+		if (typeof this._config.removeOutOfRangeItems === 'boolean') {
 			return this._config.removeOutOfRangeItems;
 		}
 

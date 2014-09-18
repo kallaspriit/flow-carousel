@@ -422,6 +422,17 @@
 			return $('<div>loading #' + index + '</div>')[0];
 		};
 
+		function logEvents(carousel, name) {
+			// log events to console
+			for (eventKey in FlowCarousel.Event) {
+				eventName = FlowCarousel.Event[eventKey];
+
+				carousel.on(eventName, function() {
+					console.log(name, 'event "' + this.eventName + '"', arguments);
+				}.bind({ eventName: eventName }));
+			}
+		}
+
 		var basicCarousel = new FlowCarousel(),
 			matchLargestElementCarousel = new FlowCarousel(),
 			halfWidthCarousel = new FlowCarousel(),
@@ -434,14 +445,8 @@
 			eventKey,
 			eventName;
 
-		// log events to console
-		for (eventKey in FlowCarousel.Event) {
-			eventName = FlowCarousel.Event[eventKey];
-
-			basicCarousel.on(eventName, function() {
-				console.log('event "' + this.eventName + '"', arguments);
-			}.bind({ eventName: eventName }));
-		}
+		logEvents(basicCarousel, 'basicCarousel');
+		logEvents(asyncCarousel, 'asyncCarousel');
 
 		$('#basic-carousel .carousel-item').each(function() {
 			$(this).click(function() {
@@ -508,7 +513,7 @@
 		});*/
 
 		// set random heights for the items
-		/*$('#match-largest-element-carousel .carousel-item').each(function() {
+		$('#match-largest-element-carousel .carousel-item').each(function() {
 			$(this).css('height', (100 + Math.random() * 200) + 'px');
 		});
 
@@ -586,7 +591,7 @@
 				}
 			},
 			animator: new FlowCarousel.ScrollAnimator(scrollAnimatorVerticalCarousel)
-		});*/
+		});
 
 		// setup buttons
 		$('.btn').click(function() {

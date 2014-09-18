@@ -303,20 +303,10 @@ define([
 
 		// add a class that enables transitioning transforms if instant is not required
 		if (instant === true &amp;&amp; this._isUsingAnimatedTransform) {
-			//$scrollerWrap.removeClass(animateTransformClass);
-
 			$scrollerWrap.css(&#x27;transition-duration&#x27;, &#x27;0ms&#x27;);
-			//$scrollerWrap[0].style.animationDuration = 0;
-			//$scrollerWrap[0].classList.remove(animateTransformClass)
 
 			this._isUsingAnimatedTransform = false;
 		} else if (instant === false/* &amp;&amp; !this._isUsingAnimatedTransform*/) {
-			//$scrollerWrap.addClass(animateTransformClass);
-			//$scrollerWrap[0].classList.add(animateTransformClass)
-
-			//$scrollerWrap.css(&#x27;transition-duration&#x27;, &#x27;200ms&#x27;);
-			//$scrollerWrap[0].style.animationDuration = &#x27;200ms&#x27;;
-
 			// calculate animation duration from speed and delta position if not set manually
 			if (typeof animationDuration !== &#x27;number&#x27;) {
 				animationDuration = Math.round(Math.abs(deltaPosition) / animationSpeed);
@@ -336,8 +326,6 @@ define([
 				$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
 			});
 		}
-
-		//$scrollerWrap.css(&#x27;transform&#x27;, translateCommand);
 
 		// remove the deferred overhead where not required
 		if (noDeferred) {

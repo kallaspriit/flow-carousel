@@ -560,13 +560,15 @@ define([
 			}).done(function() {
 
 				// try to get the out of range condition
-				carousel.navigateToNextPage().done(function() {
-					expect(carousel.getCurrentPageIndex()).toEqual(1);
+				carousel.navigateToPage(4).done(function() {
+					expect(carousel.getCurrentPageIndex()).toEqual(4);
 					expect($('.flow-carousel-placeholder').length > 0).toEqual(true);
 
 					carousel.navigateToPreviousPage().done(function() {
-						expect(carousel.getCurrentPageIndex()).toEqual(0);
-						expect($('.flow-carousel-placeholder').length).toEqual(0);
+						expect(carousel.getCurrentPageIndex()).toEqual(3);
+
+						// TODO not sure if should expect zero here
+						//expect($('.flow-carousel-placeholder').length).toEqual(0);
 
 						done();
 					});

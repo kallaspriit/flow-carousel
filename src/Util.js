@@ -75,12 +75,13 @@ define([
 				result;
 
 			/* istanbul ignore next */
-			/*if (matrix === 'none') {
+			// handle missing matrix
+			if (matrix === 'none' || matrix === '') {
 				return {
 					x: 0,
 					y: 0
 				};
-			}*/
+			}
 
 			// TODO remove the istanbul ignore once karma coverage fixes not counting these lines
 			/* istanbul ignore next */

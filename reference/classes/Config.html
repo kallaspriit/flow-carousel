@@ -496,7 +496,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l439"><code>src\Config.js:439</code></a>
+        <a href="../files/src_Config.js.html#l451"><code>src\Config.js:451</code></a>
         
         </p>
 
@@ -589,7 +589,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l478"><code>src\Config.js:478</code></a>
+        <a href="../files/src_Config.js.html#l490"><code>src\Config.js:490</code></a>
         
         </p>
 
@@ -693,7 +693,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l451"><code>src\Config.js:451</code></a>
+        <a href="../files/src_Config.js.html#l463"><code>src\Config.js:463</code></a>
         
         </p>
 
@@ -766,6 +766,12 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
                     
                 </li>
             
+                <li class="arg">
+                    
+                        <code>firstRender</code>
+                    
+                </li>
+            
             </ul><span class="paren">)</span>
         </div>
     
@@ -814,6 +820,8 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
     <div class="description">
         <p>Returns the range of items that should be rendered given current item index and items per page.</p>
 <p>By default returns one page before the current page and one after but one may choose to override it.</p>
+<p>One can use the firstRender parameter to for example render more items during the first render so no new
+rendering is triggered if the user only moves for a few pages.</p>
 
     </div>
 
@@ -865,6 +873,22 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
 
                     <div class="param-description">
                         <p>How many items there are in total</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">firstRender</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>This parameter is true for the very first render</p>
 
                     </div>
 
@@ -1800,7 +1824,7 @@ instance.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l409"><code>src\Config.js:409</code></a>
+        <a href="../files/src_Config.js.html#l421"><code>src\Config.js:421</code></a>
         
         </p>
 
@@ -2221,7 +2245,7 @@ itself on every frame but rather waits for the size to normalize.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l423"><code>src\Config.js:423</code></a>
+        <a href="../files/src_Config.js.html#l435"><code>src\Config.js:435</code></a>
         
         </p>
 

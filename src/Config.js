@@ -391,17 +391,29 @@ define([
 		 *
 		 * By default returns one page before the current page and one after but one may choose to override it.
 		 *
+		 * One can use the firstRender parameter to for example render more items during the first render so no new
+		 * rendering is triggered if the user only moves for a few pages.
+		 *
 		 * @method getRenderRange
 		 * @param {number} currentItemIndex Currently scrolled position index
 		 * @param {number} itemsPerPage How many items are shown on a page
 		 * @param {number} itemCount How many items there are in total
+		 * @param {boolean} firstRender This parameter is true for the very first render
 		 * @return {object} Render range with start and end keys
 		 * @private
 		 */
-		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount) {
+		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount, firstRender) {
+			var pagesBefore = 1,
+				pagesAfter = 1;
+
+			// render more pages on the first render
+			if (firstRender && this.removeOutOfRangeItems !== true) {
+				pagesBefore = pagesAfter = 3;
+			}
+
 			return {
-				start: Math.max(currentItemIndex - itemsPerPage, 0),
-				end: Math.min(currentItemIndex + itemsPerPage * 2 - 1, itemCount - 1)
+				start: Math.max(currentItemIndex - itemsPerPage * pagesBefore, 0),
+				end: Math.min(currentItemIndex + itemsPerPage * (pagesAfter + 1) - 1, itemCount - 1)
 			};
 		};
 	}

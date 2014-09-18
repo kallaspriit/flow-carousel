@@ -43,6 +43,7 @@ define([
 		};
 		this._firstMoveEvent = true;
 		this._lastDragDirection = 1;
+		this._disabledElements = [];
 
 		this.setMode(config.mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
@@ -514,6 +515,13 @@ define([
 		};
 		this._firstMoveEvent = true;
 
+		// restore all disabled elements in next frame
+		window.setTimeout(function() {
+			while (this._disabledElements.length > 0) {
+				this._restoreClickHandlers(this._disabledElements.pop());
+			}
+		}.bind(this), 0);
+
 		return propagate;
 	};
 
@@ -578,6 +586,8 @@ define([
 
 			// mark it disabled to be easy to find for restoring
 			$disableElement.attr('data-disabled', 'true');
+
+			this._disabledElements.push(clickedElement);
 		}
 	};
 

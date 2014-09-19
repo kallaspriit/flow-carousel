@@ -517,6 +517,11 @@ define([
 
 		// restore all disabled elements in next frame
 		window.setTimeout(function() {
+			// the carousel may get destroyed before this
+			if (this._carousel === null || !this._carousel.isInitiated()) {
+				return;
+			}
+
 			while (this._disabledElements.length > 0) {
 				this._restoreClickHandlers(this._disabledElements.pop());
 			}
@@ -599,6 +604,11 @@ define([
 	 * @private
 	 */
 	DragNavigator.prototype._restoreClickHandlers = function(clickedElement) {
+		// the carousel may get destroyed before this
+		if (this._carousel === null || !this._carousel.isInitiated()) {
+			return;
+		}
+
 		var disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
 			$clickedElement = $(clickedElement),
 			$restoreElement = null,

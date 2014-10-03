@@ -602,8 +602,8 @@ define('Util',[
 				items,
 				result;
 
-			/* istanbul ignore next */
 			// handle missing matrix
+			/* istanbul ignore next */
 			if (matrix === 'none' || matrix === '') {
 				return {
 					x: 0,
@@ -1731,8 +1731,6 @@ define('DragNavigator',[
 	/**
 	 * Ignores given jQuery event.
 	 *
-	 * TODO don't know how to unit-test this yet
-	 *
 	 * @method _ignoreEvent
 	 * @param {jQuery.Event} e jQuery event
 	 * @return {boolean} Should the event propagate
@@ -2079,7 +2077,7 @@ define('InterfaceNavigator',[
 	
 
 	/**
-	 * Build a user interface for navigating the carousel.
+	 * Builds a user interface for navigating the carousel.
 	 *
 	 * @class InterfaceNavigator
 	 * @extends AbstractNavigator
@@ -2089,15 +2087,46 @@ define('InterfaceNavigator',[
 	function InterfaceNavigator(config) {
 		AbstractNavigator.call(this);
 
+		/**
+		 * Navigator configuration.
+		 *
+		 * @property _config
+		 * @type {object}
+		 * @private
+		 */
 		this._config = config;
+
+		/**
+		 * Navigation mode.
+		 *
+		 * @property _mode
+		 * @type {KeyboardNavigator.Mode}
+		 * @private
+		 */
 		this._mode = null;
+
+		/**
+		 * Is the mouse over given carousel.
+		 *
+		 * @property _mouseEntered
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._mouseEntered = false;
 
+		/**
+		 * List of used event listeners.
+		 *
+		 * @type {object}
+		 * @private
+		 */
 		this._eventListeners = {
 			mouseenter: this._onRawMouseEnter.bind(this),
 			mouseleave: this._onRawMouseLeave.bind(this)
 		};
 
+		// set the mode to use
 		this.setMode(config.mode || InterfaceNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -2162,9 +2191,11 @@ define('InterfaceNavigator',[
 			.on('mouseenter', this._eventListeners.mouseenter)
 			.on('mouseleave', this._eventListeners.mouseleave);
 
+		// listen to some carousel events
 		this._carousel.on(this._carousel.Event.NAVIGATING_TO_ITEM, this._onNavigatingToItem.bind(this));
 		this._carousel.on(this._carousel.Event.LAYOUT_CHANGED, this._onLayoutChanged.bind(this));
 
+		// trigger UI draw
 		this._redraw();
 	};
 
@@ -2251,39 +2282,6 @@ define('InterfaceNavigator',[
 			.off('mouseenter', this._eventListeners.mouseenter)
 			.off('mouseleave', this._eventListeners.mouseleave);
 	};
-
-	/**
-	 * Performs the change event.
-	 *
-	 * @method _performChange
-	 * @private
-	 */
-	/*InterfaceNavigator.prototype._performChange = function() {
-		// don't control the carousel when user is hovering it
-		if (this._mouseEntered) {
-			return;
-		}
-
-		var instantRollover = this._config.instantRollover;
-
-		if (this._mode === InterfaceNavigator.Mode.NAVIGATE_PAGE) {
-			if (this._carousel.getPageCount() > 0) {
-				if (this._carousel.isLastPage()) {
-					this._carousel.navigateToPage(0, instantRollover);
-				} else {
-					this._carousel.navigateToNextPage();
-				}
-			}
-		} else if (this._mode === InterfaceNavigator.Mode.NAVIGATE_ITEM) {
-			if (this._carousel.getItemCount() > 0) {
-				if (this._carousel.isLastItem()) {
-					this._carousel.navigateToItem(0, instantRollover);
-				} else {
-					this._carousel.navigateToNextItem();
-				}
-			}
-		}
-	};*/
 
 	/**
 	 * Called on mouse enter event.
@@ -2827,7 +2825,6 @@ define('Config',[
 				return this.itemsPerPage;
 			}
 
-			// TODO could be cached
 			for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
 				breakpoint = this.responsiveBreakpoints[i];
 
@@ -4698,8 +4695,6 @@ define('FlowCarousel',[
 		/**
 		 * List of placeholder indexes that have been rendered.
 		 *
-		 * TODO consider getting rid of this index list
-		 *
 		 * @property _renderedPlaceholderIndexes
 		 * @type {array}
 		 * @private
@@ -5780,13 +5775,6 @@ define('FlowCarousel',[
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
-		// TODO investigate allowing navigation while the previous animation is ongoing
-		/*if (this._activeAnimationDeferred !== null) {
-			this._activeAnimationDeferred.resolve();
-
-			return this.navigateToItem(itemIndex,instant, force);
-		}*/
-
 		// ignore navigation request when already navigating
 		if (this._isAnimating) {
 			if (this._activeAnimationDeferred === null) {
@@ -5881,8 +5869,6 @@ define('FlowCarousel',[
 
 		var currentPageIndex = this.getCurrentPageIndex(),
 			itemIndex = pageIndex * this.getItemsPerPage(),
-			// TODO this needs change in getCurrentPageIndex as well
-			//itemIndex = Math.min(pageIndex * this.getItemsPerPage(), this.getMaximumValidItemIndex()),
 			pageCount = this.getPageCount(),
 			deferred = new Deferred();
 
@@ -6453,7 +6439,6 @@ define('FlowCarousel',[
 			i;
 
 		// destroy rendered placeholders out of the render range
-		// TODO the placeholders and real items destroying should be merged
 		for (i = 0; i < this._renderedPlaceholderIndexes.length; i++) {
 			itemIndex = this._renderedPlaceholderIndexes[i];
 
@@ -6531,7 +6516,6 @@ define('FlowCarousel',[
 			renderRange = this.getRenderRange(targetItemIndex);
 
 		// render placeholders that are later replaced with real loaded items
-		// TODO this is not needed for syncronous data source
 		this._renderItemPlaceholders(renderRange.start, renderRange.end);
 	};
 
@@ -6728,12 +6712,10 @@ define('FlowCarousel',[
 		$(this._mainWrap).addClass(renderingClassName);
 
 		// wait for all the elements to get rendered
-		// TODO Add each element as soon as it renders?
 		Deferred.when.apply($, promises)
 			.done(function() {
 				// the carousel may get destroyed while the items are loading
 				if (!this._initiated) {
-					//return; // TODO restore
 					throw new Error('Carousel was destroyed before rendering items');
 				}
 
@@ -6865,7 +6847,6 @@ define('FlowCarousel',[
 		}
 
 		// the element may be display: none to begin with, make it visible
-		// TODO consider using a class instead
 		$element.css('display', 'block');
 
 		// wrap the item element in a carousel wrapper
@@ -6937,9 +6918,6 @@ define('FlowCarousel',[
 		$itemWrapper.hover(
 			function() {
 				var elementIndex = $(this).data(self._config.cssPrefix + 'index');
-
-				// TODO not sure if it's a good idea
-				//$(this).addClass(itemHoverClass);
 
 				self._hoverItemIndex = elementIndex;
 			},

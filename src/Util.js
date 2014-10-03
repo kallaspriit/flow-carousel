@@ -74,8 +74,8 @@ define([
 				items,
 				result;
 
-			/* istanbul ignore next */
 			// handle missing matrix
+			/* istanbul ignore next */
 			if (matrix === 'none' || matrix === '') {
 				return {
 					x: 0,

@@ -823,8 +823,6 @@ define([
 	/**
 	 * Ignores given jQuery event.
 	 *
-	 * TODO don't know how to unit-test this yet
-	 *
 	 * @method _ignoreEvent
 	 * @param {jQuery.Event} e jQuery event
 	 * @return {boolean} Should the event propagate

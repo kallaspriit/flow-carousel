@@ -247,8 +247,6 @@ define([
 		/**
 		 * List of placeholder indexes that have been rendered.
 		 *
-		 * TODO consider getting rid of this index list
-		 *
 		 * @property _renderedPlaceholderIndexes
 		 * @type {array}
 		 * @private
@@ -1329,13 +1327,6 @@ define([
 			throw new Error('Too large index "' + itemIndex + '" requested, there are only ' + itemCount + ' items');
 		}
 
-		// TODO investigate allowing navigation while the previous animation is ongoing
-		/*if (this._activeAnimationDeferred !== null) {
-			this._activeAnimationDeferred.resolve();
-
-			return this.navigateToItem(itemIndex,instant, force);
-		}*/
-
 		// ignore navigation request when already navigating
 		if (this._isAnimating) {
 			if (this._activeAnimationDeferred === null) {
@@ -1430,8 +1421,6 @@ define([
 
 		var currentPageIndex = this.getCurrentPageIndex(),
 			itemIndex = pageIndex * this.getItemsPerPage(),
-			// TODO this needs change in getCurrentPageIndex as well
-			//itemIndex = Math.min(pageIndex * this.getItemsPerPage(), this.getMaximumValidItemIndex()),
 			pageCount = this.getPageCount(),
 			deferred = new Deferred();
 
@@ -2002,7 +1991,6 @@ define([
 			i;
 
 		// destroy rendered placeholders out of the render range
-		// TODO the placeholders and real items destroying should be merged
 		for (i = 0; i < this._renderedPlaceholderIndexes.length; i++) {
 			itemIndex = this._renderedPlaceholderIndexes[i];
 
@@ -2080,7 +2068,6 @@ define([
 			renderRange = this.getRenderRange(targetItemIndex);
 
 		// render placeholders that are later replaced with real loaded items
-		// TODO this is not needed for syncronous data source
 		this._renderItemPlaceholders(renderRange.start, renderRange.end);
 	};
 
@@ -2277,12 +2264,10 @@ define([
 		$(this._mainWrap).addClass(renderingClassName);
 
 		// wait for all the elements to get rendered
-		// TODO Add each element as soon as it renders?
 		Deferred.when.apply($, promises)
 			.done(function() {
 				// the carousel may get destroyed while the items are loading
 				if (!this._initiated) {
-					//return; // TODO restore
 					throw new Error('Carousel was destroyed before rendering items');
 				}
 
@@ -2414,7 +2399,6 @@ define([
 		}
 
 		// the element may be display: none to begin with, make it visible
-		// TODO consider using a class instead
 		$element.css('display', 'block');
 
 		// wrap the item element in a carousel wrapper
@@ -2486,9 +2470,6 @@ define([
 		$itemWrapper.hover(
 			function() {
 				var elementIndex = $(this).data(self._config.cssPrefix + 'index');
-
-				// TODO not sure if it's a good idea
-				//$(this).addClass(itemHoverClass);
 
 				self._hoverItemIndex = elementIndex;
 			},

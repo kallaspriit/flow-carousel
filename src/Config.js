@@ -464,7 +464,6 @@ define([
 				return this.itemsPerPage;
 			}
 
-			// TODO could be cached
 			for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
 				breakpoint = this.responsiveBreakpoints[i];
 

@@ -127,7 +127,7 @@ define([
 	&#x27;use strict&#x27;;
 
 	/**
-	 * Build a user interface for navigating the carousel.
+	 * Builds a user interface for navigating the carousel.
 	 *
 	 * @class InterfaceNavigator
 	 * @extends AbstractNavigator
@@ -137,15 +137,46 @@ define([
 	function InterfaceNavigator(config) {
 		AbstractNavigator.call(this);
 
+		/**
+		 * Navigator configuration.
+		 *
+		 * @property _config
+		 * @type {object}
+		 * @private
+		 */
 		this._config = config;
+
+		/**
+		 * Navigation mode.
+		 *
+		 * @property _mode
+		 * @type {KeyboardNavigator.Mode}
+		 * @private
+		 */
 		this._mode = null;
+
+		/**
+		 * Is the mouse over given carousel.
+		 *
+		 * @property _mouseEntered
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._mouseEntered = false;
 
+		/**
+		 * List of used event listeners.
+		 *
+		 * @type {object}
+		 * @private
+		 */
 		this._eventListeners = {
 			mouseenter: this._onRawMouseEnter.bind(this),
 			mouseleave: this._onRawMouseLeave.bind(this)
 		};
 
+		// set the mode to use
 		this.setMode(config.mode || InterfaceNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -210,9 +241,11 @@ define([
 			.on(&#x27;mouseenter&#x27;, this._eventListeners.mouseenter)
 			.on(&#x27;mouseleave&#x27;, this._eventListeners.mouseleave);
 
+		// listen to some carousel events
 		this._carousel.on(this._carousel.Event.NAVIGATING_TO_ITEM, this._onNavigatingToItem.bind(this));
 		this._carousel.on(this._carousel.Event.LAYOUT_CHANGED, this._onLayoutChanged.bind(this));
 
+		// trigger UI draw
 		this._redraw();
 	};
 
@@ -299,39 +332,6 @@ define([
 			.off(&#x27;mouseenter&#x27;, this._eventListeners.mouseenter)
 			.off(&#x27;mouseleave&#x27;, this._eventListeners.mouseleave);
 	};
-
-	/**
-	 * Performs the change event.
-	 *
-	 * @method _performChange
-	 * @private
-	 */
-	/*InterfaceNavigator.prototype._performChange = function() {
-		// don&#x27;t control the carousel when user is hovering it
-		if (this._mouseEntered) {
-			return;
-		}
-
-		var instantRollover = this._config.instantRollover;
-
-		if (this._mode === InterfaceNavigator.Mode.NAVIGATE_PAGE) {
-			if (this._carousel.getPageCount() &gt; 0) {
-				if (this._carousel.isLastPage()) {
-					this._carousel.navigateToPage(0, instantRollover);
-				} else {
-					this._carousel.navigateToNextPage();
-				}
-			}
-		} else if (this._mode === InterfaceNavigator.Mode.NAVIGATE_ITEM) {
-			if (this._carousel.getItemCount() &gt; 0) {
-				if (this._carousel.isLastItem()) {
-					this._carousel.navigateToItem(0, instantRollover);
-				} else {
-					this._carousel.navigateToNextItem();
-				}
-			}
-		}
-	};*/
 
 	/**
 	 * Called on mouse enter event.

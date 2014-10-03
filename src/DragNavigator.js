@@ -5,7 +5,7 @@ define([
 	'use strict';
 
 	/**
-	 * Drag navigator.
+	 * Uses mouse and touch events to navigate the carousel.
 	 *
 	 * @class DragNavigator
 	 * @extends AbstractNavigator
@@ -15,36 +15,209 @@ define([
 	function DragNavigator(config) {
 		AbstractNavigator.call(this);
 
+		/**
+		 * Navigator configuration.
+		 *
+		 * @property _config
+		 * @type {object}
+		 * @private
+		 */
 		this._config = config;
+
+		/**
+		 * Navigation mode.
+		 *
+		 * @property _mode
+		 * @type {DragNavigator.Mode}
+		 * @private
+		 */
 		this._mode = null;
+
+		/**
+		 * Is the drag navigator currently active and dragging.
+		 *
+		 * @property _active
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._active = false;
+
+		/**
+		 * Was an existing animation stopped.
+		 *
+		 * @property _stoppedExistingAnimation
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._stoppedExistingAnimation = false;
+
+		/**
+		 * Has the dragging procedure started.
+		 *
+		 * @property _startedDragging
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._startedDragging = false;
+
+		/**
+		 * Drag cursor position at the start of the drag process.
+		 *
+		 * @property _startDragPosition
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._startDragPosition = null;
+
+		/**
+		 * Drag cursor opposite position at the start of the drag process.
+		 *
+		 * @property _startOppositePosition
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._startOppositePosition = null;
+
+		/**
+		 * Carousel wrap position at the start of the drag process.
+		 *
+		 * @property _startCarouselPosition
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._startCarouselPosition = null;
+
+		/**
+		 * Item index that was hovered when starting to drag.
+		 *
+		 * @property _startHoverItemIndex
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._startHoverItemIndex = null;
+
+		/**
+		 * The DOM node that the user started to drag.
+		 *
+		 * @property _startTargetElement
+		 * @type {DOMElement|null}
+		 * @default null
+		 * @private
+		 */
 		this._startTargetElement = null;
-		this._startWindowScrollTop = null;
+
+		/**
+		 * Last observed drag cursor position.
+		 *
+		 * @property _lastDragPosition
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._lastDragPosition = null;
+
+		/**
+		 * Last observed opposite drag cursor position.
+		 *
+		 * @property _lastDragPosition
+		 * @type _lastOppositePosition
+		 * @default null
+		 * @private
+		 */
 		this._lastOppositePosition = null;
+
+		/**
+		 * Timestamp of the last move event.
+		 *
+		 * @property _lastMoveTime
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._lastMoveTime = null;
+
+		/**
+		 * Time difference between the last move events.
+		 *
+		 * @property _lastMoveDeltaTime
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._lastMoveDeltaTime = null;
+
+		/**
+		 * Pixels position difference between the last move events.
+		 *
+		 * @property _lastDeltaDragPosition
+		 * @type {number|null}
+		 * @default null
+		 * @private
+		 */
 		this._lastDeltaDragPosition = null;
+
+		/**
+		 * Accumulated move events positions in main and opposite directions.
+		 *
+		 * @property _accumulatedMagnitude
+		 * @type {object}
+		 * @private
+		 */
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
 		};
+
+		/**
+		 * Is the move event the first one during current drag procedure.
+		 *
+		 * @property _firstMoveEvent
+		 * @type {boolean}
+		 * @default true
+		 * @private
+		 */
+		this._firstMoveEvent = true;
+
+		/**
+		 * The last direction that the carousel was dragged at (1 for positive and -1 for negative).
+		 *
+		 * @property _lastDragDirection
+		 * @type {number}
+		 * @default 1
+		 * @private
+		 */
+		this._lastDragDirection = 1;
+
+		/**
+		 * List of elements that have been disabled during dragging.
+		 *
+		 * @property _disabledElements
+		 * @type {Array}
+		 * @private
+		 */
+		this._disabledElements = [];
+
+		/**
+		 * List of used event listeners.
+		 *
+		 * @type {object}
+		 * @private
+		 */
 		this._eventListeners = {
 			start: this._onRawStart.bind(this),
 			move: this._onRawMove.bind(this),
 			end: this._onRawEnd.bind(this),
 			dragStart: this._onRawDragStart.bind(this)
 		};
-		this._firstMoveEvent = true;
-		this._lastDragDirection = 1;
-		this._disabledElements = [];
 
+		// set the mode to use
 		this.setMode(config.mode || DragNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -147,14 +320,15 @@ define([
 
 		var orientation = this._carousel.getOrientation(),
 			horizontal = orientation === this._carousel.Config.Orientation.HORIZONTAL,
-			isTouchEvent = e.type === 'touchstart',
-			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX,
-			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY,
+			eventPosition = this._extractDragPosition(e),
+			dragPosition = horizontal ? eventPosition.x : eventPosition.y,
+			oppositePosition = horizontal ? eventPosition.y : eventPosition.x,
 			targetElement = e.target,
 			result;
 
-		result = this._begin(horizontal ? x : y, horizontal ? y : x, targetElement);
+		result = this._begin(dragPosition, oppositePosition, targetElement);
 
+		// prevent the default browser behaviour if started dragging
 		if (result === false) {
 			e.preventDefault();
 
@@ -177,8 +351,9 @@ define([
 			horizontal = orientation === this._carousel.Config.Orientation.HORIZONTAL,
 			isTouchEvent = e.type === 'touchmove',
 			result,
-			x,
-			y;
+			eventPosition,
+			dragPosition,
+			oppositePosition;
 
 		// stop if not active
 		if (!this._active) {
@@ -189,10 +364,11 @@ define([
 		if (e.which !== 1 && e.type !== 'touchmove') {
 			result = this._end(e.target, isTouchEvent);
 		} else {
-			x = isTouchEvent ? e.originalEvent.changedTouches[0].pageX : e.pageX;
-			y = isTouchEvent ? e.originalEvent.changedTouches[0].pageY : e.pageY;
+			eventPosition = this._extractDragPosition(e);
+			dragPosition = horizontal ? eventPosition.x : eventPosition.y;
+			oppositePosition = horizontal ? eventPosition.y : eventPosition.x;
 
-			result = this._move(horizontal ? x : y, horizontal ? y : x);
+			result = this._move(dragPosition, oppositePosition);
 		}
 
 		if (result === false) {
@@ -214,8 +390,8 @@ define([
 	 */
 	DragNavigator.prototype._onRawEnd = function(e) {
 		var isTouchEvent = e.type === 'touchend' || e.type === 'touchcancel',
-			result,
-			targetElement;
+			targetElement = e.target,
+			result;
 
 		// stop if not active
 		if (!this._active) {
@@ -226,8 +402,6 @@ define([
 		if (e.which !== 1 && e.type !== 'touchend' && e.type !== 'touchcancel') {
 			return true;
 		}
-
-		targetElement = e.target;
 
 		result = this._end(targetElement, isTouchEvent);
 
@@ -266,6 +440,7 @@ define([
 	DragNavigator.prototype._begin = function(dragPosition, oppositePosition, targetElement) {
 		targetElement = targetElement || null;
 
+		// store drag start information
 		this._active = true;
 		this._startDragPosition = dragPosition;
 		this._startOppositePosition = oppositePosition;
@@ -274,7 +449,6 @@ define([
 		this._lastMoveTime = (new Date()).getTime();
 		this._startCarouselPosition = this._carousel.getAnimator().getCurrentPosition();
 		this._startHoverItemIndex = this._carousel.getHoverItemIndex();
-		this._startWindowScrollTop = $(window).scrollTop();
 		this._accumulatedMagnitude = {
 			main: 0,
 			opposite: 0
@@ -300,12 +474,8 @@ define([
 		this._carousel._onDragBegin(
 			this._startDragPosition,
 			this._startOppositePosition,
-			this._startCarouselPosition,
-			this._startWindowScrollTop
+			this._startCarouselPosition
 		);
-
-		// disable default functionality
-		//return false;
 
 		// do not let the event propagate if we stopped an existing animation
 		if (this._stoppedExistingAnimation) {
@@ -334,13 +504,12 @@ define([
 		var deltaDragPosition = dragPosition - this._startDragPosition,
 			moveDelta = this._lastDragPosition - dragPosition,
 			currentTime = (new Date()).getTime();
-			//deltaDragOppositePosition = oppositePosition - this._startOppositePosition,
-			//currentWindowScrollTop = $(window).scrollTop(),
-			//windowScrollTopDifference = this._startWindowScrollTop - currentWindowScrollTop;
 
+		// increment the accumulated move amount
 		this._accumulatedMagnitude.main += Math.abs(moveDelta);
 		this._accumulatedMagnitude.opposite += Math.abs(this._lastOppositePosition - oppositePosition);
 
+		// the delta time and position are used to calculate drag speed
 		if (this._lastMoveTime !== null) {
 			this._lastMoveDeltaTime = currentTime - this._lastMoveTime;
 		}
@@ -404,6 +573,7 @@ define([
 		// use the animator to move to calculated position instantly
 		this._carousel.getAnimator().animateToPosition(applyPosition, true, true);
 
+		// stop event propagation so browser won't perform its default actions
 		return false;
 	};
 
@@ -469,6 +639,7 @@ define([
 		} else {
 			endHoverItemIndex = this._carousel.getHoverItemIndex();
 
+			// there is a number of requirements for handling the click event
 			performClick = this._startHoverItemIndex !== null
 				&& targetElement !== null
 				&& targetElement === this._startTargetElement
@@ -647,31 +818,6 @@ define([
 		// remove the disabled state
 		$restoreElement.data(disabledDataName, false);
 		$restoreElement.attr('data-disabled', null);
-
-		/*var $clickedElement = $(clickedElement),
-			disabledDataName = this._carousel.getConfig().cssPrefix + 'click-disabled',
-			isDisabled = $clickedElement.data(disabledDataName);
-
-		if (isDisabled === true) {
-			// fetch the original click handlers
-			var originalClickHandlers = $clickedElement.data('original-click-handlers'),
-				i;
-
-			// remove the ignore handler
-			$clickedElement.off('click');
-
-			// restore the old click handlers if present
-			if (Util.isArray(originalClickHandlers)) {
-				// restore the original click handlers
-				for (i = 0; i < originalClickHandlers.length; i++) {
-					$clickedElement.on('click', originalClickHandlers[i].bind(clickedElement));
-
-					//originalClickHandlers[i].call(element);
-				}
-			}
-
-			$clickedElement.data(disabledDataName, false);
-		}*/
 	};
 
 	/**
@@ -685,11 +831,28 @@ define([
 	 * @private
 	 */
 	/* istanbul ignore next */
-	DragNavigator.prototype._ignoreEvent = function(e) {
-		e.preventDefault();
-		e.stopPropagation();
+	DragNavigator.prototype._ignoreEvent = function(event) {
+		event.preventDefault();
+		event.stopPropagation();
 
 		return false;
+	};
+
+	/**
+	 * Extracts drag position x, y from mouse or touch event.
+	 *
+	 * @method _extractDragPosition
+	 * @param {Event} event Mouse or drag event
+	 * @return {object}
+	 * @private
+	 */
+	DragNavigator.prototype._extractDragPosition = function(event) {
+		var isTouchEvent = event.type === 'touchstart';
+
+		return {
+			x: isTouchEvent ? event.originalEvent.changedTouches[0].pageX : event.pageX,
+			y: isTouchEvent ? event.originalEvent.changedTouches[0].pageY : event.pageY
+		};
 	};
 
 	return DragNavigator;

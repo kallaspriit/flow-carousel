@@ -137,16 +137,47 @@ define([
 	function KeyboardNavigator(config) {
 		AbstractNavigator.call(this);
 
+		/**
+		 * Navigator configuration.
+		 *
+		 * @property _config
+		 * @type {object}
+		 * @private
+		 */
 		this._config = config;
+
+		/**
+		 * Navigation mode.
+		 *
+		 * @property _mode
+		 * @type {KeyboardNavigator.Mode}
+		 * @private
+		 */
 		this._mode = null;
+
+		/**
+		 * Is the mouse over given carousel.
+		 *
+		 * @property _mouseEntered
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._mouseEntered = false;
 
+		/**
+		 * List of used event listeners.
+		 *
+		 * @type {object}
+		 * @private
+		 */
 		this._eventListeners = {
 			mouseenter: this._onRawMouseEnter.bind(this),
 			mouseleave: this._onRawMouseLeave.bind(this),
 			keydown: this._onRawKeyDown.bind(this),
 		};
 
+		// set the mode to use
 		this.setMode(config.mode || KeyboardNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -291,17 +322,11 @@ define([
 		// the keycodes are based on carousel orientation (left-right arrows for horizontal and up-down for vertical)
 		switch (this._carousel.getOrientation()) {
 			case this._carousel.Config.Orientation.HORIZONTAL:
-				keyCodes = {
-					previous: 37, // arrow left
-					next: 39 // arrow right
-				};
+				keyCodes = this._config.keys.horizontal;
 			break;
 
 			case this._carousel.Config.Orientation.VERTICAL:
-				keyCodes = {
-					previous: 38, // arrow up
-					next: 40 // arrow down
-				};
+				keyCodes = this._config.keys.vertical;
 			break;
 		}
 

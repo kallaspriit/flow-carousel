@@ -140,7 +140,7 @@
 
 
 <div class="box intro">
-    <p>Drag navigator.</p>
+    <p>Uses mouse and touch events to navigate the carousel.</p>
 
 </div>
 
@@ -283,6 +283,13 @@
                             </li>
                         
                             <li class="index-item method private">
+                                <a href="#method__extractDragPosition">_extractDragPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
                                 <a href="#method__ignoreEvent">_ignoreEvent</a>
 
                                 
@@ -376,6 +383,146 @@
 
                     <ul class="index-list properties extends">
                         
+                            <li class="index-item property private">
+                                <a href="#property__accumulatedMagnitude">_accumulatedMagnitude</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__active">_active</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private inherited">
+                                <a href="#property__carousel">_carousel</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__config">_config</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__disabledElements">_disabledElements</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__firstMoveEvent">_firstMoveEvent</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__lastDeltaDragPosition">_lastDeltaDragPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__lastDragDirection">_lastDragDirection</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__lastDragPosition">_lastDragPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__lastDragPosition">_lastDragPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__lastMoveDeltaTime">_lastMoveDeltaTime</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__lastMoveTime">_lastMoveTime</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__mode">_mode</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__startCarouselPosition">_startCarouselPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__startDragPosition">_startDragPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__startedDragging">_startedDragging</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__startHoverItemIndex">_startHoverItemIndex</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__startOppositePosition">_startOppositePosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__startTargetElement">_startTargetElement</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property private">
+                                <a href="#property__stoppedExistingAnimation">_stoppedExistingAnimation</a>
+
+                                
+                                
+                            </li>
+                        
                             <li class="index-item property">
                                 <a href="#property_Mode">Mode</a>
 
@@ -457,7 +604,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l256"><code>src\DragNavigator.js:256</code></a>
+        <a href="../files/src_DragNavigator.js.html#l430"><code>src\DragNavigator.js:430</code></a>
         
         </p>
 
@@ -594,7 +741,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l533"><code>src\DragNavigator.js:533</code></a>
+        <a href="../files/src_DragNavigator.js.html#l704"><code>src\DragNavigator.js:704</code></a>
         
         </p>
 
@@ -695,7 +842,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l410"><code>src\DragNavigator.js:410</code></a>
+        <a href="../files/src_DragNavigator.js.html#l580"><code>src\DragNavigator.js:580</code></a>
         
         </p>
 
@@ -773,6 +920,113 @@
 </div>
 
                 
+                    <div id="method__extractDragPosition" class="method item private">
+    <h3 class="name"><code>_extractDragPosition</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+        </span>
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l841"><code>src\DragNavigator.js:841</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Extracts drag position x, y from mouse or touch event.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Event</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Mouse or drag event</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
                     <div id="method__ignoreEvent" class="method item private">
     <h3 class="name"><code>_ignoreEvent</code></h3>
 
@@ -821,7 +1075,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l677"><code>src\DragNavigator.js:677</code></a>
+        <a href="../files/src_DragNavigator.js.html#l823"><code>src\DragNavigator.js:823</code></a>
         
         </p>
 
@@ -937,7 +1191,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l318"><code>src\DragNavigator.js:318</code></a>
+        <a href="../files/src_DragNavigator.js.html#l488"><code>src\DragNavigator.js:488</code></a>
         
         </p>
 
@@ -1058,7 +1312,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l244"><code>src\DragNavigator.js:244</code></a>
+        <a href="../files/src_DragNavigator.js.html#l418"><code>src\DragNavigator.js:418</code></a>
         
         </p>
 
@@ -1153,7 +1407,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l207"><code>src\DragNavigator.js:207</code></a>
+        <a href="../files/src_DragNavigator.js.html#l383"><code>src\DragNavigator.js:383</code></a>
         
         </p>
 
@@ -1262,7 +1516,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l167"><code>src\DragNavigator.js:167</code></a>
+        <a href="../files/src_DragNavigator.js.html#l341"><code>src\DragNavigator.js:341</code></a>
         
         </p>
 
@@ -1371,7 +1625,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l135"><code>src\DragNavigator.js:135</code></a>
+        <a href="../files/src_DragNavigator.js.html#l308"><code>src\DragNavigator.js:308</code></a>
         
         </p>
 
@@ -1476,7 +1730,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l599"><code>src\DragNavigator.js:599</code></a>
+        <a href="../files/src_DragNavigator.js.html#l770"><code>src\DragNavigator.js:770</code></a>
         
         </p>
 
@@ -1557,7 +1811,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l98"><code>src\DragNavigator.js:98</code></a>
+        <a href="../files/src_DragNavigator.js.html#l271"><code>src\DragNavigator.js:271</code></a>
         
         </p>
 
@@ -1612,7 +1866,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l118"><code>src\DragNavigator.js:118</code></a>
+        <a href="../files/src_DragNavigator.js.html#l291"><code>src\DragNavigator.js:291</code></a>
         
         </p>
 
@@ -1671,7 +1925,7 @@
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l84"><code>src\DragNavigator.js:84</code></a>
+        <a href="../files/src_DragNavigator.js.html#l257"><code>src\DragNavigator.js:257</code></a>
         
         </p>
 
@@ -1748,7 +2002,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_AbstractNavigator.js.html#l17"><code>src\AbstractNavigator.js:17</code></a>
+        <a href="../files/src_AbstractNavigator.js.html#l26"><code>src\AbstractNavigator.js:26</code></a>
         
         </p>
 
@@ -1838,7 +2092,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l66"><code>src\DragNavigator.js:66</code></a>
+        <a href="../files/src_DragNavigator.js.html#l239"><code>src\DragNavigator.js:239</code></a>
         
         </p>
 
@@ -1896,6 +2150,975 @@ either the page or navigate one item at a time.</p>
                 <h2 class="off-left">Properties</h2>
 
                 
+                    <div id="property__accumulatedMagnitude" class="property item private">
+    <h3 class="name"><code>_accumulatedMagnitude</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l166"><code>src\DragNavigator.js:166</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Accumulated move events positions in main and opposite directions.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__active" class="property item private">
+    <h3 class="name"><code>_active</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l36"><code>src\DragNavigator.js:36</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Is the drag navigator currently active and dragging.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> false</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__carousel" class="property item private inherited">
+    <h3 class="name"><code>_carousel</code></h3>
+    <span class="type"><a href="../classes/FlowCarousel.html" class="crosslink">FlowCarousel</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="../classes/AbstractNavigator.html#property__carousel">AbstractNavigator</a>:
+            
+        
+        
+        <a href="../files/src_AbstractNavigator.js.html#l15"><code>src\AbstractNavigator.js:15</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Carousel component.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__config" class="property item private">
+    <h3 class="name"><code>_config</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l18"><code>src\DragNavigator.js:18</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Navigator configuration.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__disabledElements" class="property item private">
+    <h3 class="name"><code>_disabledElements</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l198"><code>src\DragNavigator.js:198</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>List of elements that have been disabled during dragging.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__firstMoveEvent" class="property item private">
+    <h3 class="name"><code>_firstMoveEvent</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l178"><code>src\DragNavigator.js:178</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Is the move event the first one during current drag procedure.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> true</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__lastDeltaDragPosition" class="property item private">
+    <h3 class="name"><code>_lastDeltaDragPosition</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l156"><code>src\DragNavigator.js:156</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Pixels position difference between the last move events.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__lastDragDirection" class="property item private">
+    <h3 class="name"><code>_lastDragDirection</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l188"><code>src\DragNavigator.js:188</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The last direction that the carousel was dragged at (1 for positive and -1 for negative).</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> 1</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__lastDragPosition" class="property item private">
+    <h3 class="name"><code>_lastDragPosition</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l116"><code>src\DragNavigator.js:116</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Last observed drag cursor position.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__lastDragPosition" class="property item private">
+    <h3 class="name"><code>_lastDragPosition</code></h3>
+    <span class="type">_lastOppositePosition</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l126"><code>src\DragNavigator.js:126</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Last observed opposite drag cursor position.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__lastMoveDeltaTime" class="property item private">
+    <h3 class="name"><code>_lastMoveDeltaTime</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l146"><code>src\DragNavigator.js:146</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Time difference between the last move events.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__lastMoveTime" class="property item private">
+    <h3 class="name"><code>_lastMoveTime</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l136"><code>src\DragNavigator.js:136</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Timestamp of the last move event.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__mode" class="property item private">
+    <h3 class="name"><code>_mode</code></h3>
+    <span class="type">DragNavigator.Mode</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l27"><code>src\DragNavigator.js:27</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Navigation mode.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__startCarouselPosition" class="property item private">
+    <h3 class="name"><code>_startCarouselPosition</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l86"><code>src\DragNavigator.js:86</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Carousel wrap position at the start of the drag process.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__startDragPosition" class="property item private">
+    <h3 class="name"><code>_startDragPosition</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l66"><code>src\DragNavigator.js:66</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Drag cursor position at the start of the drag process.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__startedDragging" class="property item private">
+    <h3 class="name"><code>_startedDragging</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l56"><code>src\DragNavigator.js:56</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Has the dragging procedure started.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> false</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__startHoverItemIndex" class="property item private">
+    <h3 class="name"><code>_startHoverItemIndex</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l96"><code>src\DragNavigator.js:96</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Item index that was hovered when starting to drag.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__startOppositePosition" class="property item private">
+    <h3 class="name"><code>_startOppositePosition</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l76"><code>src\DragNavigator.js:76</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Drag cursor opposite position at the start of the drag process.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__startTargetElement" class="property item private">
+    <h3 class="name"><code>_startTargetElement</code></h3>
+    <span class="type">DOMElement | Null</span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l106"><code>src\DragNavigator.js:106</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The DOM node that the user started to drag.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property__stoppedExistingAnimation" class="property item private">
+    <h3 class="name"><code>_stoppedExistingAnimation</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_DragNavigator.js.html#l46"><code>src\DragNavigator.js:46</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Was an existing animation stopped.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> false</p>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="property_Mode" class="property item">
     <h3 class="name"><code>Mode</code></h3>
     <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
@@ -1919,7 +3142,7 @@ either the page or navigate one item at a time.</p>
             
         
         
-        <a href="../files/src_DragNavigator.js.html#l53"><code>src\DragNavigator.js:53</code></a>
+        <a href="../files/src_DragNavigator.js.html#l226"><code>src\DragNavigator.js:226</code></a>
         
         </p>
 

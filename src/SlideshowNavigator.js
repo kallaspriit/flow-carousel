@@ -15,17 +15,65 @@ define([
 	function SlideshowNavigator(config) {
 		AbstractNavigator.call(this);
 
+		/**
+		 * Navigator configuration.
+		 *
+		 * @property _config
+		 * @type {object}
+		 * @private
+		 */
 		this._config = config;
+
+		/**
+		 * Navigation mode.
+		 *
+		 * @property _mode
+		 * @type {SlideshowNavigator.Mode}
+		 * @private
+		 */
 		this._mode = null;
+
+		/**
+		 * The timeout for the next change.
+		 *
+		 * @property _delayTimeout
+		 * @type {number|null}
+		 * @private
+		 */
 		this._delayTimeout = null;
+
+		/**
+		 * Is the slideshow playing.
+		 *
+		 * @property _playing
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._playing = false;
+
+		/**
+		 * Is the mouse over given carousel.
+		 *
+		 * @property _mouseEntered
+		 * @type {boolean}
+		 * @default false
+		 * @private
+		 */
 		this._mouseEntered = false;
 
+		/**
+		 * List of used event listeners.
+		 *
+		 * @type {object}
+		 * @private
+		 */
 		this._eventListeners = {
 			mouseenter: this._onRawMouseEnter.bind(this),
 			mouseleave: this._onRawMouseLeave.bind(this)
 		};
 
+		// set the mode to use
 		this.setMode(config.mode || SlideshowNavigator.Mode.NAVIGATE_PAGE);
 	}
 
@@ -90,8 +138,10 @@ define([
 			.on('mouseenter', this._eventListeners.mouseenter)
 			.on('mouseleave', this._eventListeners.mouseleave);
 
+		// listen for navigation end event to schedule the next slideshow move
 		this._carousel.on(this._carousel.Event.NAVIGATED_TO_ITEM, this._onNavigatedToItem.bind(this));
 
+		// begin the slideshow
 		this.start();
 	};
 
@@ -126,6 +176,7 @@ define([
 	 * @method start
 	 */
 	SlideshowNavigator.prototype.start = function() {
+		// stop existing slideshow if already playing
 		if (this.isPlaying()) {
 			this.stop();
 		}
@@ -176,6 +227,7 @@ define([
 				return;
 			}
 
+			// perform navigation and schedule next change
 			this._performChange();
 			this._scheduleNextChange();
 		}.bind(this), interval);
@@ -195,6 +247,7 @@ define([
 
 		var instantRollover = this._config.instantRollover;
 
+		// either change the page or item as set by mode, taking rollover into account
 		if (this._mode === SlideshowNavigator.Mode.NAVIGATE_PAGE) {
 			if (this._carousel.getPageCount() > 0) {
 				if (this._carousel.isLastPage()) {

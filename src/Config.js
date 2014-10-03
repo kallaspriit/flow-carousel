@@ -221,6 +221,16 @@ define([
 			keyboard: {
 				enabled: true,
 				mode: 'navigate-page',
+				keys: {
+					horizontal: {
+						previous: 37, // arrow left
+						next: 39 // arrow right
+					},
+					vertical: {
+						previous: 38, // arrow up
+						next: 40 // arrow down
+					}
+				},
 
 				createInstance: function(carousel) {
 					return new KeyboardNavigator(carousel.getConfig().navigators.keyboard);

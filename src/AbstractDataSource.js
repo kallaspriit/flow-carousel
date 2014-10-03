@@ -5,20 +5,12 @@ define([
 	/**
 	 * Data source interface.
 	 *
+	 * Datasources are used as source of items to render.
+	 *
 	 * @class AbstractDataSource
 	 * @constructor
 	 */
 	function AbstractDataSource() {}
-
-	/**
-	 * Returns the number of items in the dataset.
-	 *
-	 * @method getItemCount
-	 * @return {number}
-	 */
-	AbstractDataSource.prototype.getItemCount = function() {
-		throw new Error('Not implemented');
-	};
 
 	/**
 	 * Returns whether given data source is asynchronous or not.
@@ -32,6 +24,16 @@ define([
 	 */
 	AbstractDataSource.prototype.isAsynchronous = function() {
 		return false;
+	};
+
+	/**
+	 * Returns the number of items in the dataset.
+	 *
+	 * @method getItemCount
+	 * @return {number}
+	 */
+	AbstractDataSource.prototype.getItemCount = function() {
+		throw new Error('Not implemented');
 	};
 
 	/**

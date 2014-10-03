@@ -5,7 +5,7 @@ define([
 	'use strict';
 
 	/**
-	 * Data source interface.
+	 * Array based data source.
 	 *
 	 * @class ArrayDataSource
 	 * @extends AbstractDataSource
@@ -14,6 +14,14 @@ define([
 	function ArrayDataSource(data) {
 		AbstractDataSource.call(this);
 
+		/**
+		 * Data array.
+		 *
+		 * @property _data
+		 * @type {array}
+		 * @default []
+		 * @private
+		 */
 		this._data = data || [];
 	}
 

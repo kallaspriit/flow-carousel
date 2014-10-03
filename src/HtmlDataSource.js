@@ -6,7 +6,9 @@ define([
 	'use strict';
 
 	/**
-	 * Data source interface.
+	 * HTML dom elements data source.
+	 *
+	 * This is the default data source where the list of DOM elements are extracted from existing HTML.
 	 *
 	 * @class HtmlDataSource
 	 * @extends AbstractDataSource
@@ -15,7 +17,22 @@ define([
 	function HtmlDataSource(wrap) {
 		AbstractDataSource.call(this);
 
+		/**
+		 * Carousel wrap DOM element.
+		 *
+		 * @property _wrap
+		 * @type DOMElement
+		 * @private
+		 */
 		this._wrap = wrap;
+
+		/**
+		 * Array of DOM elements.
+		 *
+		 * @property _data
+		 * @type {array}
+		 * @private
+		 */
 		this._data = this._setupData(this._wrap);
 	}
 

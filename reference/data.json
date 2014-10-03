@@ -268,7 +268,7 @@
             "extension_for": [],
             "file": "src\\Config.js",
             "line": 11,
-            "description": "Provides configuration.",
+            "description": "Carousel configuration.\n\nProvides the default values for various configurable parameters that can be overriden.",
             "is_constructor": 1
         },
         "Deferred": {
@@ -846,17 +846,17 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 19,
+            "line": 21,
             "description": "Carousel orientation to use.\n\nOne of {{#crossLink \"Config/Orientation:property\"}}{{/crossLink}}.\n\nDefaults to horizontal.",
             "itemtype": "property",
             "name": "orientation",
             "type": "{Config/Orientation:property}",
-            "default": "Config.Orientation.VERTICAL",
+            "default": "Config.Orientation.HORIZONTAL",
             "class": "Config"
         },
         {
             "file": "src\\Config.js",
-            "line": 32,
+            "line": 34,
             "description": "The size mode to use, defaults to matching item sizes to wrap size.",
             "itemtype": "property",
             "name": "sizeMode",
@@ -866,8 +866,8 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 41,
-            "description": "Item margin to use.",
+            "line": 43,
+            "description": "Margin in pixels to apply between items, default to none.",
             "itemtype": "property",
             "name": "margin",
             "type": "{number}",
@@ -876,7 +876,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 50,
+            "line": 52,
             "description": "Should placeholders be generated while loading actual items.",
             "itemtype": "property",
             "name": "usePlaceholders",
@@ -886,8 +886,8 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 59,
-            "description": "Should responsive layout be used by default.",
+            "line": 61,
+            "description": "Should responsive layout be used by default.\n\nThe {{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} breakpoints are used to calculate\nhow many items to render on a single page.",
             "itemtype": "property",
             "name": "useResponsiveLayout",
             "type": "boolean",
@@ -896,8 +896,27 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 68,
-            "description": "Number of items to render side-by-side when not using responsive layout.\n\nThis parameter is ignored when using responsive layout strategy.",
+            "line": 73,
+            "description": "List of default responsive layout breakpoints.\n\nThe breakpoints apply to the actual carousel wrap size not the window size.\n\nThe list should be ordered from the smallest size to the largest and each array element should be an object\nwith keys \"size\" and \"itemsPerPage\".",
+            "itemtype": "property",
+            "name": "responsiveBreakpoints",
+            "type": "array",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 101,
+            "description": "How long to wait for the wrap size to stay the same before starting the responsive layout routine.\n\nThis is useful so when the user is resizing the browser window then the carousel won't try to re-layout\nitself on every frame but rather waits for the size to stabilize.\n\nValue is in milliseconds.",
+            "itemtype": "property",
+            "name": "responsiveLayoutDelay",
+            "type": "{number}",
+            "default": "500",
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 115,
+            "description": "Number of items to render side-by-side when not using responsive layout.\n\nThis parameter is ignored when using responsive layout strategy (\n{{#crossLink \"Config/useResponsiveLayout:property\"}}{{/crossLink}} is set to true).",
             "itemtype": "property",
             "name": "itemsPerPage",
             "type": "number",
@@ -906,27 +925,27 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 79,
-            "description": "The index of the element to scroll to at startup.\n\nSet to a number value of valid range to enable.\n\nDefaults to showing the first element.\n\nSet either this or the {{#crossLink \"Config/startPageIndex:property\"}}{{/crossLink}} property, setting both\nthrows error.",
+            "line": 127,
+            "description": "The index of the element to scroll to at startup.\n\nSet to a number value in valid range to enable, null to disable.\n\nDefaults to showing the first element.\n\nSet either this or the {{#crossLink \"Config/startPageIndex:property\"}}{{/crossLink}} property, setting both\nthrows error.",
             "itemtype": "property",
             "name": "startItemIndex",
-            "type": "{number}",
+            "type": "{number|null}",
             "default": "null",
             "class": "Config"
         },
         {
             "file": "src\\Config.js",
-            "line": 95,
-            "description": "The index of the page to scroll to at startup.\n\nSet to a number value of valid range to enable.\n\nDefaults to showing the first element.\n\nSet either this or the {{#crossLink \"Config/startItemIndex:property\"}}{{/crossLink}} property, setting both\nthrows error.",
+            "line": 143,
+            "description": "The index of the page to scroll to at startup.\n\nSet to a number value of valid range to enable, null to disable.\n\nDefaults to showing the first element on the first page.\n\nSet either this or the {{#crossLink \"Config/startItemIndex:property\"}}{{/crossLink}} property, setting both\nthrows error.",
             "itemtype": "property",
             "name": "startPageIndex",
-            "type": "{number}",
+            "type": "{number|null}",
             "default": "null",
             "class": "Config"
         },
         {
             "file": "src\\Config.js",
-            "line": 111,
+            "line": 159,
             "description": "If item or page start index is set then should it animate to it or should the position be set immediately.\n\nApplies to both {{#crossLink \"Config/startIndex:property\"}}{{/crossLink}} and\n{{#crossLink \"Config/startPageIndex:property\"}}{{/crossLink}}.\n\nBy default the position is set without animation.",
             "itemtype": "property",
             "name": "animateToStartIndex",
@@ -936,8 +955,8 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 125,
-            "description": "When using the {{#crossLink \"Config/startItemIndex:property\"}}{{/crossLink}} property, should the carousel\ntry to center on this item index rather than making it the first one.",
+            "line": 173,
+            "description": "When using the {{#crossLink \"Config/startItemIndex:property\"}}{{/crossLink}} property, should the carousel\ntry to center on this item index rather than making it the first one. This is not done by default.",
             "itemtype": "property",
             "name": "centerStartItemIndex",
             "type": "{boolean}",
@@ -946,7 +965,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 135,
+            "line": 183,
             "description": "Should items that are navigated out of the rendering range given by\n{{#crossLink \"Config/getRenderRange\"}}{{/crossLink}} be removed.\n\nThis ensures that there are never too many elements in the DOM but when navigating back to these items, they\nhave to be re-generated.\n\nSet this to true to always remove out of range items, false to never remove them and null to let the\ncarousel decide based on the number of items.",
             "default": "null",
             "type": "{boolean|null}",
@@ -954,7 +973,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 151,
+            "line": 199,
             "description": "If {{#crossLink \"Config/removeOutOfRangeItems:property\"}}{{/crossLink}} is not set to a boolean value then\nthis value is used to decide whether to remove out of range items or not so if the number of items in the\ndataset is smaller then this, out of range items are not destroyed.",
             "itemtype": "property",
             "name": "removeOutOfRangeItemsThreshold",
@@ -964,38 +983,8 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 162,
-            "description": "List of default responsive layout breakpoint.\n\nThe list should be ordered from the smallest size to the largest.",
-            "itemtype": "property",
-            "name": "responsiveBreakpoints",
-            "type": "array",
-            "default": "true",
-            "class": "Config"
-        },
-        {
-            "file": "src\\Config.js",
-            "line": 189,
-            "description": "The interval at which to check for carousel wrap size changes so responsive layout could be applied.\n\nValue is in milliseconds.",
-            "itemtype": "property",
-            "name": "responsiveLayoutListenerInterval",
-            "type": "{number}",
-            "default": "100",
-            "class": "Config"
-        },
-        {
-            "file": "src\\Config.js",
-            "line": 200,
-            "description": "How long to wait for the wrap size to stay the same before starting the responsive layout routine.\n\nThis is useful so when the user is resizing the browser window then the carousel won't try to re-layout\nitself on every frame but rather waits for the size to normalize.\n\nValue is in milliseconds.",
-            "itemtype": "property",
-            "name": "responsiveLayoutDelay",
-            "type": "{number}",
-            "default": "300",
-            "class": "Config"
-        },
-        {
-            "file": "src\\Config.js",
-            "line": 214,
-            "description": "List of navigators to use with their configuration and factories.\n\nThe \"createInstance(carousel)\" factory method gets the carousel instance as its only parameter and should\neither return a navigator instance directly or a deferred promise that will be resolved with a navigator\ninstance.",
+            "line": 210,
+            "description": "List of navigators to use with their configuration and factory methods.\n\nThe \"createInstance(carousel)\" factory method gets the carousel instance as its only parameter and should\neither return a navigator instance directly or a deferred promise that will be resolved with a navigator\ninstance.",
             "itemtype": "property",
             "name": "navigators",
             "type": "{object}",
@@ -1171,7 +1160,7 @@
         {
             "file": "src\\Config.js",
             "line": 356,
-            "description": "The carousel instance is registered as the main wrap data with the dataTarget name.",
+            "description": "The carousel instance is registered as the main wrap dom data with the dataTarget name.\n\nThis means that you can access the carousel instance using $('#my-carousel').data('flow-carousel') etc.",
             "itemtype": "property",
             "name": "dataTarget",
             "type": "{string}",
@@ -1180,38 +1169,38 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 365,
+            "line": 367,
             "description": "Optional custom data source to use.\n\nAs a special case, a simple array can be provided as data source which is converted to use\n{{#crossLink \"ArrayDataSource\"}}{{/crossLink}} implementation.\n\nIf none is provided then the {{#crossLink \"HtmlDataSource\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
-            "type": "{AbstractRenderer|array}",
+            "type": "{AbstractRenderer|array|null}",
             "default": "null",
             "class": "Config"
         },
         {
             "file": "src\\Config.js",
-            "line": 379,
+            "line": 381,
             "description": "Optional custom renderer to use.\n\nIf none is provided then the {{#crossLink \"HtmlRenderer\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
-            "type": "{AbstractRenderer}",
+            "type": "{AbstractRenderer|null}",
             "default": "null",
             "class": "Config"
         },
         {
             "file": "src\\Config.js",
-            "line": 390,
+            "line": 392,
             "description": "Optional custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is provided then the {{#crossLink \"TransformAnimator\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "animator",
-            "type": "{AbstractAnimator}",
+            "type": "{AbstractAnimator|null}",
             "default": "null",
             "class": "Config"
         },
         {
             "file": "src\\Config.js",
-            "line": 403,
-            "description": "Returns the range of items that should be rendered given current item index and items per page.\n\nBy default returns one page before the current page and one after but one may choose to override it.\n\nOne can use the firstRender parameter to for example render more items during the first render so no new\nrendering is triggered if the user only moves for a few pages.",
+            "line": 405,
+            "description": "Returns the range of items that should be rendered given current item index and items per page.\n\nBy default returns one page before the current page and one after but one may choose to override it. On the\nfirst render, returns three pages before/after so that the user can navigate a few pages without triggering\nrendering new items.\n\nOne can use the firstRender parameter to for example render more items during the first render so no new\nrendering is triggered if the user only moves for a few pages.",
             "itemtype": "method",
             "name": "getRenderRange",
             "params": [
@@ -1237,7 +1226,7 @@
                 }
             ],
             "return": {
-                "description": "Render range with start and end keys",
+                "description": "Render range with keys \"start\" and \"end\"",
                 "type": "Object"
             },
             "access": "private",
@@ -1246,7 +1235,22 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 435,
+            "line": 438,
+            "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.\n\nUses the {{#crossLink \"Config/useResponsiveLayout:property\"}}{{/crossLink}} setting and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} breakpoints by default, but one may\nchoose to redefine this and use some custom logic.",
+            "itemtype": "method",
+            "name": "getItemsPerPage",
+            "params": [
+                {
+                    "name": "wrapSize",
+                    "description": "Wrap size to base the calculation on",
+                    "type": "Number"
+                }
+            ],
+            "class": "Config"
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 470,
             "description": "Enumeration of possible carousel orientations.",
             "itemtype": "property",
             "name": "Orientation",
@@ -1268,7 +1272,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 449,
+            "line": 484,
             "description": "There are two different strategies for setting the size of the wrap and the items:\n> MATCH_WRAP - the size of the items is set to match the wrap size\n> MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item",
             "itemtype": "property",
             "name": "SizeMode",
@@ -1290,8 +1294,8 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 465,
-            "description": "Extends the base default configuration properties with user-defined values.\n\nPerforms a deep-extend.",
+            "line": 500,
+            "description": "Extends the base default configuration properties with user-defined values.\n\nPerforms deep-extend.",
             "itemtype": "method",
             "name": "extend",
             "params": [
@@ -1305,22 +1309,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 477,
-            "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
-            "itemtype": "method",
-            "name": "getItemsPerPage",
-            "params": [
-                {
-                    "name": "wrapSize",
-                    "description": "Wrap size to base the calculation on",
-                    "type": "Number"
-                }
-            ],
-            "class": "Config"
-        },
-        {
-            "file": "src\\Config.js",
-            "line": 504,
+            "line": 512,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -5283,7 +5272,7 @@
         },
         {
             "message": "Missing item type\nShould items that are navigated out of the rendering range given by\n{{#crossLink \"Config/getRenderRange\"}}{{/crossLink}} be removed.\n\nThis ensures that there are never too many elements in the DOM but when navigating back to these items, they\nhave to be re-generated.\n\nSet this to true to always remove out of range items, false to never remove them and null to let the\ncarousel decide based on the number of items.",
-            "line": " src\\Config.js:135"
+            "line": " src\\Config.js:183"
         },
         {
             "message": "Missing item type\nFinds the index of the listener for the event in it's storage array.",

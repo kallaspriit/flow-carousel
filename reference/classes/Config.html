@@ -136,7 +136,8 @@
 
 
 <div class="box intro">
-    <p>Provides configuration.</p>
+    <p>Carousel configuration.</p>
+<p>Provides the default values for various configurable parameters that can be overriden.</p>
 
 </div>
 
@@ -383,13 +384,6 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_responsiveLayoutListenerInterval">responsiveLayoutListenerInterval</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
                                 <a href="#property_scrollAnimator">scrollAnimator</a>
 
                                 
@@ -503,7 +497,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l465"><code>src\Config.js:465</code></a>
+        <a href="../files/src_Config.js.html#l500"><code>src\Config.js:500</code></a>
         
         </p>
 
@@ -515,7 +509,7 @@
 
     <div class="description">
         <p>Extends the base default configuration properties with user-defined values.</p>
-<p>Performs a deep-extend.</p>
+<p>Performs deep-extend.</p>
 
     </div>
 
@@ -596,7 +590,7 @@
             
         
         
-        <a href="../files/src_Config.js.html#l504"><code>src\Config.js:504</code></a>
+        <a href="../files/src_Config.js.html#l512"><code>src\Config.js:512</code></a>
         
         </p>
 
@@ -700,7 +694,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l477"><code>src\Config.js:477</code></a>
+        <a href="../files/src_Config.js.html#l438"><code>src\Config.js:438</code></a>
         
         </p>
 
@@ -713,6 +707,9 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
     <div class="description">
         <p>Returns the number of items to render side-by-side based on the wrap size and
 <a href="../classes/Config.html#property_responsiveBreakpoints" class="crosslink">responsiveBreakpoints</a> setting.</p>
+<p>Uses the <a href="../classes/Config.html#property_useResponsiveLayout" class="crosslink">useResponsiveLayout</a> setting and
+<a href="../classes/Config.html#property_responsiveBreakpoints" class="crosslink">responsiveBreakpoints</a> breakpoints by default, but one may
+choose to redefine this and use some custom logic.</p>
 
     </div>
 
@@ -814,7 +811,7 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
             
         
         
-        <a href="../files/src_Config.js.html#l403"><code>src\Config.js:403</code></a>
+        <a href="../files/src_Config.js.html#l405"><code>src\Config.js:405</code></a>
         
         </p>
 
@@ -826,7 +823,9 @@ and the mapping in <a href="../classes/Config.html#property_cssClasses" class="c
 
     <div class="description">
         <p>Returns the range of items that should be rendered given current item index and items per page.</p>
-<p>By default returns one page before the current page and one after but one may choose to override it.</p>
+<p>By default returns one page before the current page and one after but one may choose to override it. On the
+first render, returns three pages before/after so that the user can navigate a few pages without triggering
+rendering new items.</p>
 <p>One can use the firstRender parameter to for example render more items during the first render so no new
 rendering is triggered if the user only moves for a few pages.</p>
 
@@ -915,7 +914,7 @@ rendering is triggered if the user only moves for a few pages.</p>
                     
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
                     
-                    <p>Render range with start and end keys</p>
+                    <p>Render range with keys &quot;start&quot; and &quot;end&quot;</p>
 
                 
             </div>
@@ -957,7 +956,7 @@ rendering is triggered if the user only moves for a few pages.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l111"><code>src\Config.js:111</code></a>
+        <a href="../files/src_Config.js.html#l159"><code>src\Config.js:159</code></a>
         
         </p>
 
@@ -986,7 +985,7 @@ rendering is triggered if the user only moves for a few pages.</p>
                 
                     <div id="property_animator" class="property item">
     <h3 class="name"><code>animator</code></h3>
-    <span class="type"><a href="../classes/AbstractAnimator.html" class="crosslink">AbstractAnimator</a></span>
+    <span class="type"><a href="../classes/AbstractAnimator.html" class="crosslink">AbstractAnimator</a> | Null</span>
 
     
 
@@ -1007,7 +1006,7 @@ rendering is triggered if the user only moves for a few pages.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l390"><code>src\Config.js:390</code></a>
+        <a href="../files/src_Config.js.html#l392"><code>src\Config.js:392</code></a>
         
         </p>
 
@@ -1056,7 +1055,7 @@ rendering is triggered if the user only moves for a few pages.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l125"><code>src\Config.js:125</code></a>
+        <a href="../files/src_Config.js.html#l173"><code>src\Config.js:173</code></a>
         
         </p>
 
@@ -1067,7 +1066,7 @@ rendering is triggered if the user only moves for a few pages.</p>
 
     <div class="description">
         <p>When using the <a href="../classes/Config.html#property_startItemIndex" class="crosslink">startItemIndex</a> property, should the carousel
-try to center on this item index rather than making it the first one.</p>
+try to center on this item index rather than making it the first one. This is not done by default.</p>
 
     </div>
 
@@ -1414,7 +1413,8 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
     </div>
 
     <div class="description">
-        <p>The carousel instance is registered as the main wrap data with the dataTarget name.</p>
+        <p>The carousel instance is registered as the main wrap dom data with the dataTarget name.</p>
+<p>This means that you can access the carousel instance using $(&#39;#my-carousel&#39;).data(&#39;flow-carousel&#39;) etc.</p>
 
     </div>
 
@@ -1451,7 +1451,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l68"><code>src\Config.js:68</code></a>
+        <a href="../files/src_Config.js.html#l115"><code>src\Config.js:115</code></a>
         
         </p>
 
@@ -1462,7 +1462,8 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
 
     <div class="description">
         <p>Number of items to render side-by-side when not using responsive layout.</p>
-<p>This parameter is ignored when using responsive layout strategy.</p>
+<p>This parameter is ignored when using responsive layout strategy (
+<a href="../classes/Config.html#property_useResponsiveLayout" class="crosslink">useResponsiveLayout</a> is set to true).</p>
 
     </div>
 
@@ -1592,7 +1593,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l41"><code>src\Config.js:41</code></a>
+        <a href="../files/src_Config.js.html#l43"><code>src\Config.js:43</code></a>
         
         </p>
 
@@ -1602,7 +1603,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
     </div>
 
     <div class="description">
-        <p>Item margin to use.</p>
+        <p>Margin in pixels to apply between items, default to none.</p>
 
     </div>
 
@@ -1639,7 +1640,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
             
         
         
-        <a href="../files/src_Config.js.html#l214"><code>src\Config.js:214</code></a>
+        <a href="../files/src_Config.js.html#l210"><code>src\Config.js:210</code></a>
         
         </p>
 
@@ -1649,7 +1650,7 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
     </div>
 
     <div class="description">
-        <p>List of navigators to use with their configuration and factories.</p>
+        <p>List of navigators to use with their configuration and factory methods.</p>
 <p>The &quot;createInstance(carousel)&quot; factory method gets the carousel instance as its only parameter and should
 either return a navigator instance directly or a deferred promise that will be resolved with a navigator
 instance.</p>
@@ -1689,7 +1690,7 @@ instance.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l435"><code>src\Config.js:435</code></a>
+        <a href="../files/src_Config.js.html#l470"><code>src\Config.js:470</code></a>
         
         </p>
 
@@ -1768,7 +1769,7 @@ instance.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l19"><code>src\Config.js:19</code></a>
+        <a href="../files/src_Config.js.html#l21"><code>src\Config.js:21</code></a>
         
         </p>
 
@@ -1785,7 +1786,7 @@ instance.</p>
     </div>
 
     
-        <p><strong>Default:</strong> Config.Orientation.VERTICAL</p>
+        <p><strong>Default:</strong> Config.Orientation.HORIZONTAL</p>
     
 
     
@@ -1817,7 +1818,7 @@ instance.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l151"><code>src\Config.js:151</code></a>
+        <a href="../files/src_Config.js.html#l199"><code>src\Config.js:199</code></a>
         
         </p>
 
@@ -1845,7 +1846,7 @@ dataset is smaller then this, out of range items are not destroyed.</p>
                 
                     <div id="property_renderer" class="property item">
     <h3 class="name"><code>renderer</code></h3>
-    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a> | Null</span>
 
     
 
@@ -1866,7 +1867,7 @@ dataset is smaller then this, out of range items are not destroyed.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l365"><code>src\Config.js:365</code></a>
+        <a href="../files/src_Config.js.html#l381"><code>src\Config.js:381</code></a>
         
         </p>
 
@@ -1876,10 +1877,8 @@ dataset is smaller then this, out of range items are not destroyed.</p>
     </div>
 
     <div class="description">
-        <p>Optional custom data source to use.</p>
-<p>As a special case, a simple array can be provided as data source which is converted to use
-<a href="../classes/ArrayDataSource.html" class="crosslink">ArrayDataSource</a> implementation.</p>
-<p>If none is provided then the <a href="../classes/HtmlDataSource.html" class="crosslink">HtmlDataSource</a> is used.</p>
+        <p>Optional custom renderer to use.</p>
+<p>If none is provided then the <a href="../classes/HtmlRenderer.html" class="crosslink">HtmlRenderer</a> is used.</p>
 
     </div>
 
@@ -1895,7 +1894,7 @@ dataset is smaller then this, out of range items are not destroyed.</p>
                 
                     <div id="property_renderer" class="property item">
     <h3 class="name"><code>renderer</code></h3>
-    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a></span>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | Null</span>
 
     
 
@@ -1916,7 +1915,7 @@ dataset is smaller then this, out of range items are not destroyed.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l379"><code>src\Config.js:379</code></a>
+        <a href="../files/src_Config.js.html#l367"><code>src\Config.js:367</code></a>
         
         </p>
 
@@ -1926,8 +1925,10 @@ dataset is smaller then this, out of range items are not destroyed.</p>
     </div>
 
     <div class="description">
-        <p>Optional custom renderer to use.</p>
-<p>If none is provided then the <a href="../classes/HtmlRenderer.html" class="crosslink">HtmlRenderer</a> is used.</p>
+        <p>Optional custom data source to use.</p>
+<p>As a special case, a simple array can be provided as data source which is converted to use
+<a href="../classes/ArrayDataSource.html" class="crosslink">ArrayDataSource</a> implementation.</p>
+<p>If none is provided then the <a href="../classes/HtmlDataSource.html" class="crosslink">HtmlDataSource</a> is used.</p>
 
     </div>
 
@@ -1964,7 +1965,7 @@ dataset is smaller then this, out of range items are not destroyed.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l162"><code>src\Config.js:162</code></a>
+        <a href="../files/src_Config.js.html#l73"><code>src\Config.js:73</code></a>
         
         </p>
 
@@ -1974,13 +1975,13 @@ dataset is smaller then this, out of range items are not destroyed.</p>
     </div>
 
     <div class="description">
-        <p>List of default responsive layout breakpoint.</p>
-<p>The list should be ordered from the smallest size to the largest.</p>
+        <p>List of default responsive layout breakpoints.</p>
+<p>The breakpoints apply to the actual carousel wrap size not the window size.</p>
+<p>The list should be ordered from the smallest size to the largest and each array element should be an object
+with keys &quot;size&quot; and &quot;itemsPerPage&quot;.</p>
 
     </div>
 
-    
-        <p><strong>Default:</strong> true</p>
     
 
     
@@ -2012,7 +2013,7 @@ dataset is smaller then this, out of range items are not destroyed.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l200"><code>src\Config.js:200</code></a>
+        <a href="../files/src_Config.js.html#l101"><code>src\Config.js:101</code></a>
         
         </p>
 
@@ -2024,61 +2025,13 @@ dataset is smaller then this, out of range items are not destroyed.</p>
     <div class="description">
         <p>How long to wait for the wrap size to stay the same before starting the responsive layout routine.</p>
 <p>This is useful so when the user is resizing the browser window then the carousel won&#39;t try to re-layout
-itself on every frame but rather waits for the size to normalize.</p>
+itself on every frame but rather waits for the size to stabilize.</p>
 <p>Value is in milliseconds.</p>
 
     </div>
 
     
-        <p><strong>Default:</strong> 300</p>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_responsiveLayoutListenerInterval" class="property item">
-    <h3 class="name"><code>responsiveLayoutListenerInterval</code></h3>
-    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_Config.js.html#l189"><code>src\Config.js:189</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>The interval at which to check for carousel wrap size changes so responsive layout could be applied.</p>
-<p>Value is in milliseconds.</p>
-
-    </div>
-
-    
-        <p><strong>Default:</strong> 100</p>
+        <p><strong>Default:</strong> 500</p>
     
 
     
@@ -2203,7 +2156,7 @@ itself on every frame but rather waits for the size to normalize.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l32"><code>src\Config.js:32</code></a>
+        <a href="../files/src_Config.js.html#l34"><code>src\Config.js:34</code></a>
         
         </p>
 
@@ -2252,7 +2205,7 @@ itself on every frame but rather waits for the size to normalize.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l449"><code>src\Config.js:449</code></a>
+        <a href="../files/src_Config.js.html#l484"><code>src\Config.js:484</code></a>
         
         </p>
 
@@ -2314,7 +2267,7 @@ MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item</p>
                 
                     <div id="property_startItemIndex" class="property item">
     <h3 class="name"><code>startItemIndex</code></h3>
-    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
 
     
 
@@ -2335,7 +2288,7 @@ MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item</p>
             
         
         
-        <a href="../files/src_Config.js.html#l79"><code>src\Config.js:79</code></a>
+        <a href="../files/src_Config.js.html#l127"><code>src\Config.js:127</code></a>
         
         </p>
 
@@ -2346,7 +2299,7 @@ MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item</p>
 
     <div class="description">
         <p>The index of the element to scroll to at startup.</p>
-<p>Set to a number value of valid range to enable.</p>
+<p>Set to a number value in valid range to enable, null to disable.</p>
 <p>Defaults to showing the first element.</p>
 <p>Set either this or the <a href="../classes/Config.html#property_startPageIndex" class="crosslink">startPageIndex</a> property, setting both
 throws error.</p>
@@ -2365,7 +2318,7 @@ throws error.</p>
                 
                     <div id="property_startPageIndex" class="property item">
     <h3 class="name"><code>startPageIndex</code></h3>
-    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a> | Null</span>
 
     
 
@@ -2386,7 +2339,7 @@ throws error.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l95"><code>src\Config.js:95</code></a>
+        <a href="../files/src_Config.js.html#l143"><code>src\Config.js:143</code></a>
         
         </p>
 
@@ -2397,8 +2350,8 @@ throws error.</p>
 
     <div class="description">
         <p>The index of the page to scroll to at startup.</p>
-<p>Set to a number value of valid range to enable.</p>
-<p>Defaults to showing the first element.</p>
+<p>Set to a number value of valid range to enable, null to disable.</p>
+<p>Defaults to showing the first element on the first page.</p>
 <p>Set either this or the <a href="../classes/Config.html#property_startItemIndex" class="crosslink">startItemIndex</a> property, setting both
 throws error.</p>
 
@@ -2530,7 +2483,7 @@ throws error.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l50"><code>src\Config.js:50</code></a>
+        <a href="../files/src_Config.js.html#l52"><code>src\Config.js:52</code></a>
         
         </p>
 
@@ -2577,7 +2530,7 @@ throws error.</p>
             
         
         
-        <a href="../files/src_Config.js.html#l59"><code>src\Config.js:59</code></a>
+        <a href="../files/src_Config.js.html#l61"><code>src\Config.js:61</code></a>
         
         </p>
 
@@ -2588,6 +2541,8 @@ throws error.</p>
 
     <div class="description">
         <p>Should responsive layout be used by default.</p>
+<p>The <a href="../classes/Config.html#property_responsiveBreakpoints" class="crosslink">responsiveBreakpoints</a> breakpoints are used to calculate
+how many items to render on a single page.</p>
 
     </div>
 

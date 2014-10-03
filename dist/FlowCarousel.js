@@ -2122,7 +2122,9 @@ define('Config',[
 	
 
 	/**
-	 * Provides configuration.
+	 * Carousel configuration.
+	 *
+	 * Provides the default values for various configurable parameters that can be overriden.
 	 *
 	 * @class Config
 	 * @constructor
@@ -2138,7 +2140,7 @@ define('Config',[
 		 *
 		 * @property orientation
 		 * @type {Config/Orientation:property}
-		 * @default Config.Orientation.VERTICAL
+		 * @default Config.Orientation.HORIZONTAL
 		 */
 		this.orientation = Config.Orientation.HORIZONTAL;
 
@@ -2152,7 +2154,7 @@ define('Config',[
 		this.sizeMode = Config.SizeMode.MATCH_WRAP;
 
 		/**
-		 * Item margin to use.
+		 * Margin in pixels to apply between items, default to none.
 		 *
 		 * @property margin
 		 * @type {number}
@@ -2172,6 +2174,9 @@ define('Config',[
 		/**
 		 * Should responsive layout be used by default.
 		 *
+		 * The {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} breakpoints are used to calculate
+		 * how many items to render on a single page.
+		 *
 		 * @property useResponsiveLayout
 		 * @type boolean
 		 * @default true
@@ -2179,9 +2184,52 @@ define('Config',[
 		this.useResponsiveLayout = true;
 
 		/**
+		 * List of default responsive layout breakpoints.
+		 *
+		 * The breakpoints apply to the actual carousel wrap size not the window size.
+		 *
+		 * The list should be ordered from the smallest size to the largest and each array element should be an object
+		 * with keys "size" and "itemsPerPage".
+		 *
+		 * @property responsiveBreakpoints
+		 * @type array
+		 */
+		this.responsiveBreakpoints = [{
+			size: 0,
+			itemsPerPage: 1
+		}, {
+			size: 320,
+			itemsPerPage: 2
+		}, {
+			size: 768,
+			itemsPerPage: 3
+		}, {
+			size: 1224,
+			itemsPerPage: 4
+		}, {
+			size: 1824,
+			itemsPerPage: 5
+		}];
+
+		/**
+		 * How long to wait for the wrap size to stay the same before starting the responsive layout routine.
+		 *
+		 * This is useful so when the user is resizing the browser window then the carousel won't try to re-layout
+		 * itself on every frame but rather waits for the size to stabilize.
+		 *
+		 * Value is in milliseconds.
+		 *
+		 * @property responsiveLayoutDelay
+		 * @type {number}
+		 * @default 500
+		 */
+		this.responsiveLayoutDelay = 500;
+
+		/**
 		 * Number of items to render side-by-side when not using responsive layout.
 		 *
-		 * This parameter is ignored when using responsive layout strategy.
+		 * This parameter is ignored when using responsive layout strategy (
+		 * {{#crossLink "Config/useResponsiveLayout:property"}}{{/crossLink}} is set to true).
 		 *
 		 * @property itemsPerPage
 		 * @type number
@@ -2192,7 +2240,7 @@ define('Config',[
 		/**
 		 * The index of the element to scroll to at startup.
 		 *
-		 * Set to a number value of valid range to enable.
+		 * Set to a number value in valid range to enable, null to disable.
 		 *
 		 * Defaults to showing the first element.
 		 *
@@ -2200,7 +2248,7 @@ define('Config',[
 		 * throws error.
 		 *
 		 * @property startItemIndex
-		 * @type {number}
+		 * @type {number|null}
 		 * @default null
 		 */
 		this.startItemIndex = null;
@@ -2208,15 +2256,15 @@ define('Config',[
 		/**
 		 * The index of the page to scroll to at startup.
 		 *
-		 * Set to a number value of valid range to enable.
+		 * Set to a number value of valid range to enable, null to disable.
 		 *
-		 * Defaults to showing the first element.
+		 * Defaults to showing the first element on the first page.
 		 *
 		 * Set either this or the {{#crossLink "Config/startItemIndex:property"}}{{/crossLink}} property, setting both
 		 * throws error.
 		 *
 		 * @property startPageIndex
-		 * @type {number}
+		 * @type {number|null}
 		 * @default null
 		 */
 		this.startPageIndex = null;
@@ -2237,7 +2285,7 @@ define('Config',[
 
 		/**
 		 * When using the {{#crossLink "Config/startItemIndex:property"}}{{/crossLink}} property, should the carousel
-		 * try to center on this item index rather than making it the first one.
+		 * try to center on this item index rather than making it the first one. This is not done by default.
 		 *
 		 * @property centerStartItemIndex
 		 * @type {boolean}
@@ -2273,59 +2321,7 @@ define('Config',[
 		this.removeOutOfRangeItemsThreshold = 30;
 
 		/**
-		 * List of default responsive layout breakpoint.
-		 *
-		 * The list should be ordered from the smallest size to the largest.
-		 *
-		 * @property responsiveBreakpoints
-		 * @type array
-		 * @default true
-		 */
-		this.responsiveBreakpoints = [{
-			size: 0,
-			itemsPerPage: 1
-		}, {
-			size: 320,
-			itemsPerPage: 2
-		}, {
-			//size: 768,
-			size: 560, // TODO remove
-			itemsPerPage: 3
-		}, {
-			size: 1224,
-			itemsPerPage: 4
-		}, {
-			size: 1824,
-			itemsPerPage: 5
-		}];
-
-		/**
-		 * The interval at which to check for carousel wrap size changes so responsive layout could be applied.
-		 *
-		 * Value is in milliseconds.
-		 *
-		 * @property responsiveLayoutListenerInterval
-		 * @type {number}
-		 * @default 100
-		 */
-		this.responsiveLayoutListenerInterval = 100;
-
-		/**
-		 * How long to wait for the wrap size to stay the same before starting the responsive layout routine.
-		 *
-		 * This is useful so when the user is resizing the browser window then the carousel won't try to re-layout
-		 * itself on every frame but rather waits for the size to normalize.
-		 *
-		 * Value is in milliseconds.
-		 *
-		 * @property responsiveLayoutDelay
-		 * @type {number}
-		 * @default 300
-		 */
-		this.responsiveLayoutDelay = 500;
-
-		/**
-		 * List of navigators to use with their configuration and factories.
+		 * List of navigators to use with their configuration and factory methods.
 		 *
 		 * The "createInstance(carousel)" factory method gets the carousel instance as its only parameter and should
 		 * either return a navigator instance directly or a deferred promise that will be resolved with a navigator
@@ -2338,6 +2334,7 @@ define('Config',[
 			keyboard: {
 				enabled: true,
 				mode: 'navigate-page',
+
 				createInstance: function(carousel) {
 					return new KeyboardNavigator(carousel.getConfig().navigators.keyboard);
 				}
@@ -2347,6 +2344,7 @@ define('Config',[
 				mode: 'navigate-page',
 				overEdgeDragPositionMultiplier: 0.2,
 				ignoreClickThreshold: 10,
+
 				createInstance: function(carousel) {
 					return new DragNavigator(carousel.getConfig().navigators.drag);
 				}
@@ -2356,6 +2354,7 @@ define('Config',[
 				mode: 'navigate-page',
 				interval: 3000,
 				instantRollover: true,
+
 				createInstance: function(carousel) {
 					return new SlideshowNavigator(carousel.getConfig().navigators.slideshow);
 				}
@@ -2363,6 +2362,7 @@ define('Config',[
 			interface: {
 				enabled: false,
 				mode: 'navigate-page',
+
 				createInstance: function(carousel) {
 					return new InterfaceNavigator(carousel.getConfig().navigators.slideshow);
 				}
@@ -2454,8 +2454,8 @@ define('Config',[
 			items: 'items',
 			scroller: 'scroller',
 			item: 'item',
-			placeholder: 'placeholder',
 			itemHover: 'item-hover',
+			placeholder: 'placeholder',
 			matchWrap: 'match-wrap',
 			matchLargestItem: 'match-largest-item',
 			horizontal: 'horizontal',
@@ -2467,7 +2467,9 @@ define('Config',[
 		};
 
 		/**
-		 * The carousel instance is registered as the main wrap data with the dataTarget name.
+		 * The carousel instance is registered as the main wrap dom data with the dataTarget name.
+		 *
+		 * This means that you can access the carousel instance using $('#my-carousel').data('flow-carousel') etc.
 		 *
 		 * @property dataTarget
 		 * @type {string}
@@ -2484,7 +2486,7 @@ define('Config',[
 		 * If none is provided then the {{#crossLink "HtmlDataSource"}}{{/crossLink}} is used.
 		 *
 		 * @property renderer
-		 * @type {AbstractRenderer|array}
+		 * @type {AbstractRenderer|array|null}
 		 * @default null
 		 */
 		this.dataSource = null;
@@ -2495,7 +2497,7 @@ define('Config',[
 		 * If none is provided then the {{#crossLink "HtmlRenderer"}}{{/crossLink}} is used.
 		 *
 		 * @property renderer
-		 * @type {AbstractRenderer}
+		 * @type {AbstractRenderer|null}
 		 * @default null
 		 */
 		this.renderer = null;
@@ -2508,7 +2510,7 @@ define('Config',[
 		 * If none is provided then the {{#crossLink "TransformAnimator"}}{{/crossLink}} is used.
 		 *
 		 * @property animator
-		 * @type {AbstractAnimator}
+		 * @type {AbstractAnimator|null}
 		 * @default null
 		 */
 		this.animator = null;
@@ -2516,7 +2518,9 @@ define('Config',[
 		/**
 		 * Returns the range of items that should be rendered given current item index and items per page.
 		 *
-		 * By default returns one page before the current page and one after but one may choose to override it.
+		 * By default returns one page before the current page and one after but one may choose to override it. On the
+		 * first render, returns three pages before/after so that the user can navigate a few pages without triggering
+		 * rendering new items.
 		 *
 		 * One can use the firstRender parameter to for example render more items during the first render so no new
 		 * rendering is triggered if the user only moves for a few pages.
@@ -2526,7 +2530,7 @@ define('Config',[
 		 * @param {number} itemsPerPage How many items are shown on a page
 		 * @param {number} itemCount How many items there are in total
 		 * @param {boolean} firstRender This parameter is true for the very first render
-		 * @return {object} Render range with start and end keys
+		 * @return {object} Render range with keys "start" and "end"
 		 * @private
 		 */
 		this.getRenderRange = function(currentItemIndex, itemsPerPage, itemCount, firstRender) {
@@ -2542,6 +2546,37 @@ define('Config',[
 				start: Math.max(currentItemIndex - itemsPerPage * pagesBefore, 0),
 				end: Math.min(currentItemIndex + itemsPerPage * (pagesAfter + 1) - 1, itemCount - 1)
 			};
+		};
+
+		/**
+		 * Returns the number of items to render side-by-side based on the wrap size and
+		 * {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} setting.
+		 *
+		 * Uses the {{#crossLink "Config/useResponsiveLayout:property"}}{{/crossLink}} setting and
+		 * {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} breakpoints by default, but one may
+		 * choose to redefine this and use some custom logic.
+		 *
+		 * @method getItemsPerPage
+		 * @param {number} wrapSize Wrap size to base the calculation on
+		 */
+		this.getItemsPerPage = function(wrapSize) {
+			var i,
+				breakpoint;
+
+			if (!this.useResponsiveLayout) {
+				return this.itemsPerPage;
+			}
+
+			// TODO could be cached
+			for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
+				breakpoint = this.responsiveBreakpoints[i];
+
+				if (breakpoint.size <= wrapSize) {
+					return breakpoint.itemsPerPage;
+				}
+			}
+
+			return this.responsiveBreakpoints[0].itemsPerPage;
 		};
 	}
 
@@ -2578,40 +2613,13 @@ define('Config',[
 	/**
 	 * Extends the base default configuration properties with user-defined values.
 	 *
-	 * Performs a deep-extend.
+	 * Performs deep-extend.
 	 *
 	 * @method extend
 	 * @param {object} userConfig
 	 */
 	Config.prototype.extend = function(userConfig) {
 		$.extend(true, this, userConfig);
-	};
-
-	/**
-	 * Returns the number of items to render side-by-side based on the wrap size and
-	 * {{#crossLink "Config/responsiveBreakpoints:property"}}{{/crossLink}} setting.
-	 *
-	 * @method getItemsPerPage
-	 * @param {number} wrapSize Wrap size to base the calculation on
-	 */
-	Config.prototype.getItemsPerPage = function(wrapSize) {
-		var i,
-			breakpoint;
-
-		if (!this.useResponsiveLayout) {
-			return this.itemsPerPage;
-		}
-
-		// TODO could be cached
-		for (i = this.responsiveBreakpoints.length - 1; i >= 0; i--) {
-			breakpoint = this.responsiveBreakpoints[i];
-
-			if (breakpoint.size <= wrapSize) {
-				return breakpoint.itemsPerPage;
-			}
-		}
-
-		return this.responsiveBreakpoints[0].itemsPerPage;
 	};
 
 	/**

@@ -6161,15 +6161,18 @@ define('FlowCarousel',[
 			isEvenNumberOfPages = itemPerPage % 2 === 0,
 			sign = inverse ? 1 : -1,
 			roundMethod = inverse ? 'floor' : 'ceil',
-			centeredItemIndex = Math[roundMethod](startItemIndex + sign * itemPerPage / 2);
+			centeredItemIndex = Math[roundMethod](startItemIndex + sign * itemPerPage / 2),
+			result;
 
 		// prefer before the center rather than after
 		if (isEvenNumberOfPages) {
-			centeredItemIndex -= 1;
+			centeredItemIndex += 1;
 		}
 
 		// limit the calculated item index to valid range
-		return Math.max(Math.min(centeredItemIndex, maximumValidItemIndex), 0);
+		result = Math.max(Math.min(centeredItemIndex, maximumValidItemIndex), 0);
+
+		return result;
 	};
 
 	/**

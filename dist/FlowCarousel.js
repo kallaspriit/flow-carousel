@@ -6166,7 +6166,7 @@ define('FlowCarousel',[
 
 		// prefer before the center rather than after
 		if (isEvenNumberOfPages) {
-			centeredItemIndex += 1;
+			centeredItemIndex += inverse ? -1 : 1;
 		}
 
 		// limit the calculated item index to valid range

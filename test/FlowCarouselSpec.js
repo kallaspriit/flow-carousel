@@ -5,7 +5,7 @@ define([
 	'ArrayDataSource',
 	'HtmlDataSource',
 	'AbstractAnimator',
-	'DefaultAnimator',
+	'TransformAnimator',
 	'AbstractRenderer',
 	'AbstractNavigator',
 	'KeyboardNavigator',
@@ -17,7 +17,7 @@ define([
 	ArrayDataSource,
 	HtmlDataSource,
 	AbstractAnimator,
-	DefaultAnimator,
+	TransformAnimator,
 	AbstractRenderer,
 	AbstractNavigator,
 	KeyboardNavigator,
@@ -256,7 +256,7 @@ define([
 		});
 
 		it('can be initiated with a custom animator', function () {
-			var animator = new DefaultAnimator(carousel);
+			var animator = new TransformAnimator(carousel);
 
 			carousel.init('.carousel', {
 				animator: animator

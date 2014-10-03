@@ -53,8 +53,6 @@
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
-                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
-            
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
                 <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
@@ -74,6 +72,8 @@
                 <li><a href="../classes/ScrollAnimator.html">ScrollAnimator</a></li>
             
                 <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
+            
+                <li><a href="../classes/TransformAnimator.html">TransformAnimator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -381,12 +381,12 @@ define([
 		/**
 		 * Default animator configuration.
 		 *
-		 * @property defaultAnimator
-		 * @param {number} defaultAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
-		 * @param {number} defaultAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
-		 * @param {number} defaultAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
+		 * @property transformAnimator
+		 * @param {number} transformAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
+		 * @param {number} transformAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
+		 * @param {number} transformAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
 		 */
-		this.defaultAnimator = {
+		this.transformAnimator = {
 			defaultAnimationSpeed: 4,
 			minAnimationSpeed: 1,
 			maxAnimationSpeed: 10
@@ -500,7 +500,7 @@ define([
 		 *
 		 * Should be an instance of {{#crossLink &quot;AbstractAnimator&quot;}}{{/crossLink}}.
 		 *
-		 * If none is provided then the {{#crossLink &quot;DefaultAnimator&quot;}}{{/crossLink}} is used.
+		 * If none is provided then the {{#crossLink &quot;TransformAnimator&quot;}}{{/crossLink}} is used.
 		 *
 		 * @property animator
 		 * @type {AbstractAnimator}

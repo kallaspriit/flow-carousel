@@ -53,8 +53,6 @@
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
-                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
-            
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
                 <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
@@ -74,6 +72,8 @@
                 <li><a href="../classes/ScrollAnimator.html">ScrollAnimator</a></li>
             
                 <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
+            
+                <li><a href="../classes/TransformAnimator.html">TransformAnimator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -1094,13 +1094,6 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_DefaultAnimator">DefaultAnimator</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
                                 <a href="#property_Deferred">Deferred</a>
 
                                 
@@ -1165,6 +1158,13 @@
 
                                 
                                     <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_TransformAnimator">TransformAnimator</a>
+
                                 
                                 
                             </li>
@@ -11076,7 +11076,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_AbstractAnimator" class="property item">
     <h3 class="name"><code>AbstractAnimator</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/AbstractAnimator.html" class="crosslink">AbstractAnimator</a></span>
 
     
 
@@ -11121,7 +11121,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_AbstractDataSource" class="property item">
     <h3 class="name"><code>AbstractDataSource</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/AbstractDataSource.html" class="crosslink">AbstractDataSource</a></span>
 
     
 
@@ -11166,7 +11166,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_AbstractNavigator" class="property item">
     <h3 class="name"><code>AbstractNavigator</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/AbstractNavigator.html" class="crosslink">AbstractNavigator</a></span>
 
     
 
@@ -11211,7 +11211,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_AbstractRenderer" class="property item">
     <h3 class="name"><code>AbstractRenderer</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/AbstractRenderer.html" class="crosslink">AbstractRenderer</a></span>
 
     
 
@@ -11256,7 +11256,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_ArrayDataSource" class="property item">
     <h3 class="name"><code>ArrayDataSource</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/ArrayDataSource.html" class="crosslink">ArrayDataSource</a></span>
 
     
 
@@ -11391,54 +11391,9 @@ which in turn contains the actual item wrappers and items.</p>
 </div>
 
                 
-                    <div id="property_DefaultAnimator" class="property item">
-    <h3 class="name"><code>DefaultAnimator</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l468"><code>src\FlowCarousel.js:468</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Reference to the <a href="../classes/DefaultAnimator.html" class="crosslink">DefaultAnimator</a> class.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
                     <div id="property_Deferred" class="property item">
     <h3 class="name"><code>Deferred</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/Deferred.html" class="crosslink">Deferred</a></span>
 
     
 
@@ -11470,52 +11425,6 @@ which in turn contains the actual item wrappers and items.</p>
 
     <div class="description">
         <p>Reference to the <a href="../classes/Deferred.html" class="crosslink">Deferred</a> class.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_Event" class="property item">
-    <h3 class="name"><code>Event</code></h3>
-    <span class="type">FlowCarousel.Event</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_FlowCarousel.js.html#l361"><code>src\FlowCarousel.js:361</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Reference to the Event list.</p>
-<p>Useful for when you have an instance of the carousel but no reference to the class.</p>
 
     </div>
 
@@ -11801,9 +11710,55 @@ which in turn contains the actual item wrappers and items.</p>
 </div>
 
                 
+                    <div id="property_Event" class="property item">
+    <h3 class="name"><code>Event</code></h3>
+    <span class="type">FlowCarousel.Event</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l361"><code>src\FlowCarousel.js:361</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Reference to the Event list.</p>
+<p>Useful for when you have an instance of the carousel but no reference to the class.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="property_HtmlDataSource" class="property item">
     <h3 class="name"><code>HtmlDataSource</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/HtmlDataSource.html" class="crosslink">HtmlDataSource</a></span>
 
     
 
@@ -11848,7 +11803,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_HtmlRenderer" class="property item">
     <h3 class="name"><code>HtmlRenderer</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/HtmlRenderer.html" class="crosslink">HtmlRenderer</a></span>
 
     
 
@@ -11991,7 +11946,7 @@ which in turn contains the actual item wrappers and items.</p>
                 
                     <div id="property_ScrollAnimator" class="property item">
     <h3 class="name"><code>ScrollAnimator</code></h3>
-    <span class="type"><a href="../classes/Config.html" class="crosslink">Config</a></span>
+    <span class="type"><a href="../classes/ScrollAnimator.html" class="crosslink">ScrollAnimator</a></span>
 
     
 
@@ -12113,6 +12068,51 @@ which in turn contains the actual item wrappers and items.</p>
             </li>
             
         </ul>
+    
+</div>
+
+                
+                    <div id="property_TransformAnimator" class="property item">
+    <h3 class="name"><code>TransformAnimator</code></h3>
+    <span class="type"><a href="../classes/TransformAnimator.html" class="crosslink">TransformAnimator</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_FlowCarousel.js.html#l468"><code>src\FlowCarousel.js:468</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Reference to the <a href="../classes/TransformAnimator.html" class="crosslink">TransformAnimator</a> class.</p>
+
+    </div>
+
+    
+
+    
+
     
 </div>
 

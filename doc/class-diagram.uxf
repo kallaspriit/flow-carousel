@@ -167,7 +167,7 @@ get data from</panel_attributes>
       <w>130</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>DefaultAnimator</panel_attributes>
+    <panel_attributes>TransformAnimator</panel_attributes>
     <additional_attributes/>
   </element>
   <element>

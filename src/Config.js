@@ -259,12 +259,12 @@ define([
 		/**
 		 * Default animator configuration.
 		 *
-		 * @property defaultAnimator
-		 * @param {number} defaultAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
-		 * @param {number} defaultAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
-		 * @param {number} defaultAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
+		 * @property transformAnimator
+		 * @param {number} transformAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
+		 * @param {number} transformAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
+		 * @param {number} transformAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
 		 */
-		this.defaultAnimator = {
+		this.transformAnimator = {
 			defaultAnimationSpeed: 4,
 			minAnimationSpeed: 1,
 			maxAnimationSpeed: 10
@@ -378,7 +378,7 @@ define([
 		 *
 		 * Should be an instance of {{#crossLink "AbstractAnimator"}}{{/crossLink}}.
 		 *
-		 * If none is provided then the {{#crossLink "DefaultAnimator"}}{{/crossLink}} is used.
+		 * If none is provided then the {{#crossLink "TransformAnimator"}}{{/crossLink}} is used.
 		 *
 		 * @property animator
 		 * @type {AbstractAnimator}

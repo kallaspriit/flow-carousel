@@ -7,7 +7,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "AbstractRenderer",
         "ArrayDataSource",
         "Config",
-        "DefaultAnimator",
         "Deferred",
         "DragNavigator",
         "EventEmitter Manages event registering and emitting.",
@@ -18,6 +17,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "KeyboardNavigator",
         "ScrollAnimator",
         "SlideshowNavigator",
+        "TransformAnimator",
         "Util"
     ],
     "modules": [],

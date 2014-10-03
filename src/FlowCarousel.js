@@ -5,7 +5,7 @@ define([
 	'ArrayDataSource',
 	'HtmlDataSource',
 	'AbstractAnimator',
-	'DefaultAnimator',
+	'TransformAnimator',
 	'ScrollAnimator',
 	'AbstractRenderer',
 	'HtmlRenderer',
@@ -21,7 +21,7 @@ define([
 	ArrayDataSource,
 	HtmlDataSource,
 	AbstractAnimator,
-	DefaultAnimator,
+	TransformAnimator,
 	ScrollAnimator,
 	AbstractRenderer,
 	HtmlRenderer,
@@ -421,7 +421,7 @@ define([
 	 * Reference to the {{#crossLink "AbstractDataSource"}}{{/crossLink}} class.
 	 *
 	 * @property AbstractDataSource
-	 * @type {Config}
+	 * @type {AbstractDataSource}
 	 */
 	FlowCarousel.AbstractDataSource = AbstractDataSource;
 
@@ -429,7 +429,7 @@ define([
 	 * Reference to the {{#crossLink "ArrayDataSource"}}{{/crossLink}} class.
 	 *
 	 * @property ArrayDataSource
-	 * @type {Config}
+	 * @type {ArrayDataSource}
 	 */
 	FlowCarousel.ArrayDataSource = ArrayDataSource;
 
@@ -437,7 +437,7 @@ define([
 	 * Reference to the {{#crossLink "HtmlDataSource"}}{{/crossLink}} class.
 	 *
 	 * @property HtmlDataSource
-	 * @type {Config}
+	 * @type {HtmlDataSource}
 	 */
 	FlowCarousel.HtmlDataSource = HtmlDataSource;
 
@@ -445,7 +445,7 @@ define([
 	 * Reference to the {{#crossLink "AbstractRenderer"}}{{/crossLink}} class.
 	 *
 	 * @property AbstractRenderer
-	 * @type {Config}
+	 * @type {AbstractRenderer}
 	 */
 	FlowCarousel.AbstractRenderer = AbstractRenderer;
 
@@ -453,7 +453,7 @@ define([
 	 * Reference to the {{#crossLink "HtmlRenderer"}}{{/crossLink}} class.
 	 *
 	 * @property HtmlRenderer
-	 * @type {Config}
+	 * @type {HtmlRenderer}
 	 */
 	FlowCarousel.HtmlRenderer = HtmlRenderer;
 
@@ -461,23 +461,23 @@ define([
 	 * Reference to the {{#crossLink "AbstractAnimator"}}{{/crossLink}} class.
 	 *
 	 * @property AbstractAnimator
-	 * @type {Config}
+	 * @type {AbstractAnimator}
 	 */
 	FlowCarousel.AbstractAnimator = AbstractAnimator;
 
 	/**
-	 * Reference to the {{#crossLink "DefaultAnimator"}}{{/crossLink}} class.
+	 * Reference to the {{#crossLink "TransformAnimator"}}{{/crossLink}} class.
 	 *
-	 * @property DefaultAnimator
-	 * @type {Config}
+	 * @property TransformAnimator
+	 * @type {TransformAnimator}
 	 */
-	FlowCarousel.DefaultAnimator = DefaultAnimator;
+	FlowCarousel.TransformAnimator = TransformAnimator;
 
 	/**
 	 * Reference to the {{#crossLink "ScrollAnimator"}}{{/crossLink}} class.
 	 *
 	 * @property ScrollAnimator
-	 * @type {Config}
+	 * @type {ScrollAnimator}
 	 */
 	FlowCarousel.ScrollAnimator = ScrollAnimator;
 
@@ -485,7 +485,7 @@ define([
 	 * Reference to the {{#crossLink "AbstractNavigator"}}{{/crossLink}} class.
 	 *
 	 * @property AbstractNavigator
-	 * @type {Config}
+	 * @type {AbstractNavigator}
 	 */
 	FlowCarousel.AbstractNavigator = AbstractNavigator;
 
@@ -493,7 +493,7 @@ define([
 	 * Reference to the {{#crossLink "Deferred"}}{{/crossLink}} class.
 	 *
 	 * @property Deferred
-	 * @type {Config}
+	 * @type {Deferred}
 	 */
 	FlowCarousel.Deferred = Deferred;
 
@@ -636,7 +636,7 @@ define([
 			}
 		}
 
-		// use custom animator if provided or the DefaultAnimator if not
+		// use custom animator if provided or the TransformAnimator if not
 		if (this._config.animator !== null) {
 			if (this._config.animator instanceof AbstractAnimator) {
 				this._animator = this._config.animator;
@@ -646,7 +646,7 @@ define([
 		} else {
 			// the animator could have been set before init
 			if (this._animator === null) {
-				this._animator = new DefaultAnimator(this);
+				this._animator = new TransformAnimator(this);
 			}
 		}
 
@@ -1354,7 +1354,7 @@ define([
 			this._targetItemIndex = itemIndex;
 
 			// start animating to given item, this is an asynchronous process
-			this._animator.animateToItem(itemIndex, instant, animationSpeed).done(function() {
+			this._animator.animateToItem(itemIndex, instant, false, animationSpeed).done(function() {
 				deferred.resolve();
 			});
 
@@ -1923,7 +1923,7 @@ define([
 
 			this.emit(FlowCarousel.Event.NAVIGATING_TO_ITEM, startItemIndex, instantAnimation);
 
-			this._animator.animateToItem(startItemIndex, instantAnimation, true).done(function() {
+			this._animator.animateToItem(startItemIndex, instantAnimation).done(function() {
 				this.emit(FlowCarousel.Event.NAVIGATED_TO_ITEM, startItemIndex, instantAnimation);
 			}.bind(this));
 		}

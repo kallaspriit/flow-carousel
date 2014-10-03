@@ -53,8 +53,6 @@
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
-                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
-            
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
                 <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
@@ -74,6 +72,8 @@
                 <li><a href="../classes/ScrollAnimator.html">ScrollAnimator</a></li>
             
                 <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
+            
+                <li><a href="../classes/TransformAnimator.html">TransformAnimator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -137,6 +137,13 @@
 
 <div class="box intro">
     <p>Animator interface.</p>
+<p>Extend this class to implement your own animators.</p>
+<p>At minimal you need to implement the following methods:</p>
+<ul>
+<li>getCurrentPosition</li>
+<li>animateToItem</li>
+<li>animateToPosition</li>
+</ul>
 
 </div>
 
@@ -325,6 +332,24 @@
                     
                 </li>
             
+                <li class="arg">
+                    
+                        <code class="optional">[noDeferred=false]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[animationSpeed]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[animationDuration]</code>
+                    
+                </li>
+            
             </ul><span class="paren">)</span>
         </div>
     
@@ -358,7 +383,7 @@
             
         
         
-        <a href="../files/src_AbstractAnimator.js.html#l26"><code>src\AbstractAnimator.js:26</code></a>
+        <a href="../files/src_AbstractAnimator.js.html#l42"><code>src\AbstractAnimator.js:42</code></a>
         
         </p>
 
@@ -370,6 +395,7 @@
 
     <div class="description">
         <p>Animates the carousel to given item index position.</p>
+<p>Returns deferred promise that is resolved when the animation completes.</p>
 
     </div>
 
@@ -406,6 +432,57 @@
 
                     <div class="param-description">
                         <p>Should the navigation be instantaneous and not use animation</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[noDeferred=false]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Does not create a deferred if set to true, returns undefined</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[animationSpeed]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Optional custom animation speed to use</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[animationDuration]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Optional animation duration in milliseconds</p>
 
                     </div>
 
@@ -504,7 +581,7 @@
             
         
         
-        <a href="../files/src_AbstractAnimator.js.html#l40"><code>src\AbstractAnimator.js:40</code></a>
+        <a href="../files/src_AbstractAnimator.js.html#l67"><code>src\AbstractAnimator.js:67</code></a>
         
         </p>
 
@@ -515,9 +592,10 @@
     </div>
 
     <div class="description">
-        <p>Animates the carousel to given absolute position.</p>
+        <p>Animates the carousel to given absolute position in pixels.</p>
 <p>One can set either a custom animation speed in pixels per millisecond or custom animation duration in
 milliseconds. If animation duration is set then animation speed is ignored.</p>
+<p>Returns deferred promise that is resolved when the animation completes.</p>
 
     </div>
 
@@ -536,7 +614,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
                     
 
                     <div class="param-description">
-                        <p>Requested position</p>
+                        <p>Requested position in pixels</p>
 
                     </div>
 
@@ -570,7 +648,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
                     
 
                     <div class="param-description">
-                        <p>Does not create a deferred if set to true</p>
+                        <p>Does not create a deferred if set to true, returns undefined</p>
 
                     </div>
 
@@ -665,7 +743,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
             
         
         
-        <a href="../files/src_AbstractAnimator.js.html#l75"><code>src\AbstractAnimator.js:75</code></a>
+        <a href="../files/src_AbstractAnimator.js.html#l23"><code>src\AbstractAnimator.js:23</code></a>
         
         </p>
 
@@ -676,7 +754,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
     </div>
 
     <div class="description">
-        <p>Called by the carousel on destroy.</p>
+        <p>Called by the carousel when it is destroyed, releases all listeners etc.</p>
 
     </div>
 
@@ -724,7 +802,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
             
         
         
-        <a href="../files/src_AbstractAnimator.js.html#l16"><code>src\AbstractAnimator.js:16</code></a>
+        <a href="../files/src_AbstractAnimator.js.html#l32"><code>src\AbstractAnimator.js:32</code></a>
         
         </p>
 
@@ -735,7 +813,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
     </div>
 
     <div class="description">
-        <p>Returns current absolute position.</p>
+        <p>Returns current slider absolute position in configured orientation in pixels.</p>
 
     </div>
 
@@ -791,7 +869,7 @@ milliseconds. If animation duration is set then animation speed is ignored.</p>
             
         
         
-        <a href="../files/src_AbstractAnimator.js.html#l66"><code>src\AbstractAnimator.js:66</code></a>
+        <a href="../files/src_AbstractAnimator.js.html#l95"><code>src\AbstractAnimator.js:95</code></a>
         
         </p>
 

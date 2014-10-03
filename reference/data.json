@@ -60,15 +60,6 @@
             "fors": {},
             "namespaces": {}
         },
-        "src\\DefaultAnimator.js": {
-            "name": "src\\DefaultAnimator.js",
-            "modules": {},
-            "classes": {
-                "DefaultAnimator": 1
-            },
-            "fors": {},
-            "namespaces": {}
-        },
         "src\\Deferred.js": {
             "name": "src\\Deferred.js",
             "modules": {},
@@ -166,6 +157,15 @@
             "fors": {},
             "namespaces": {}
         },
+        "src\\TransformAnimator.js": {
+            "name": "src\\TransformAnimator.js",
+            "modules": {},
+            "classes": {
+                "TransformAnimator": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\Util.js": {
             "name": "src\\Util.js",
             "modules": {},
@@ -195,7 +195,7 @@
             "extension_for": [],
             "file": "src\\AbstractAnimator.js",
             "line": 5,
-            "description": "Animator interface.",
+            "description": "Animator interface.\n\nExtend this class to implement your own animators.\n\nAt minimal you need to implement the following methods:\n- getCurrentPosition\n- animateToItem\n- animateToPosition",
             "is_constructor": 1,
             "params": [
                 {
@@ -270,27 +270,6 @@
             "line": 11,
             "description": "Provides configuration.",
             "is_constructor": 1
-        },
-        "DefaultAnimator": {
-            "name": "DefaultAnimator",
-            "shortname": "DefaultAnimator",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "file": "src\\DefaultAnimator.js",
-            "line": 45,
-            "description": "Data source interface.",
-            "extends": "AbstractAnimator",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "carousel",
-                    "description": "The carousel component",
-                    "type": "FlowCarousel"
-                }
-            ]
         },
         "Deferred": {
             "name": "Deferred",
@@ -434,7 +413,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\ScrollAnimator.js",
-            "line": 44,
+            "line": 43,
             "description": "Data source interface.",
             "extends": "AbstractAnimator",
             "is_constructor": 1,
@@ -467,6 +446,27 @@
             ],
             "is_constructor": 1
         },
+        "TransformAnimator": {
+            "name": "TransformAnimator",
+            "shortname": "TransformAnimator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\TransformAnimator.js",
+            "line": 44,
+            "description": "Transforms based animator implementation.",
+            "extends": "AbstractAnimator",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "carousel",
+                    "description": "The carousel component",
+                    "type": "FlowCarousel"
+                }
+            ]
+        },
         "Util": {
             "name": "Util",
             "shortname": "Util",
@@ -484,8 +484,16 @@
     "classitems": [
         {
             "file": "src\\AbstractAnimator.js",
-            "line": 16,
-            "description": "Returns current absolute position.",
+            "line": 23,
+            "description": "Called by the carousel when it is destroyed, releases all listeners etc.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "AbstractAnimator"
+        },
+        {
+            "file": "src\\AbstractAnimator.js",
+            "line": 32,
+            "description": "Returns current slider absolute position in configured orientation in pixels.",
             "itemtype": "method",
             "name": "getCurrentPosition",
             "return": {
@@ -496,8 +504,8 @@
         },
         {
             "file": "src\\AbstractAnimator.js",
-            "line": 26,
-            "description": "Animates the carousel to given item index position.",
+            "line": 42,
+            "description": "Animates the carousel to given item index position.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToItem",
             "params": [
@@ -512,6 +520,25 @@
                     "type": "Boolean",
                     "optional": true,
                     "optdefault": "false"
+                },
+                {
+                    "name": "noDeferred",
+                    "description": "Does not create a deferred if set to true, returns undefined",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                },
+                {
+                    "name": "animationSpeed",
+                    "description": "Optional custom animation speed to use",
+                    "type": "Number",
+                    "optional": true
+                },
+                {
+                    "name": "animationDuration",
+                    "description": "Optional animation duration in milliseconds",
+                    "type": "Number",
+                    "optional": true
                 }
             ],
             "return": {
@@ -522,14 +549,14 @@
         },
         {
             "file": "src\\AbstractAnimator.js",
-            "line": 40,
-            "description": "Animates the carousel to given absolute position.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.",
+            "line": 67,
+            "description": "Animates the carousel to given absolute position in pixels.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToPosition",
             "params": [
                 {
                     "name": "position",
-                    "description": "Requested position",
+                    "description": "Requested position in pixels",
                     "type": "Number"
                 },
                 {
@@ -541,7 +568,7 @@
                 },
                 {
                     "name": "noDeferred",
-                    "description": "Does not create a deferred if set to true",
+                    "description": "Does not create a deferred if set to true, returns undefined",
                     "type": "Boolean",
                     "optional": true,
                     "optdefault": "false"
@@ -567,18 +594,10 @@
         },
         {
             "file": "src\\AbstractAnimator.js",
-            "line": 66,
+            "line": 95,
             "description": "Called by the carousel once it's structure has been initiated.",
             "itemtype": "method",
             "name": "onCarouselElementReady",
-            "class": "AbstractAnimator"
-        },
-        {
-            "file": "src\\AbstractAnimator.js",
-            "line": 75,
-            "description": "Called by the carousel on destroy.",
-            "itemtype": "method",
-            "name": "destroy",
             "class": "AbstractAnimator"
         },
         {
@@ -987,7 +1006,7 @@
             "line": 259,
             "description": "Default animator configuration.",
             "itemtype": "property",
-            "name": "defaultAnimator",
+            "name": "transformAnimator",
             "class": "Config",
             "subprops": [
                 {
@@ -1157,7 +1176,7 @@
         {
             "file": "src\\Config.js",
             "line": 376,
-            "description": "Optional custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is provided then the {{#crossLink \"DefaultAnimator\"}}{{/crossLink}} is used.",
+            "description": "Optional custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is provided then the {{#crossLink \"TransformAnimator\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "animator",
             "type": "{AbstractAnimator}",
@@ -1292,149 +1311,6 @@
                 "type": "String"
             },
             "class": "Config"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 67,
-            "description": "Called by the carousel on destroy.",
-            "itemtype": "method",
-            "name": "destroy",
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 82,
-            "description": "Returns current absolute position.",
-            "itemtype": "method",
-            "name": "getCurrentPosition",
-            "return": {
-                "description": "",
-                "type": "Number"
-            },
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 101,
-            "description": "Animates the carousel to given item index position.",
-            "itemtype": "method",
-            "name": "animateToItem",
-            "params": [
-                {
-                    "name": "itemIndex",
-                    "description": "Index of the item",
-                    "type": "Number"
-                },
-                {
-                    "name": "instant",
-                    "description": "Should the navigation be instantaneous and not use animation",
-                    "type": "Boolean",
-                    "optional": true,
-                    "optdefault": "false"
-                },
-                {
-                    "name": "animationSpeed",
-                    "description": "Optional animation speed in pixels per millisecond",
-                    "type": "Number",
-                    "optional": true
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "Deferred.Promise"
-            },
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 116,
-            "description": "Animates the carousel to given absolute position.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.",
-            "itemtype": "method",
-            "name": "animateToPosition",
-            "params": [
-                {
-                    "name": "position",
-                    "description": "Requested position",
-                    "type": "Number"
-                },
-                {
-                    "name": "instant",
-                    "description": "Should the navigation be instantaneous and not use animation",
-                    "type": "Boolean",
-                    "optional": true,
-                    "optdefault": "false"
-                },
-                {
-                    "name": "noDeferred",
-                    "description": "Does not create a deferred if set to true",
-                    "type": "Boolean",
-                    "optional": true,
-                    "optdefault": "false"
-                },
-                {
-                    "name": "animationSpeed",
-                    "description": "Optional animation speed in pixels per millisecond",
-                    "type": "Number",
-                    "optional": true,
-                    "optdefault": "2"
-                },
-                {
-                    "name": "animationDuration",
-                    "description": "Optional animation duration in milliseconds",
-                    "type": "Number",
-                    "optional": true
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "Deferred.Promise"
-            },
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 229,
-            "description": "Called by the carousel once it's structure has been initiated.",
-            "itemtype": "method",
-            "name": "onCarouselInitiated",
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 238,
-            "description": "Starts listening for transition end event on the scroller wrap.",
-            "itemtype": "method",
-            "name": "_setupTransitionEndListener",
-            "access": "private",
-            "tagname": "",
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 255,
-            "description": "Called on transition end event.",
-            "itemtype": "method",
-            "name": "_onRawTransitionEnd",
-            "params": [
-                {
-                    "name": "e",
-                    "description": "Raw event",
-                    "type": "Event"
-                }
-            ],
-            "access": "private",
-            "tagname": "",
-            "class": "DefaultAnimator"
-        },
-        {
-            "file": "src\\DefaultAnimator.js",
-            "line": 267,
-            "description": "Resolves currently active deferred if available and sets it to null.",
-            "itemtype": "method",
-            "name": "_resolveDeferred",
-            "access": "private",
-            "tagname": "",
-            "class": "DefaultAnimator"
         },
         {
             "file": "src\\DragNavigator.js",
@@ -2549,7 +2425,7 @@
             "description": "Reference to the {{#crossLink \"AbstractDataSource\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "AbstractDataSource",
-            "type": "{Config}",
+            "type": "{AbstractDataSource}",
             "class": "FlowCarousel"
         },
         {
@@ -2558,7 +2434,7 @@
             "description": "Reference to the {{#crossLink \"ArrayDataSource\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "ArrayDataSource",
-            "type": "{Config}",
+            "type": "{ArrayDataSource}",
             "class": "FlowCarousel"
         },
         {
@@ -2567,7 +2443,7 @@
             "description": "Reference to the {{#crossLink \"HtmlDataSource\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "HtmlDataSource",
-            "type": "{Config}",
+            "type": "{HtmlDataSource}",
             "class": "FlowCarousel"
         },
         {
@@ -2576,7 +2452,7 @@
             "description": "Reference to the {{#crossLink \"AbstractRenderer\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "AbstractRenderer",
-            "type": "{Config}",
+            "type": "{AbstractRenderer}",
             "class": "FlowCarousel"
         },
         {
@@ -2585,7 +2461,7 @@
             "description": "Reference to the {{#crossLink \"HtmlRenderer\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "HtmlRenderer",
-            "type": "{Config}",
+            "type": "{HtmlRenderer}",
             "class": "FlowCarousel"
         },
         {
@@ -2594,16 +2470,16 @@
             "description": "Reference to the {{#crossLink \"AbstractAnimator\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "AbstractAnimator",
-            "type": "{Config}",
+            "type": "{AbstractAnimator}",
             "class": "FlowCarousel"
         },
         {
             "file": "src\\FlowCarousel.js",
             "line": 468,
-            "description": "Reference to the {{#crossLink \"DefaultAnimator\"}}{{/crossLink}} class.",
+            "description": "Reference to the {{#crossLink \"TransformAnimator\"}}{{/crossLink}} class.",
             "itemtype": "property",
-            "name": "DefaultAnimator",
-            "type": "{Config}",
+            "name": "TransformAnimator",
+            "type": "{TransformAnimator}",
             "class": "FlowCarousel"
         },
         {
@@ -2612,7 +2488,7 @@
             "description": "Reference to the {{#crossLink \"ScrollAnimator\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "ScrollAnimator",
-            "type": "{Config}",
+            "type": "{ScrollAnimator}",
             "class": "FlowCarousel"
         },
         {
@@ -2621,7 +2497,7 @@
             "description": "Reference to the {{#crossLink \"AbstractNavigator\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "AbstractNavigator",
-            "type": "{Config}",
+            "type": "{AbstractNavigator}",
             "class": "FlowCarousel"
         },
         {
@@ -2630,7 +2506,7 @@
             "description": "Reference to the {{#crossLink \"Deferred\"}}{{/crossLink}} class.",
             "itemtype": "property",
             "name": "Deferred",
-            "type": "{Config}",
+            "type": "{Deferred}",
             "class": "FlowCarousel"
         },
         {
@@ -4760,7 +4636,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 61,
+            "line": 60,
             "description": "Called by the carousel once it's structure has been initiated.",
             "itemtype": "method",
             "name": "onCarouselInitiated",
@@ -4768,7 +4644,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 71,
+            "line": 70,
             "description": "Returns current absolute position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -4780,8 +4656,8 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 88,
-            "description": "Animates the carousel to given item index position.",
+            "line": 87,
+            "description": "Animates the carousel to given item index position.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToItem",
             "params": [
@@ -4796,6 +4672,25 @@
                     "type": "Boolean",
                     "optional": true,
                     "optdefault": "false"
+                },
+                {
+                    "name": "noDeferred",
+                    "description": "Does not create a deferred if set to true, returns undefined",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                },
+                {
+                    "name": "animationSpeed",
+                    "description": "Optional custom animation speed to use",
+                    "type": "Number",
+                    "optional": true
+                },
+                {
+                    "name": "animationDuration",
+                    "description": "Optional animation duration in milliseconds",
+                    "type": "Number",
+                    "optional": true
                 }
             ],
             "return": {
@@ -4806,14 +4701,14 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 102,
-            "description": "Animates the carousel to given absolute position.",
+            "line": 112,
+            "description": "Animates the carousel to given absolute position in pixels.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToPosition",
             "params": [
                 {
                     "name": "position",
-                    "description": "Requested position",
+                    "description": "Requested position in pixels",
                     "type": "Number"
                 },
                 {
@@ -4825,10 +4720,22 @@
                 },
                 {
                     "name": "noDeferred",
-                    "description": "Does not create a deferred if set to true",
+                    "description": "Does not create a deferred if set to true, returns undefined",
                     "type": "Boolean",
                     "optional": true,
                     "optdefault": "false"
+                },
+                {
+                    "name": "animationSpeed",
+                    "description": "Animation speed in pixels per millisecond",
+                    "type": "Number",
+                    "optional": true
+                },
+                {
+                    "name": "animationDuration",
+                    "description": "Optional animation duration in milliseconds",
+                    "type": "Number",
+                    "optional": true
                 }
             ],
             "return": {
@@ -4839,7 +4746,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 141,
+            "line": 166,
             "description": "Animates the carousel to given absolute position from left.",
             "itemtype": "method",
             "name": "_animateToLeftPosition",
@@ -4865,7 +4772,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 173,
+            "line": 198,
             "description": "Animates the carousel to given absolute position from top.",
             "itemtype": "method",
             "name": "_animateToTopPosition",
@@ -5042,6 +4949,212 @@
             "access": "private",
             "tagname": "",
             "class": "SlideshowNavigator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 55,
+            "description": "Reference to the parent carousel component.",
+            "itemtype": "property",
+            "name": "_carousel",
+            "type": "{FlowCarousel}",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 64,
+            "description": "Currently active animation deferred.",
+            "itemtype": "property",
+            "name": "_activeDeferred",
+            "type": "{Deferred}",
+            "default": "null",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 74,
+            "description": "Has the transition end listener been created.",
+            "itemtype": "property",
+            "name": "_transitionEndListenerCreated",
+            "type": "{boolean}",
+            "default": "false",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 84,
+            "description": "Does the animated element have the class used for animated transforms.",
+            "itemtype": "property",
+            "name": "_isUsingAnimatedTransform",
+            "type": "{boolean}",
+            "default": "true",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 94,
+            "description": "List of used event listeners.\n\nUsed to keep track of added event listeners so they would properly get destroyed in the destructor.",
+            "itemtype": "property",
+            "name": "_eventListeners",
+            "type": "{object}",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 110,
+            "description": "Called by the carousel when it is destroyed, releases all listeners etc.",
+            "itemtype": "method",
+            "name": "destroy",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 125,
+            "description": "Returns current slider absolute position in configured orientation in pixels.",
+            "itemtype": "method",
+            "name": "getCurrentPosition",
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 144,
+            "description": "Animates the carousel to given item index position.\n\nAnimation speed from {{#crossLink \"Config/transformAnimator/defaultAnimationSpeed:property\"}}{{/crossLink}} is\nused by default.\n\nReturns deferred promise that is resolved when the animation completes.",
+            "itemtype": "method",
+            "name": "animateToItem",
+            "params": [
+                {
+                    "name": "itemIndex",
+                    "description": "Index of the item",
+                    "type": "Number"
+                },
+                {
+                    "name": "instant",
+                    "description": "Should the navigation be instantaneous and not use animation",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                },
+                {
+                    "name": "noDeferred",
+                    "description": "Does not create a deferred if set to true, returns undefined",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                },
+                {
+                    "name": "animationSpeed",
+                    "description": "Optional custom animation speed to use",
+                    "type": "Number",
+                    "optional": true
+                },
+                {
+                    "name": "animationDuration",
+                    "description": "Optional animation duration in milliseconds",
+                    "type": "Number",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 172,
+            "description": "Animates the carousel to given absolute position in pixels.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.\n\nAnimation speed from {{#crossLink \"Config/transformAnimator/defaultAnimationSpeed:property\"}}{{/crossLink}} is\nused by default.\n\nReturns deferred promise that is resolved when the animation completes.",
+            "itemtype": "method",
+            "name": "animateToPosition",
+            "params": [
+                {
+                    "name": "position",
+                    "description": "Requested position in pixels",
+                    "type": "Number"
+                },
+                {
+                    "name": "instant",
+                    "description": "Should the navigation be instantaneous and not use animation",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                },
+                {
+                    "name": "noDeferred",
+                    "description": "Does not create a deferred if set to true, returns undefined",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                },
+                {
+                    "name": "animationSpeed",
+                    "description": "Animation speed in pixels per millisecond",
+                    "type": "Number",
+                    "optional": true
+                },
+                {
+                    "name": "animationDuration",
+                    "description": "Optional animation duration in milliseconds",
+                    "type": "Number",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Deferred.Promise"
+            },
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 291,
+            "description": "Called by the carousel once it's structure has been initiated.",
+            "itemtype": "method",
+            "name": "onCarouselInitiated",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 300,
+            "description": "Starts listening for transition end event on the scroller wrap.",
+            "itemtype": "method",
+            "name": "_setupTransitionEndListener",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 317,
+            "description": "Called on transition end event.",
+            "itemtype": "method",
+            "name": "_onRawTransitionEnd",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
+        },
+        {
+            "file": "src\\TransformAnimator.js",
+            "line": 328,
+            "description": "Resolves currently active deferred if available and sets it to null.",
+            "itemtype": "method",
+            "name": "_resolveDeferred",
+            "access": "private",
+            "tagname": "",
+            "class": "TransformAnimator"
         },
         {
             "file": "src\\Util.js",

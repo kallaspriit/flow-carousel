@@ -14,7 +14,6 @@ define([
 
 		for (x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 			window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-
 			window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
 				|| window[vendors[x] + 'CancelRequestAnimationFrame'];
 		}
@@ -88,29 +87,55 @@ define([
 	/**
 	 * Animates the carousel to given item index position.
 	 *
+	 * Returns deferred promise that is resolved when the animation completes.
+	 *
 	 * @method animateToItem
 	 * @param {number} itemIndex Index of the item
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
+	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true, returns undefined
+	 * @param {number} [animationSpeed] Optional custom animation speed to use
+	 * @param {number} [animationDuration] Optional animation duration in milliseconds
 	 * @return {Deferred.Promise}
 	 */
-	ScrollAnimator.prototype.animateToItem = function(itemIndex, instant) {
+	ScrollAnimator.prototype.animateToItem = function(
+		itemIndex,
+		instant,
+		noDeferred,
+		animationSpeed,
+		animationDuration
+	) {
 		var position = this._carousel.getItemPositionByIndex(itemIndex);
 
-		return this.animateToPosition(position, instant);
+		return this.animateToPosition(position, instant, noDeferred, animationSpeed, animationDuration);
 	};
 
 	/**
-	 * Animates the carousel to given absolute position.
+	 * Animates the carousel to given absolute position in pixels.
+	 *
+	 * One can set either a custom animation speed in pixels per millisecond or custom animation duration in
+	 * milliseconds. If animation duration is set then animation speed is ignored.
+	 *
+	 * Returns deferred promise that is resolved when the animation completes.
 	 *
 	 * @method animateToPosition
-	 * @param {number} position Requested position
+	 * @param {number} position Requested position in pixels
 	 * @param {boolean} [instant=false] Should the navigation be instantaneous and not use animation
-	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true
+	 * @param {boolean} [noDeferred=false] Does not create a deferred if set to true, returns undefined
+	 * @param {number} [animationSpeed] Animation speed in pixels per millisecond
+	 * @param {number} [animationDuration] Optional animation duration in milliseconds
 	 * @return {Deferred.Promise}
 	 */
-	ScrollAnimator.prototype.animateToPosition = function(position, instant, noDeferred) {
+	ScrollAnimator.prototype.animateToPosition = function(
+		position,
+		instant,
+		noDeferred,
+		animationSpeed,
+		animationDuration
+	) {
 		instant = typeof instant === 'boolean' ? instant : false;
 		noDeferred = typeof noDeferred === 'boolean' ? noDeferred : false;
+
+		void(animationSpeed, animationDuration);
 
 		var deferred = noDeferred ? null : new Deferred(),
 			orientation = this._carousel.getOrientation();

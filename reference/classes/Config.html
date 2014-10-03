@@ -53,8 +53,6 @@
             
                 <li><a href="../classes/Config.html">Config</a></li>
             
-                <li><a href="../classes/DefaultAnimator.html">DefaultAnimator</a></li>
-            
                 <li><a href="../classes/Deferred.html">Deferred</a></li>
             
                 <li><a href="../classes/DragNavigator.html">DragNavigator</a></li>
@@ -74,6 +72,8 @@
                 <li><a href="../classes/ScrollAnimator.html">ScrollAnimator</a></li>
             
                 <li><a href="../classes/SlideshowNavigator.html">SlideshowNavigator</a></li>
+            
+                <li><a href="../classes/TransformAnimator.html">TransformAnimator</a></li>
             
                 <li><a href="../classes/Util.html">Util</a></li>
             
@@ -304,13 +304,6 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_defaultAnimator">defaultAnimator</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item property">
                                 <a href="#property_itemsPerPage">itemsPerPage</a>
 
                                 
@@ -339,17 +332,17 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_orientation">orientation</a>
+                                <a href="#property_Orientation">Orientation</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_Orientation">Orientation</a>
+                                <a href="#property_orientation">orientation</a>
 
-                                
-                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -421,6 +414,13 @@
                         
                             <li class="index-item property">
                                 <a href="#property_startPageIndex">startPageIndex</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_transformAnimator">transformAnimator</a>
 
                                 
                                 
@@ -1012,7 +1012,7 @@ rendering is triggered if the user only moves for a few pages.</p>
     <div class="description">
         <p>Optional custom animator to use.</p>
 <p>Should be an instance of <a href="../classes/AbstractAnimator.html" class="crosslink">AbstractAnimator</a>.</p>
-<p>If none is provided then the <a href="../classes/DefaultAnimator.html" class="crosslink">DefaultAnimator</a> is used.</p>
+<p>If none is provided then the <a href="../classes/TransformAnimator.html" class="crosslink">TransformAnimator</a> is used.</p>
 
     </div>
 
@@ -1421,99 +1421,6 @@ so if the prefix is "flow-carousel-" and the wrap class is "wrap" then the main 
 </div>
 
                 
-                    <div id="property_defaultAnimator" class="property item">
-    <h3 class="name"><code>defaultAnimator</code></h3>
-    <span class="type">Unknown</span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_Config.js.html#l259"><code>src\Config.js:259</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Default animator configuration.</p>
-
-    </div>
-
-    
-
-    
-
-    
-        <h4>Sub-properties:</h4>
-
-        <ul class="params-list">
-            
-            <li class="param">
-                
-                    <code class="param-name">defaultAnimationSpeed=2</code>
-                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                
-
-                <div class="param-description">
-                    <p>Default animation speed in pixels per millisecond</p>
-
-                </div>
-
-                
-            </li>
-            
-            <li class="param">
-                
-                    <code class="param-name">minAnimationSpeed=1</code>
-                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                
-
-                <div class="param-description">
-                    <p>Minimum animation speed in pixels per millisecond</p>
-
-                </div>
-
-                
-            </li>
-            
-            <li class="param">
-                
-                    <code class="param-name">maxAnimationSpeed=10</code>
-                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
-                
-
-                <div class="param-description">
-                    <p>Maximum animation speed in pixels per millisecond</p>
-
-                </div>
-
-                
-            </li>
-            
-        </ul>
-    
-</div>
-
-                
                     <div id="property_itemsPerPage" class="property item">
     <h3 class="name"><code>itemsPerPage</code></h3>
     <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
@@ -1750,55 +1657,6 @@ instance.</p>
 </div>
 
                 
-                    <div id="property_orientation" class="property item">
-    <h3 class="name"><code>orientation</code></h3>
-    <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_Config.js.html#l19"><code>src\Config.js:19</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Carousel orientation to use.</p>
-<p>One of <a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a>.</p>
-<p>Defaults to horizontal.</p>
-
-    </div>
-
-    
-        <p><strong>Default:</strong> Config.Orientation.VERTICAL</p>
-    
-
-    
-
-    
-</div>
-
-                
                     <div id="property_Orientation" class="property item">
     <h3 class="name"><code>Orientation</code></h3>
     <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
@@ -1876,6 +1734,55 @@ instance.</p>
             </li>
             
         </ul>
+    
+</div>
+
+                
+                    <div id="property_orientation" class="property item">
+    <h3 class="name"><code>orientation</code></h3>
+    <span class="type"><a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l19"><code>src\Config.js:19</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Carousel orientation to use.</p>
+<p>One of <a href="../classes/Config.html#property_Orientation" class="crosslink">Orientation</a>.</p>
+<p>Defaults to horizontal.</p>
+
+    </div>
+
+    
+        <p><strong>Default:</strong> Config.Orientation.VERTICAL</p>
+    
+
+    
+
     
 </div>
 
@@ -2403,6 +2310,99 @@ throws error.</p>
 
     
 
+    
+</div>
+
+                
+                    <div id="property_transformAnimator" class="property item">
+    <h3 class="name"><code>transformAnimator</code></h3>
+    <span class="type">Unknown</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_Config.js.html#l259"><code>src\Config.js:259</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Default animator configuration.</p>
+
+    </div>
+
+    
+
+    
+
+    
+        <h4>Sub-properties:</h4>
+
+        <ul class="params-list">
+            
+            <li class="param">
+                
+                    <code class="param-name">defaultAnimationSpeed=2</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                
+
+                <div class="param-description">
+                    <p>Default animation speed in pixels per millisecond</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">minAnimationSpeed=1</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                
+
+                <div class="param-description">
+                    <p>Minimum animation speed in pixels per millisecond</p>
+
+                </div>
+
+                
+            </li>
+            
+            <li class="param">
+                
+                    <code class="param-name">maxAnimationSpeed=10</code>
+                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                
+
+                <div class="param-description">
+                    <p>Maximum animation speed in pixels per millisecond</p>
+
+                </div>
+
+                
+            </li>
+            
+        </ul>
     
 </div>
 

@@ -2979,15 +2979,10 @@ define('AbstractAnimator',[
 
 	return AbstractAnimator;
 });
-define('TransformAnimator',[
-	'jquery',
-	'AbstractAnimator',
-	'Config',
-	'Util',
-	'Deferred'
-], function($, AbstractAnimator, Config, Util, Deferred) {
+define('polyfills/requestAnimationFrame',[
+], function() {
 	
-
+	
 	// requestAnimationFrame polyfill
 	(function () {
 		var lastTime = 0,
@@ -3021,6 +3016,16 @@ define('TransformAnimator',[
 			};
 		}
 	}());
+});
+define('TransformAnimator',[
+	'jquery',
+	'AbstractAnimator',
+	'Config',
+	'Util',
+	'Deferred',
+	'polyfills/requestAnimationFrame'
+], function($, AbstractAnimator, Config, Util, Deferred) {
+	
 
 	/**
 	 * Transforms based animator implementation.
@@ -3326,43 +3331,10 @@ define('ScrollAnimator',[
 	'jquery',
 	'AbstractAnimator',
 	'Config',
-	'Deferred'
+	'Deferred',
+	'polyfills/requestAnimationFrame'
 ], function($, AbstractAnimator, Config, Deferred) {
 	
-
-	// requestAnimationFrame polyfill
-	(function () {
-		var lastTime = 0,
-			vendors = ['webkit', 'moz'],
-			x;
-
-		for (x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-			window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-			window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
-				|| window[vendors[x] + 'CancelRequestAnimationFrame'];
-		}
-
-		if (!window.requestAnimationFrame) {
-			window.requestAnimationFrame = function(callback/*, element*/) {
-				var currTime = new Date().getTime(),
-					timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-					id = window.setTimeout(function () {
-						callback(currTime + timeToCall);
-					},
-					timeToCall);
-
-				lastTime = currTime + timeToCall;
-
-				return id;
-			};
-		}
-
-		if (!window.cancelAnimationFrame) {
-			window.cancelAnimationFrame = function(id) {
-				clearTimeout(id);
-			};
-		}
-	}());
 
 	/**
 	 * Native scroll based animator implementation.

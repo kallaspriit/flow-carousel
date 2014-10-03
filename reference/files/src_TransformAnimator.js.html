@@ -125,43 +125,10 @@ define([
 	&#x27;AbstractAnimator&#x27;,
 	&#x27;Config&#x27;,
 	&#x27;Util&#x27;,
-	&#x27;Deferred&#x27;
+	&#x27;Deferred&#x27;,
+	&#x27;polyfills/requestAnimationFrame&#x27;
 ], function($, AbstractAnimator, Config, Util, Deferred) {
 	&#x27;use strict&#x27;;
-
-	// requestAnimationFrame polyfill
-	(function () {
-		var lastTime = 0,
-			vendors = [&#x27;webkit&#x27;, &#x27;moz&#x27;],
-			x;
-
-		for (x = 0; x &lt; vendors.length &amp;&amp; !window.requestAnimationFrame; ++x) {
-			window.requestAnimationFrame = window[vendors[x] + &#x27;RequestAnimationFrame&#x27;];
-			window.cancelAnimationFrame = window[vendors[x] + &#x27;CancelAnimationFrame&#x27;]
-				|| window[vendors[x] + &#x27;CancelRequestAnimationFrame&#x27;];
-		}
-
-		if (!window.requestAnimationFrame) {
-			window.requestAnimationFrame = function(callback/*, element*/) {
-				var currTime = new Date().getTime(),
-					timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-					id = window.setTimeout(function () {
-						callback(currTime + timeToCall);
-					},
-					timeToCall);
-
-				lastTime = currTime + timeToCall;
-
-				return id;
-			};
-		}
-
-		if (!window.cancelAnimationFrame) {
-			window.cancelAnimationFrame = function(id) {
-				clearTimeout(id);
-			};
-		}
-	}());
 
 	/**
 	 * Transforms based animator implementation.

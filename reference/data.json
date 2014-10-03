@@ -413,7 +413,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\ScrollAnimator.js",
-            "line": 43,
+            "line": 10,
             "description": "Native scroll based animator implementation.",
             "extends": "AbstractAnimator",
             "is_constructor": 1,
@@ -455,7 +455,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src\\TransformAnimator.js",
-            "line": 44,
+            "line": 11,
             "description": "Transforms based animator implementation.",
             "extends": "AbstractAnimator",
             "is_constructor": 1,
@@ -4661,7 +4661,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 60,
+            "line": 27,
             "description": "Called by the carousel once it's structure has been initiated.",
             "itemtype": "method",
             "name": "onCarouselInitiated",
@@ -4669,7 +4669,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 70,
+            "line": 37,
             "description": "Returns current absolute position.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -4681,7 +4681,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 87,
+            "line": 54,
             "description": "Animates the carousel to given item index position.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToItem",
@@ -4726,7 +4726,7 @@
         },
         {
             "file": "src\\ScrollAnimator.js",
-            "line": 112,
+            "line": 79,
             "description": "Animates the carousel to given absolute position in pixels.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToPosition",
@@ -4925,7 +4925,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 55,
+            "line": 22,
             "description": "Reference to the parent carousel component.",
             "itemtype": "property",
             "name": "_carousel",
@@ -4936,7 +4936,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 64,
+            "line": 31,
             "description": "Currently active animation deferred.",
             "itemtype": "property",
             "name": "_activeDeferred",
@@ -4948,7 +4948,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 74,
+            "line": 41,
             "description": "Has the transition end listener been created.",
             "itemtype": "property",
             "name": "_transitionEndListenerCreated",
@@ -4960,7 +4960,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 84,
+            "line": 51,
             "description": "Does the animated element have the class used for animated transforms.",
             "itemtype": "property",
             "name": "_isUsingAnimatedTransform",
@@ -4972,7 +4972,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 94,
+            "line": 61,
             "description": "List of used event listeners.\n\nUsed to keep track of added event listeners so they would properly get destroyed in the destructor.",
             "itemtype": "property",
             "name": "_eventListeners",
@@ -4983,7 +4983,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 110,
+            "line": 77,
             "description": "Called by the carousel when it is destroyed, releases all listeners etc.",
             "itemtype": "method",
             "name": "destroy",
@@ -4991,7 +4991,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 125,
+            "line": 92,
             "description": "Returns current slider absolute position in configured orientation in pixels.",
             "itemtype": "method",
             "name": "getCurrentPosition",
@@ -5003,7 +5003,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 144,
+            "line": 111,
             "description": "Animates the carousel to given item index position.\n\nAnimation speed from {{#crossLink \"Config/transformAnimator/defaultAnimationSpeed:property\"}}{{/crossLink}} is\nused by default.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToItem",
@@ -5048,7 +5048,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 172,
+            "line": 139,
             "description": "Animates the carousel to given absolute position in pixels.\n\nOne can set either a custom animation speed in pixels per millisecond or custom animation duration in\nmilliseconds. If animation duration is set then animation speed is ignored.\n\nAnimation speed from {{#crossLink \"Config/transformAnimator/defaultAnimationSpeed:property\"}}{{/crossLink}} is\nused by default.\n\nReturns deferred promise that is resolved when the animation completes.",
             "itemtype": "method",
             "name": "animateToPosition",
@@ -5093,7 +5093,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 291,
+            "line": 258,
             "description": "Called by the carousel once it's structure has been initiated.",
             "itemtype": "method",
             "name": "onCarouselInitiated",
@@ -5101,7 +5101,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 300,
+            "line": 267,
             "description": "Starts listening for transition end event on the scroller wrap.",
             "itemtype": "method",
             "name": "_setupTransitionEndListener",
@@ -5111,7 +5111,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 317,
+            "line": 284,
             "description": "Called on transition end event.",
             "itemtype": "method",
             "name": "_onRawTransitionEnd",
@@ -5121,7 +5121,7 @@
         },
         {
             "file": "src\\TransformAnimator.js",
-            "line": 328,
+            "line": 295,
             "description": "Resolves currently active deferred if available and sets it to null.",
             "itemtype": "method",
             "name": "_resolveDeferred",

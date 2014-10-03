@@ -2370,14 +2370,28 @@ define('Config',[
 		};
 
 		/**
-		 * Default animator configuration.
+		 * Transform animator configuration.
 		 *
 		 * @property transformAnimator
-		 * @param {number} transformAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
+		 * @param {number} transformAnimator.defaultAnimationSpeed=4 Default animation speed in pixels per millisecond
 		 * @param {number} transformAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
 		 * @param {number} transformAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
 		 */
 		this.transformAnimator = {
+			defaultAnimationSpeed: 4,
+			minAnimationSpeed: 1,
+			maxAnimationSpeed: 10
+		};
+
+		/**
+		 * Scroll animator configuration.
+		 *
+		 * @property scrollAnimator
+		 * @param {number} scrollAnimator.defaultAnimationSpeed=4 Default animation speed in pixels per millisecond
+		 * @param {number} scrollAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
+		 * @param {number} scrollAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
+		 */
+		this.scrollAnimator = {
 			defaultAnimationSpeed: 4,
 			minAnimationSpeed: 1,
 			maxAnimationSpeed: 10
@@ -3351,7 +3365,7 @@ define('ScrollAnimator',[
 	}());
 
 	/**
-	 * Data source interface.
+	 * Native scroll based animator implementation.
 	 *
 	 * @class ScrollAnimator
 	 * @extends AbstractAnimator
@@ -3361,8 +3375,8 @@ define('ScrollAnimator',[
 	function ScrollAnimator(carousel) {
 		AbstractAnimator.call(this, carousel);
 
-		this._animationSpeed = 200;
 		this._carousel = carousel;
+		this._activeDeferred = null;
 	}
 
 	ScrollAnimator.prototype = Object.create(AbstractAnimator.prototype);
@@ -3373,7 +3387,7 @@ define('ScrollAnimator',[
 	 * @method onCarouselInitiated
 	 */
 	ScrollAnimator.prototype.onCarouselElementReady = function() {
-		//add css class to indicate the type of this animator
+		// add css class to indicate the type of this animator
 		$(this._carousel.getMainWrap()).addClass(this._carousel.getConfig().cssPrefix + 'scroll-animator');
 	};
 
@@ -3442,98 +3456,73 @@ define('ScrollAnimator',[
 		animationSpeed,
 		animationDuration
 	) {
+		var config = this._carousel.getConfig().scrollAnimator;
+
 		instant = typeof instant === 'boolean' ? instant : false;
 		noDeferred = typeof noDeferred === 'boolean' ? noDeferred : false;
+		animationSpeed = typeof animationSpeed === 'number' ? animationSpeed : config.defaultAnimationSpeed;
 
-		void(animationSpeed, animationDuration);
+		// limit the animation speed to configured range
+		animationSpeed = Math.min(Math.max(animationSpeed, config.minAnimationSpeed), config.maxAnimationSpeed);
+
+		// resolve existing animation deferred if exists
+		if (this._activeDeferred !== null) {
+			this._activeDeferred.resolve();
+			this._activeDeferred = null;
+		}
 
 		var deferred = noDeferred ? null : new Deferred(),
-			orientation = this._carousel.getOrientation();
+			orientation = this._carousel.getOrientation(),
+			$itemsWrap = $(this._carousel.getItemsWrap()),
+			scrollMethod = orientation === Config.Orientation.HORIZONTAL ? 'scrollLeft' : 'scrollTop',
+			animationProps = {},
+			currentPosition,
+			deltaPosition;
 
 		// make sure the position is a full integer
-		position = Math.floor(position) * -1;
+		position = Math.floor(position);
 
-		// decide to use scrollLeft or scrollTop based on carousel orientation
-		if (orientation === Config.Orientation.HORIZONTAL) {
-			this._animateToLeftPosition(position, instant).done(function(){
+		// don't waste resources on calculating current position if not using deferred
+		if (noDeferred !== true) {
+			currentPosition = this.getCurrentPosition();
+			deltaPosition = position - currentPosition;
+		}
+
+		if (instant === true) {
+			// apply the scroll, use requestAnimationFrame for smoother results
+			window.requestAnimationFrame(function () {
+				$itemsWrap[scrollMethod](-position);
+
 				if (noDeferred !== true) {
 					deferred.resolve();
 				}
 			});
 		} else {
-			this._animateToTopPosition(position, instant).done(function(){
+			// calculate animation duration from speed and delta position if not set manually
+			if (typeof animationDuration !== 'number') {
+				animationDuration = Math.round(Math.abs(deltaPosition) / animationSpeed);
+			}
+
+			animationProps[scrollMethod] = -position;
+
+			// animate with jquery
+			$itemsWrap.animate(animationProps, animationDuration, function() {
 				if (noDeferred !== true) {
 					deferred.resolve();
 				}
-			});
+			}.bind(this));
 		}
 
 		if (noDeferred !== true) {
+			this._activeDeferred = deferred;
+
+			// clear the active deferred once this completes
+			deferred.done(function() {
+				this._activeDeferred = null;
+			}.bind(this));
+
 			return deferred.promise();
 		}
-	};
-
-	/**
-	 * Animates the carousel to given absolute position from left.
-	 *
-	 * @method _animateToLeftPosition
-	 * @param {number} position Requested position
-	 * @param {boolean} instant Should the navigation be instantaneous and not use animation
-	 * @return {Deferred.Promise}
-	 * @private
-	 */
-	ScrollAnimator.prototype._animateToLeftPosition = function(position, instant) {
-		var $scrollerWrap = $(this._carousel.getItemsWrap()),
-			deferred = new Deferred();
-
-		if (instant === true) {
-			// apply the scroll, use requestAnimationFrame for smoother results
-			window.requestAnimationFrame(function () {
-				//debugger
-				$scrollerWrap.scrollLeft(position);
-				deferred.resolve();
-			});
-		} else {
-			//animate with jquery
-			$scrollerWrap.animate({
-				scrollLeft: position
-			}, this._animationSpeed, function() {
-				deferred.resolve();
-			}.bind(this));
-		}
-
-		return deferred.promise();
-	};
-
-	/**
-	 * Animates the carousel to given absolute position from top.
-	 *
-	 * @method _animateToTopPosition
-	 * @param {number} position Requested position
-	 * @param {boolean} instant Should the navigation be instantaneous and not use animation
-	 * @return {Deferred.Promise}
-	 * @private
-	 */
-	ScrollAnimator.prototype._animateToTopPosition = function(position, instant) {
-		var $scrollerWrap = $(this._carousel.getItemsWrap()),
-			deferred = new Deferred();
-
-		if (instant === true) {
-			// apply the scroll, use requestAnimationFrame for smoother results
-			window.requestAnimationFrame(function () {
-				$scrollerWrap.scrollTop(position);
-				deferred.resolve();
-			});
-		} else {
-			//animate with jquery
-			$scrollerWrap.animate({
-				scrollTop: position
-			}, this._animationSpeed, function() {
-				deferred.resolve();
-			}.bind(this));
-		}
-
-		return deferred.promise();
 	};
 
 	return ScrollAnimator;

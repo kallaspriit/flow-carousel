@@ -379,14 +379,28 @@ define([
 		};
 
 		/**
-		 * Default animator configuration.
+		 * Transform animator configuration.
 		 *
 		 * @property transformAnimator
-		 * @param {number} transformAnimator.defaultAnimationSpeed=2 Default animation speed in pixels per millisecond
+		 * @param {number} transformAnimator.defaultAnimationSpeed=4 Default animation speed in pixels per millisecond
 		 * @param {number} transformAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
 		 * @param {number} transformAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
 		 */
 		this.transformAnimator = {
+			defaultAnimationSpeed: 4,
+			minAnimationSpeed: 1,
+			maxAnimationSpeed: 10
+		};
+
+		/**
+		 * Scroll animator configuration.
+		 *
+		 * @property scrollAnimator
+		 * @param {number} scrollAnimator.defaultAnimationSpeed=4 Default animation speed in pixels per millisecond
+		 * @param {number} scrollAnimator.minAnimationSpeed=1 Minimum animation speed in pixels per millisecond
+		 * @param {number} scrollAnimator.maxAnimationSpeed=10 Maximum animation speed in pixels per millisecond
+		 */
+		this.scrollAnimator = {
 			defaultAnimationSpeed: 4,
 			minAnimationSpeed: 1,
 			maxAnimationSpeed: 10

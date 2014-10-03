@@ -414,7 +414,7 @@
             "extension_for": [],
             "file": "src\\ScrollAnimator.js",
             "line": 43,
-            "description": "Data source interface.",
+            "description": "Native scroll based animator implementation.",
             "extends": "AbstractAnimator",
             "is_constructor": 1,
             "params": [
@@ -1004,13 +1004,13 @@
         {
             "file": "src\\Config.js",
             "line": 259,
-            "description": "Default animator configuration.",
+            "description": "Transform animator configuration.",
             "itemtype": "property",
             "name": "transformAnimator",
             "class": "Config",
             "subprops": [
                 {
-                    "name": "defaultAnimationSpeed=2",
+                    "name": "defaultAnimationSpeed=4",
                     "description": "Default animation speed in pixels per millisecond",
                     "type": "Number"
                 },
@@ -1029,6 +1029,31 @@
         {
             "file": "src\\Config.js",
             "line": 273,
+            "description": "Scroll animator configuration.",
+            "itemtype": "property",
+            "name": "scrollAnimator",
+            "class": "Config",
+            "subprops": [
+                {
+                    "name": "defaultAnimationSpeed=4",
+                    "description": "Default animation speed in pixels per millisecond",
+                    "type": "Number"
+                },
+                {
+                    "name": "minAnimationSpeed=1",
+                    "description": "Minimum animation speed in pixels per millisecond",
+                    "type": "Number"
+                },
+                {
+                    "name": "maxAnimationSpeed=10",
+                    "description": "Maximum animation speed in pixels per millisecond",
+                    "type": "Number"
+                }
+            ]
+        },
+        {
+            "file": "src\\Config.js",
+            "line": 287,
             "description": "Configuration for the animation shown when user tries to navigate past the first or last item.",
             "itemtype": "property",
             "name": "limitAnimation",
@@ -1054,7 +1079,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 288,
+            "line": 302,
             "description": "The css classes prefix to use.\n\nThe same prefix is also used when assigning custom carousel-specific data to the element.",
             "itemtype": "property",
             "name": "cssPrefix",
@@ -1064,7 +1089,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 299,
+            "line": 313,
             "description": "CSS class names to use.\n\nThe class name is combined with the {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}} property\nso if the prefix is \"flow-carousel-\" and the wrap class is \"wrap\" then the main wrap will get the\n\"flow-carousel-wrap\" class.",
             "itemtype": "property",
             "name": "cssClasses",
@@ -1145,7 +1170,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 342,
+            "line": 356,
             "description": "The carousel instance is registered as the main wrap data with the dataTarget name.",
             "itemtype": "property",
             "name": "dataTarget",
@@ -1155,7 +1180,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 351,
+            "line": 365,
             "description": "Optional custom data source to use.\n\nAs a special case, a simple array can be provided as data source which is converted to use\n{{#crossLink \"ArrayDataSource\"}}{{/crossLink}} implementation.\n\nIf none is provided then the {{#crossLink \"HtmlDataSource\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
@@ -1165,7 +1190,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 365,
+            "line": 379,
             "description": "Optional custom renderer to use.\n\nIf none is provided then the {{#crossLink \"HtmlRenderer\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "renderer",
@@ -1175,7 +1200,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 376,
+            "line": 390,
             "description": "Optional custom animator to use.\n\nShould be an instance of {{#crossLink \"AbstractAnimator\"}}{{/crossLink}}.\n\nIf none is provided then the {{#crossLink \"TransformAnimator\"}}{{/crossLink}} is used.",
             "itemtype": "property",
             "name": "animator",
@@ -1185,7 +1210,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 389,
+            "line": 403,
             "description": "Returns the range of items that should be rendered given current item index and items per page.\n\nBy default returns one page before the current page and one after but one may choose to override it.\n\nOne can use the firstRender parameter to for example render more items during the first render so no new\nrendering is triggered if the user only moves for a few pages.",
             "itemtype": "method",
             "name": "getRenderRange",
@@ -1221,7 +1246,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 421,
+            "line": 435,
             "description": "Enumeration of possible carousel orientations.",
             "itemtype": "property",
             "name": "Orientation",
@@ -1243,7 +1268,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 435,
+            "line": 449,
             "description": "There are two different strategies for setting the size of the wrap and the items:\n> MATCH_WRAP - the size of the items is set to match the wrap size\n> MATCH_LARGEST_ITEM - the size of the wrap is set to match the largest item",
             "itemtype": "property",
             "name": "SizeMode",
@@ -1265,7 +1290,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 451,
+            "line": 465,
             "description": "Extends the base default configuration properties with user-defined values.\n\nPerforms a deep-extend.",
             "itemtype": "method",
             "name": "extend",
@@ -1280,7 +1305,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 463,
+            "line": 477,
             "description": "Returns the number of items to render side-by-side based on the wrap size and\n{{#crossLink \"Config/responsiveBreakpoints:property\"}}{{/crossLink}} setting.",
             "itemtype": "method",
             "name": "getItemsPerPage",
@@ -1295,7 +1320,7 @@
         },
         {
             "file": "src\\Config.js",
-            "line": 490,
+            "line": 504,
             "description": "Returns class name to use by type.\n\nThe class name is constructed by combining the value of {{#crossLink \"Config/cssPrefix:property\"}}{{/crossLink}}\nand the mapping in {{#crossLink \"Config/cssClasses:property\"}}{{/crossLink}}.\n\nThrows error if invalid class name type is requested.",
             "itemtype": "method",
             "name": "getClassName",
@@ -4742,58 +4767,6 @@
                 "description": "",
                 "type": "Deferred.Promise"
             },
-            "class": "ScrollAnimator"
-        },
-        {
-            "file": "src\\ScrollAnimator.js",
-            "line": 166,
-            "description": "Animates the carousel to given absolute position from left.",
-            "itemtype": "method",
-            "name": "_animateToLeftPosition",
-            "params": [
-                {
-                    "name": "position",
-                    "description": "Requested position",
-                    "type": "Number"
-                },
-                {
-                    "name": "instant",
-                    "description": "Should the navigation be instantaneous and not use animation",
-                    "type": "Boolean"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "Deferred.Promise"
-            },
-            "access": "private",
-            "tagname": "",
-            "class": "ScrollAnimator"
-        },
-        {
-            "file": "src\\ScrollAnimator.js",
-            "line": 198,
-            "description": "Animates the carousel to given absolute position from top.",
-            "itemtype": "method",
-            "name": "_animateToTopPosition",
-            "params": [
-                {
-                    "name": "position",
-                    "description": "Requested position",
-                    "type": "Number"
-                },
-                {
-                    "name": "instant",
-                    "description": "Should the navigation be instantaneous and not use animation",
-                    "type": "Boolean"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "Deferred.Promise"
-            },
-            "access": "private",
-            "tagname": "",
             "class": "ScrollAnimator"
         },
         {

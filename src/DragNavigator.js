@@ -845,7 +845,7 @@ define([
 	 * @private
 	 */
 	DragNavigator.prototype._extractDragPosition = function(event) {
-		var isTouchEvent = event.type === 'touchstart';
+		var isTouchEvent = event.type === 'touchstart' || event.type === 'touchmove';
 
 		return {
 			x: isTouchEvent ? event.originalEvent.changedTouches[0].pageX : event.pageX,

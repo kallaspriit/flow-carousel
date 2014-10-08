@@ -4227,7 +4227,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2660,
+            "line": 2665,
             "description": "Visually notifies the user that carousel limit has been reached.",
             "itemtype": "method",
             "name": "_showLimit",
@@ -4244,7 +4244,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2717,
+            "line": 2722,
             "description": "Calculates and returns a single item size based on wrap size and items per page.",
             "itemtype": "method",
             "name": "_calculateItemSize",
@@ -4266,7 +4266,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2729,
+            "line": 2734,
             "description": "Returns the size of an element.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getElementSize",
@@ -4299,7 +4299,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2759,
+            "line": 2764,
             "description": "Returns biggest element size of given elements given orientation and size mode.\n\nHorizontal orientation returns element width and vertical height.\n\nMode sets whether to return the inner or outer width/height (defaults to inner).",
             "itemtype": "method",
             "name": "_getLargestElementSize",
@@ -4332,7 +4332,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2800,
+            "line": 2805,
             "description": "Returns the main wrap size in the main orientation.\n\nUses cached value if available.",
             "itemtype": "method",
             "name": "_getMainWrapSize",
@@ -4353,7 +4353,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2823,
+            "line": 2828,
             "description": "Returns the main wrap size in the opposite orientation.\n\nUses cached value if available.",
             "itemtype": "method",
             "name": "_getMainWrapOppositeSize",
@@ -4374,7 +4374,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2845,
+            "line": 2850,
             "description": "Returns the opposite orientation name.\n\nFor Config.Orientation.HORIZONTAL returns Config.Orientation.VERTICAL and vice versa.",
             "itemtype": "method",
             "name": "_getOppositeOrientation",
@@ -4395,7 +4395,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2861,
+            "line": 2866,
             "description": "Returns whether items out of the render range should be destroyed.",
             "itemtype": "method",
             "name": "_shouldDestroyInvalidItems",
@@ -4409,7 +4409,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2881,
+            "line": 2886,
             "description": "This is called by drag-based navigators on drag begin event.",
             "itemtype": "method",
             "name": "_onDragBegin",
@@ -4436,7 +4436,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2896,
+            "line": 2901,
             "description": "This is called by drag-based navigators on drag end event.",
             "itemtype": "method",
             "name": "_onDragEnd",
@@ -4483,7 +4483,7 @@
         },
         {
             "file": "src\\FlowCarousel.js",
-            "line": 2932,
+            "line": 2937,
             "description": "Performs some action delayed by given amount.\n\nIf the method is called several times with the same name, the action is executed only once after the time\nhas passed from the last call.",
             "itemtype": "method",
             "name": "performDelayed",

@@ -1753,7 +1753,7 @@ define('DragNavigator',[
 	 * @private
 	 */
 	DragNavigator.prototype._extractDragPosition = function(event) {
-		var isTouchEvent = event.type === 'touchstart';
+		var isTouchEvent = event.type === 'touchstart' || event.type === 'touchmove';
 
 		return {
 			x: isTouchEvent ? event.originalEvent.changedTouches[0].pageX : event.pageX,
@@ -7096,6 +7096,11 @@ define('FlowCarousel',[
 		if (lastSize === null || (currentSize !== lastSize && currentSize !== 0)) {
 			// perform the re-layout routine only when the wrap size has not changed for some time
 			this._performDelayed('re-layout', function() {
+				// the carousel may have gotten destroyed in the meanwhile
+				if (!this.isInitiated() || this.isDestroyed()) {
+					return;
+				}
+
 				this._reLayout();
 			}.bind(this), this._config.responsiveLayoutDelay);
 

@@ -565,9 +565,9 @@ define([
 
 		// create smooth limit at the edges applying the drag motion partially
 		if (newPosition > minLimit) {
-			applyPosition = (this._startCarouselPosition + deltaDragPosition) * edgeMultiplier;
+			applyPosition = minLimit + (newPosition - minLimit) * edgeMultiplier;
 		} else if (newPosition < maxLimit) {
-			applyPosition = this._startCarouselPosition + (deltaDragPosition * edgeMultiplier);
+			applyPosition = maxLimit + (newPosition - maxLimit) * edgeMultiplier;
 		}
 
 		// use the animator to move to calculated position instantly

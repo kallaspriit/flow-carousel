@@ -1339,5 +1339,20 @@ define([
 
 			expect(callDestroySeveralTimes).toThrow();
 		});
+
+		it('navigating from centered item to the first item of the same page updates currentItemIndex', function(done) {
+			carousel.init('.carousel', {
+				itemsPerPage: 2,
+				startItemIndex: 1,
+				centerStartItemIndex: true,
+				useResponsiveLayout: false
+			}).then (function() {
+				expect(carousel.getCurrentItemIndex()).toBe(1);
+
+				return carousel.navigateToPage(0).done(function() {
+					expect(carousel.getCurrentItemIndex()).toBe(0);
+				});
+			}).done(done);
+		});
 	});
 });

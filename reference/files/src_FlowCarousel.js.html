@@ -1541,13 +1541,12 @@ define([
 	FlowCarousel.prototype.navigateToPage = function(pageIndex, instant, force, animationSpeed) {
 		instant = typeof instant === &#x27;boolean&#x27; ? instant : false;
 
-		var currentPageIndex = this.getCurrentPageIndex(),
-			itemIndex = pageIndex * this.getItemsPerPage(),
+		var itemIndex = pageIndex * this.getItemsPerPage(),
 			pageCount = this.getPageCount(),
 			deferred = new Deferred();
 
-		// already at target page index, visualize limit
-		if (pageIndex === currentPageIndex &amp;&amp; force !== true) {
+		// already at target index, visualize limit
+		if (itemIndex === this.getCurrentItemIndex() &amp;&amp; force !== true) {
 			if (
 				(pageIndex === 0 || pageIndex === pageCount - 1)
 				&amp;&amp; this.getPageCount() &gt; 1
